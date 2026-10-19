@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Líderes Ingeniosos · Acceso</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="stylesheet" href="styles/btn.css">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body { background: linear-gradient(135deg,#ede9fe 0%,#fce7f3 40%,#dbeafe 100%); min-height:100vh; }
+    .glass { background:rgba(255,255,255,.75); backdrop-filter:blur(24px); border:1px solid rgba(255,255,255,.9); }
+    .blob { position:absolute; border-radius:50%; filter:blur(60px); opacity:.45; }
+    input:focus { outline:none; border-color:#8b5cf6; box-shadow:0 0 0 3px rgba(139,92,246,.15); }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 relative overflow-hidden">
+  <div class="blob w-72 h-72 bg-purple-300 top-[-60px] left-[-60px]"></div>
+  <div class="blob w-64 h-64 bg-pink-300 bottom-[-40px] right-[-40px]"></div>
+  <div class="blob w-48 h-48 bg-blue-300 top-1/2 right-1/4"></div>
+
+  <div class="glass rounded-3xl p-8 w-full max-w-sm relative z-10 shadow-2xl">
+    <div class="text-center mb-7">
+      <img src="img/logo.svg" alt="Logo" class="h-20 mx-auto mb-4">
+      <h1 class="text-2xl font-black text-gray-800">Bienvenido de vuelta</h1>
+      <p class="text-sm text-gray-400 mt-1">Ingresa para continuar tu aventura</p>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide flex items-center gap-1.5">
+          <i class="ti ti-user"></i> Usuario
+        </label>
+        <input type="text" id="username" placeholder="Tu nombre"
+          class="w-full px-4 py-3 rounded-2xl bg-white/60 border border-gray-200 text-sm transition-all">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wide flex items-center gap-1.5">
+          <i class="ti ti-lock"></i> Contraseña
+        </label>
+        <input type="password" id="password" placeholder="Código de acceso"
+          class="w-full px-4 py-3 rounded-2xl bg-white/60 border border-gray-200 text-sm transition-all">
+      </div>
+
+      <div id="loginError" class="hidden bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-2xl text-center flex items-center gap-2 justify-center">
+        <i class="ti ti-alert-circle"></i> <span id="loginErrorMsg"></span>
+      </div>
+
+      <button id="loginBtn"
+        class="btn-3d btn-purple btn-full btn-lg flex items-center justify-center gap-2">
+        <i class="ti ti-login"></i> Ingresar
+      </button>
+    </div>
+
+    <p class="text-center text-xs text-gray-400 mt-5 flex items-center justify-center gap-1.5">
+      <i class="ti ti-info-circle"></i> Código de prueba: <span class="font-bold text-purple-600">123</span>
+    </p>
+  </div>
+
+  <script>
+    if (sessionStorage.getItem('li_user')) window.location.href = 'app.html';
+
+    function handleLogin() {
+      const user = document.getElementById('username').value.trim();
+      const pwd = document.getElementById('password').value.trim();
+      const errBox = document.getElementById('loginError');
+      const errMsg = document.getElementById('loginErrorMsg');
+      errBox.classList.add('hidden');
+      if (!user || !pwd) { errMsg.innerText = 'Completa todos los campos'; errBox.classList.remove('hidden'); return; }
+      if (pwd === '123') {
+        sessionStorage.setItem('li_user', user);
+        if (!sessionStorage.getItem('li_class')) sessionStorage.setItem('li_class', 'A');
+        window.location.href = 'app.html';
+      } else {
+        errMsg.innerText = 'Código incorrecto';
+        errBox.classList.remove('hidden');
+        document.getElementById('password').value = '';
+      }
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', handleLogin);
+    ['username','password'].forEach(id => {
+      document.getElementById(id).addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MultiCruz Math Júnior</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-kids {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Animaciones para ganar y efectos visuales */
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+            50% { transform: scale(1.03); box-shadow: 0 0 25px rgba(16, 185, 129, 0.6); }
+        }
+        .glow-success {
+            animation: pulse-glow 1.5s infinite ease-in-out;
+            border-color: #10b981 !important;
+            background-color: #064e3b !important;
+        }
+        /* Esconder las barras de scroll */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500">
+
+    <header class="w-full bg-slate-900/60 border-b border-slate-800 backdrop-blur px-4 py-3 sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-indigo-500 to-pink-500 p-2 rounded-xl text-white shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-calculator text-lg md:text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-kids text-lg md:text-xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">MultiCruz Math</h1>
+                    <p class="text-[10px] text-slate-400 font-semibold tracking-wide uppercase">Júnior (Tablas y Divisiones)</p>
+                </div>
+            </div>
+            <!-- Botón de Tabla de Ayuda siempre accesible -->
+            <button onclick="toggleHelpModal(true)" class="bg-slate-800 hover:bg-slate-700 text-indigo-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-slate-700">
+                <i class="fa-solid fa-table"></i>
+                <span>Ver Tablas</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center py-6 px-4">
+        
+        <!-- PANTALLA 1: MENU DE SELECCION -->
+        <section id="menu-screen" class="w-full max-w-md bg-slate-900/80 border border-slate-800 rounded-3xl p-6 md:p-8 backdrop-blur shadow-2xl flex flex-col gap-6">
+            <div class="text-center">
+                <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest font-kids">¡Divertido y Educativo!</span>
+                <h2 class="font-kids text-3xl font-bold mt-3 text-white">¡Aprende Jugando!</h2>
+                <p class="text-slate-400 text-sm mt-1">Selecciona una actividad para entrenar tu mente y dominar las matemáticas de forma divertida.</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Modo Aventura -->
+                <button onclick="startGame('adventure')" class="w-full group relative overflow-hidden bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-2xl p-4 transition-all duration-300 shadow-lg hover:shadow-indigo-500/20 active:scale-95 border-b-4 border-indigo-800 flex items-center justify-between text-left">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-indigo-950/40 p-3 rounded-xl text-indigo-200">
+                            <i class="fa-solid fa-map-location-dot text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-kids text-lg font-bold">MultiCruz Aventura</h3>
+                            <p class="text-xs text-indigo-100/80">Tablas cruzadas contra reloj (2x2).</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-indigo-200 group-hover:translate-x-1 transition"></i>
+                </button>
+
+                <!-- Modo Práctica -->
+                <button onclick="startGame('practice')" class="w-full group relative overflow-hidden bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-2xl p-4 transition-all duration-300 shadow-lg hover:shadow-emerald-500/20 active:scale-95 border-b-4 border-emerald-800 flex items-center justify-between text-left">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-emerald-950/40 p-3 rounded-xl text-emerald-200">
+                            <i class="fa-solid fa-graduation-cap text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-kids text-lg font-bold">MultiCruz Práctica</h3>
+                            <p class="text-xs text-emerald-100/80">Sin tiempo ni presión. Ideal para repasar.</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-emerald-200 group-hover:translate-x-1 transition"></i>
+                </button>
+
+                <!-- Sopa de Divisiones -->
+                <button onclick="startDivisionSoup()" class="w-full group relative overflow-hidden bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white rounded-2xl p-4 transition-all duration-300 shadow-lg hover:shadow-pink-500/20 active:scale-95 border-b-4 border-purple-800 flex items-center justify-between text-left">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-pink-950/40 p-3 rounded-xl text-pink-200">
+                            <i class="fa-solid fa-hashtag text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-kids text-lg font-bold">Sopa de Números (División)</h3>
+                            <p class="text-xs text-pink-100/80">¡Encuentra múltiples divisiones cruzadas!</p>
+                        </div>
+                    </div>
+                    <span class="bg-pink-500 text-white font-bold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">¡Reto Pro!</span>
+                </button>
+            </div>
+
+            <!-- Información pedagógica -->
+            <div class="bg-slate-950/50 rounded-2xl p-4 border border-slate-800 flex gap-3 items-center">
+                <i class="fa-solid fa-face-smile-beam text-indigo-400 text-xl"></i>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Nuestras actividades estimulan el cálculo mental inverso y ayudan a consolidar la relación directa entre la multiplicación y la división.
+                </p>
+            </div>
+        </section>
+
+        <!-- PANTALLA 2: JUEGO MULTICRUZ (MULTIPLICACIÓN) -->
+        <section id="game-screen" class="hidden w-full max-w-lg bg-slate-900/80 border border-slate-800 rounded-3xl p-5 backdrop-blur shadow-2xl flex flex-col gap-4">
+            
+            <!-- Barra superior del juego -->
+            <div class="flex items-center justify-between bg-slate-950/60 p-3 rounded-2xl border border-slate-800/80">
+                <div class="flex flex-col gap-1">
+                    <button onclick="showMenu()" class="text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 py-1 px-3 rounded-xl transition text-xs font-bold flex items-center gap-1.5 border border-slate-700 active:scale-95">
+                        <i class="fa-solid fa-arrow-left text-indigo-400"></i> Volver al Menú
+                    </button>
+                    <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider px-1">
+                        Modo: <span id="game-mode-indicator" class="text-indigo-400 font-bold">Cargando</span>
+                    </span>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div id="score-container" class="text-right">
+                        <span class="text-[9px] text-slate-400 uppercase font-bold tracking-wider">Estrellas</span>
+                        <div class="text-amber-400 font-bold flex items-center justify-end gap-1 font-kids">
+                            <i class="fa-solid fa-star text-xs"></i>
+                            <span id="score-val">0</span>
+                        </div>
+                    </div>
+                    <div id="level-container" class="bg-indigo-950/60 border border-indigo-800/60 px-2.5 py-1 rounded-xl text-center min-w-[50px]">
+                        <span class="block text-[8px] text-indigo-300 uppercase font-bold">Nivel</span>
+                        <span id="level-val" class="text-sm font-bold text-white font-kids">1</span>
+                    </div>
+                    <div id="timer-container" class="bg-rose-950/60 border border-rose-800/60 px-2.5 py-1 rounded-xl text-center min-w-[60px]">
+                        <span class="block text-[8px] text-rose-300 uppercase font-bold">Tiempo</span>
+                        <span id="timer-val" class="text-sm font-bold text-rose-400 font-kids">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instrucciones de juego en directo -->
+            <div class="text-center text-xs text-slate-300 font-kids leading-relaxed">
+                ¡Encuentra los números que completen las ecuaciones verticales y horizontales!
+            </div>
+
+            <!-- El Tablero de 4 casillas (2x2) -->
+            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow-inner flex flex-col justify-center items-center gap-2 relative">
+                
+                <div class="grid grid-cols-5 gap-y-2 items-center justify-items-center w-full max-w-[340px]">
+                    <!-- Fila 1 -->
+                    <button id="cell-0" onclick="selectCell(0)" class="w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-slate-700 bg-slate-900 font-kids text-xl font-bold flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md">
+                        -
+                    </button>
+                    <div class="text-slate-500 font-kids text-lg font-bold">×</div>
+                    <button id="cell-1" onclick="selectCell(1)" class="w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-slate-700 bg-slate-900 font-kids text-xl font-bold flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md">
+                        -
+                    </button>
+                    <div class="text-slate-500 font-kids text-lg font-bold">=</div>
+                    <div id="target-r1" class="w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-300 font-kids text-lg font-bold flex items-center justify-center shadow-inner">
+                        -
+                    </div>
+
+                    <!-- Fila de Operadores Verticales (×, vacío, ×, vacío, vacío) -->
+                    <div class="text-slate-500 font-kids text-lg font-bold">×</div>
+                    <div></div>
+                    <div class="text-slate-500 font-kids text-lg font-bold">×</div>
+                    <div></div>
+                    <div></div>
+
+                    <!-- Fila 2 -->
+                    <button id="cell-2" onclick="selectCell(2)" class="w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-slate-700 bg-slate-900 font-kids text-xl font-bold flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md">
+                        -
+                    </button>
+                    <div class="text-slate-500 font-kids text-lg font-bold">×</div>
+                    <button id="cell-3" onclick="selectCell(3)" class="w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-slate-700 bg-slate-900 font-kids text-xl font-bold flex items-center justify-center transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md">
+                        -
+                    </button>
+                    <div class="text-slate-500 font-kids text-lg font-bold">=</div>
+                    <div id="target-r2" class="w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-300 font-kids text-lg font-bold flex items-center justify-center shadow-inner">
+                        -
+                    </div>
+
+                    <!-- Fila de Igualdades Verticales (=, vacío, =, vacío, vacío) -->
+                    <div class="text-slate-500 font-kids text-lg font-bold">=</div>
+                    <div></div>
+                    <div class="text-slate-500 font-kids text-lg font-bold">=</div>
+                    <div></div>
+                    <div></div>
+
+                    <!-- Fila 3 (Resultados de Columnas) -->
+                    <div id="target-c1" class="w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-300 font-kids text-lg font-bold flex items-center justify-center shadow-inner">
+                        -
+                    </div>
+                    <div></div>
+                    <div id="target-c2" class="w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-300 font-kids text-lg font-bold flex items-center justify-center shadow-inner">
+                        -
+                    </div>
+                    <div></div>
+                    <div class="text-slate-600 font-kids text-xl">🎉</div>
+                </div>
+            </div>
+
+            <!-- Teclado para responder -->
+            <div class="bg-slate-950/60 p-3 rounded-2xl border border-slate-800/80">
+                <div class="grid grid-cols-4 gap-2 max-w-sm mx-auto">
+                    <button onclick="writeNumber(1)" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-kids text-xl py-3 rounded-xl shadow transition duration-150 active:scale-95">1</button>
+                    <button onclick="writeNumber(2)" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-kids text-xl py-3 rounded-xl shadow transition duration-150 active:scale-95">2</button>
+                    <button onclick="writeNumber(3)" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-kids text-xl py-3 rounded-xl shadow transition duration-150 active:scale-95">3</button>
+                    <button onclick="writeNumber(4)" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-kids text-xl py-3 rounded-xl shadow transition duration-150 active:scale-95">4</button>
+                    
+                    <button onclick="writeNumber(5)" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-kids text-xl py-3 rounded-xl shadow transition duration-150 active:scale-95">5</button>
+                    <button onclick="writeNumber(6)" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-kids text-xl py-3 rounded-xl shadow transition duration-150 active:scale-95">6</button>
+                    <button onclick="writeNumber(7)" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-kids text-xl py-3 rounded-xl shadow transition duration-150 active:scale-95">7</button>
+                    <button onclick="writeNumber(8)" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-kids text-xl py-3 rounded-xl shadow transition duration-150 active:scale-95">8</button>
+                    
+                    <button onclick="writeNumber(9)" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-kids text-xl py-3 rounded-xl shadow transition duration-150 active:scale-95">9</button>
+                    <button onclick="writeNumber(10)" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-kids text-xl py-3 rounded-xl shadow transition duration-150 active:scale-95">10</button>
+                    <button onclick="writeNumber(11)" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-kids text-xl py-3 rounded-xl shadow transition duration-150 active:scale-95">11</button>
+                    <button onclick="writeNumber(12)" class="bg-slate-800 hover:bg-slate-700 active:bg-indigo-600 text-white font-kids text-xl py-3 rounded-xl shadow transition duration-150 active:scale-95">12</button>
+                    
+                    <button onclick="toggleHelpModal(true)" class="col-span-2 bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800 text-indigo-300 font-kids text-sm py-3 rounded-xl shadow transition active:scale-95 flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-graduation-cap"></i> Tabla de Ayuda
+                    </button>
+                    <button onclick="deleteNumber()" class="col-span-2 bg-rose-950 hover:bg-rose-900 border border-rose-900 text-rose-300 font-kids text-lg py-3 rounded-xl shadow transition active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-backspace"></i> Borrar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANTALLA 3: SOPA DE NÚMEROS (DIVISIONES) -->
+        <section id="soup-screen" class="hidden w-full max-w-3xl bg-slate-900/95 border border-slate-800 rounded-3xl p-5 backdrop-blur shadow-2xl flex flex-col gap-4">
+            
+            <!-- Cabecera de la sopa -->
+            <div class="flex items-center justify-between bg-slate-950/60 p-3 rounded-2xl border border-slate-800/80">
+                <div>
+                    <button onclick="showMenu()" class="text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 py-1 px-3 rounded-xl transition text-xs font-bold flex items-center gap-1.5 border border-slate-700 active:scale-95">
+                        <i class="fa-solid fa-arrow-left text-indigo-400"></i> Volver al Menú
+                    </button>
+                    <span class="text-[9px] text-pink-400 font-bold uppercase tracking-wider block mt-1 px-1">Reto: Sopa de Números (División)</span>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="bg-purple-950/60 border border-purple-800/60 px-3 py-1 rounded-xl text-center">
+                        <span class="block text-[8px] text-purple-300 uppercase font-bold">Encontradas</span>
+                        <span id="soup-progress" class="text-sm font-bold text-white font-kids">0 / 0</span>
+                    </div>
+                    <button onclick="generateSoupPuzzle()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold p-2.5 rounded-xl transition active:scale-95" title="Cambiar Sopa">
+                        <i class="fa-solid fa-rotate"></i> Nuevas
+                    </button>
+                </div>
+            </div>
+
+            <!-- Instrucciones dinámicas del juego -->
+            <div class="text-center text-xs text-slate-300 font-kids leading-relaxed bg-pink-950/20 py-2.5 px-3 rounded-xl border border-pink-500/10">
+                💡 <strong>¿Cómo jugar?</strong> Selecciona 3 números vecinos en línea recta (horizontal o vertical) que formen una división: <br class="hidden md:block">
+                <span class="text-pink-400 font-bold">Dividendo ➔ Divisor ➔ Resultado</span> (Ejemplo: seleccionas <strong class="underline">15</strong>, luego <strong class="underline">3</strong> y por último <strong class="underline">5</strong> porque <strong class="text-white">15 ÷ 3 = 5</strong>).
+            </div>
+
+            <!-- Contenedor Principal de la Sopa (Grid y Panel de Objetivos) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- Panel de Descubrimientos de Operaciones -->
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col gap-3 h-[250px] md:h-[360px] overflow-y-auto">
+                    <h4 class="font-kids text-sm font-bold text-pink-400 border-b border-slate-800 pb-2 flex items-center gap-2 sticky top-0 bg-slate-950 z-10">
+                        <i class="fa-solid fa-trophy"></i> Divisiones Halladas
+                    </h4>
+                    <div id="soup-targets-container" class="flex flex-col gap-2">
+                        <!-- Generado dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- El Tablero de la Sopa de Números 6x6 -->
+                <div class="md:col-span-2 bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col justify-center items-center gap-4">
+                    
+                    <!-- Sopa de celdas (puramente números) -->
+                    <div id="soup-grid" class="grid grid-cols-6 gap-2 w-full max-w-[320px] aspect-square">
+                        <!-- Generado dinámicamente con JS -->
+                    </div>
+
+                    <!-- Barra de estado de la selección actual -->
+                    <div class="w-full flex items-center justify-between bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 text-xs">
+                        <span class="text-slate-400 font-semibold">Tu selección:</span>
+                        <span id="soup-current-selection" class="font-kids text-sm text-pink-400 font-bold tracking-wider">-</span>
+                        <button onclick="clearSoupSelection()" class="text-rose-400 hover:text-rose-300 bg-rose-950/40 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-rose-500/10 active:scale-95">
+                            Limpiar
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL DE AYUDA (TABLA PITAGÓRICA SECTORIZADA) -->
+    <div id="help-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-5 shadow-2xl flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2 text-indigo-400">
+                    <i class="fa-solid fa-circle-question text-lg"></i>
+                    <h3 class="font-kids text-lg font-bold text-white">Tabla Pitagórica de Consulta</h3>
+                </div>
+                <button onclick="toggleHelpModal(false)" class="text-slate-400 hover:text-white bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center transition">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-400">Toca las intersecciones para ayudarte a recordar y deducir los resultados.</p>
+            
+            <!-- Contenedor scrollable de la tabla pitagórica libre de document.write -->
+            <div class="overflow-auto border border-slate-800 rounded-2xl bg-slate-950 max-h-[300px]">
+                <table class="w-full text-center text-[10px] md:text-xs font-semibold select-none border-collapse">
+                    <thead id="pitagoric-head">
+                        <!-- Generado dinámicamente de forma segura por JS -->
+                    </thead>
+                    <tbody id="pitagoric-body">
+                        <!-- Generado dinámicamente de forma segura por JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <button onclick="toggleHelpModal(false)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-kids font-bold py-3 rounded-2xl transition active:scale-95">
+                ¡Entendido, volver al juego!
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DE VICTORIA -->
+    <div id="win-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl p-6 text-center shadow-2xl flex flex-col gap-5">
+            <div>
+                <span class="text-4xl">🎉</span>
+                <h3 class="font-kids text-2xl font-bold mt-2 text-white">¡Nivel Superado!</h3>
+                <p class="text-slate-400 text-xs mt-1">Has resuelto la actividad correctamente.</p>
+            </div>
+
+            <!-- Resumen de puntos ganados -->
+            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex justify-around animate-bounce">
+                <div>
+                    <span class="block text-[10px] uppercase text-slate-500 font-semibold">Actividad</span>
+                    <span id="win-mode" class="text-xs font-bold text-indigo-400">---</span>
+                </div>
+                <div class="border-r border-slate-800"></div>
+                <div>
+                    <span class="block text-[10px] uppercase text-slate-500 font-semibold">Puntaje</span>
+                    <span class="text-sm font-bold text-amber-400 flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-star"></i>
+                        <span id="win-score">+10</span>
+                    </span>
+                </div>
+            </div>
+
+            <button id="next-level-btn" onclick="nextLevel()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-kids text-lg py-3 rounded-2xl font-bold transition duration-200 active:scale-95 shadow-lg shadow-emerald-500/10">
+                Siguiente Desafío <i class="fa-solid fa-circle-play ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIONES TOAST -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-full text-xs text-slate-200 shadow-xl z-50 flex items-center gap-2 transform translate-y-20 opacity-0 transition duration-300 pointer-events-none">
+        <i id="toast-icon" class="fa-solid fa-info text-indigo-400"></i>
+        <span id="toast-msg">Mensaje informativo</span>
+    </div>
+
+    <footer class="w-full bg-slate-900/40 border-t border-slate-800 py-3 text-center text-slate-500 text-[10px] font-medium">
+        MultiCruz Math Júnior &copy; 2026. ¡Cálculo mental divertido y agilidad matemática!
+    </footer>
+
+    <!-- LOGICA DEL JUEGO -->
+    <script>
+        let currentMode = 'adventure'; // 'adventure', 'practice', 'soup'
+        let score = 0;
+        let level = 1;
+        let timeLeft = 60;
+        let timerInterval = null;
+        
+        // Elementos del tablero MultiCruz
+        let selectedCellIndex = 0;
+        let solution = [0, 0, 0, 0];
+        let targets = { r1: 0, r2: 0, c1: 0, c2: 0 };
+        let playerGrid = ["", "", "", ""];
+        let hints = [false, false, false, false];
+
+        // Estado del Reto Adicional: Sopa de Números (Cruces dinámicas)
+        let soupSize = 6;
+        let soupGridData = []; // Array de 36 elementos (6x6)
+        let allPossibleDivisions = []; // Todas las operaciones detectadas en el tablero
+        let selectedSoupIndices = []; // Índices secuenciales elegidos por el usuario
+        let solvedSoupEquations = []; // Operaciones ya descubiertas y resueltas
+
+        // Contexto de audio Web API
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        window.onload = function() {
+            generatePitagoricTableDOM(); // Generación segura de tabla de ayuda
+            showMenu();
+        };
+
+        // Reemplazo moderno y seguro de document.write para la tabla pitagórica
+        function generatePitagoricTableDOM() {
+            const thead = document.getElementById('pitagoric-head');
+            const tbody = document.getElementById('pitagoric-body');
+            
+            if (!thead || !tbody) return;
+
+            thead.innerHTML = "";
+            tbody.innerHTML = "";
+
+            const trHead = document.createElement('tr');
+            trHead.className = "bg-indigo-950/80 text-indigo-300 sticky top-0";
+            
+            const thCorner = document.createElement('th');
+            thCorner.className = "p-2 border border-slate-800 bg-indigo-950";
+            thCorner.textContent = "×";
+            trHead.appendChild(thCorner);
+
+            for (let i = 1; i <= 10; i++) {
+                const th = document.createElement('th');
+                th.className = "p-2 border border-slate-800 min-w-[28px]";
+                th.textContent = i;
+                trHead.appendChild(th);
+            }
+            thead.appendChild(trHead);
+
+            for (let r = 1; r <= 10; r++) {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-indigo-950/20 border-b border-slate-900";
+
+                const tdLabel = document.createElement('td');
+                tdLabel.className = "p-2 bg-indigo-950/50 text-indigo-300 font-bold sticky left-0 border border-slate-800";
+                tdLabel.textContent = r;
+                tr.appendChild(tdLabel);
+
+                for (let c = 1; c <= 10; c++) {
+                    const td = document.createElement('td');
+                    td.className = "p-2 border border-slate-800 text-slate-400 hover:bg-indigo-600 hover:text-white transition duration-100 cursor-pointer";
+                    td.textContent = r * c;
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr);
+            }
+        }
+
+        // Sintetizador de efectos de sonido libres de dependencias
+        function playSound(type) {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new AudioContext();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'success') {
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(1000, now + 0.15);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'victory') {
+                    const notes = [440, 554.37, 659.25, 880];
+                    notes.forEach((freq, index) => {
+                        const noteOsc = audioCtx.createOscillator();
+                        const noteGain = audioCtx.createGain();
+                        noteOsc.connect(noteGain);
+                        noteGain.connect(audioCtx.destination);
+                        
+                        noteOsc.frequency.setValueAtTime(freq, now + index * 0.1);
+                        noteGain.gain.setValueAtTime(0.12, now + index * 0.1);
+                        noteGain.gain.exponentialRampToValueAtTime(0.01, now + index * 0.1 + 0.3);
+                        
+                        noteOsc.start(now + index * 0.1);
+                        noteOsc.stop(now + index * 0.1 + 0.35);
+                    });
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === 'select') {
+                    osc.frequency.setValueAtTime(400, now);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                }
+            } catch (err) {
+                console.warn("Audio Context bloqueado o no disponible:", err);
+            }
+        }
+
+        function showMenu() {
+            clearInterval(timerInterval);
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('soup-screen').classList.add('hidden');
+            document.getElementById('menu-screen').classList.remove('hidden');
+            document.getElementById('win-modal').classList.add('hidden');
+            document.getElementById('help-modal').classList.add('hidden');
+        }
+
+        function startGame(mode) {
+            playSound('select');
+            currentMode = mode;
+            score = 0;
+            level = 1;
+            
+            document.getElementById('score-val').textContent = score;
+            document.getElementById('level-val').textContent = level;
+            document.getElementById('game-mode-indicator').textContent = mode === 'adventure' ? 'Aventura' : 'Práctica';
+            
+            if (mode === 'adventure') {
+                document.getElementById('timer-container').classList.remove('invisible');
+                document.getElementById('level-container').classList.remove('hidden');
+            } else {
+                document.getElementById('timer-container').classList.add('invisible');
+                document.getElementById('level-container').classList.add('hidden');
+            }
+
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            setupBoard();
+        }
+
+        function setupBoard() {
+            const activeFactors = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+            
+            solution[0] = activeFactors[Math.floor(Math.random() * activeFactors.length)];
+            solution[1] = activeFactors[Math.floor(Math.random() * activeFactors.length)];
+            solution[2] = activeFactors[Math.floor(Math.random() * activeFactors.length)];
+            solution[3] = activeFactors[Math.floor(Math.random() * activeFactors.length)];
+
+            targets.r1 = solution[0] * solution[1];
+            targets.r2 = solution[2] * solution[3];
+            targets.c1 = solution[0] * solution[2];
+            targets.c2 = solution[1] * solution[3];
+
+            document.getElementById('target-r1').textContent = targets.r1;
+            document.getElementById('target-r2').textContent = targets.r2;
+            document.getElementById('target-c1').textContent = targets.c1;
+            document.getElementById('target-c2').textContent = targets.c2;
+
+            playerGrid = ["", "", "", ""];
+            hints = [false, false, false, false];
+
+            const pistasADar = level <= 3 ? 2 : 1;
+            const indicesDisponibles = [0, 1, 2, 3];
+            
+            for(let i = 0; i < pistasADar; i++) {
+                const randIndex = indicesDisponibles.splice(Math.floor(Math.random() * indicesDisponibles.length), 1)[0];
+                playerGrid[randIndex] = solution[randIndex];
+                hints[randIndex] = true;
+            }
+
+            selectedCellIndex = playerGrid.findIndex(val => val === "");
+            if (selectedCellIndex === -1) selectedCellIndex = 0;
+
+            resetLayoutStyles();
+            renderBoard();
+
+            if (currentMode === 'adventure') {
+                timeLeft = Math.max(20, 60 - (level * 2));
+                document.getElementById('timer-val').textContent = timeLeft + 's';
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-val').textContent = timeLeft + 's';
+                
+                if (timeLeft <= 5) {
+                    document.getElementById('timer-val').classList.add('text-rose-500');
+                } else {
+                    document.getElementById('timer-val').classList.remove('text-rose-500');
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    showToast("¡Se acabó el tiempo!", "error");
+                    playSound('error');
+                    setupBoard();
+                }
+            }, 1000);
+        }
+
+        function renderBoard() {
+            for(let i = 0; i < 4; i++) {
+                const cell = document.getElementById(`cell-${i}`);
+                if (!cell) continue;
+                cell.textContent = playerGrid[i] !== "" ? playerGrid[i] : "-";
+                
+                cell.className = "w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 font-kids text-xl font-bold flex items-center justify-center transition-all focus:outline-none focus:ring-2 shadow-md";
+
+                if (hints[i]) {
+                    cell.classList.add("bg-indigo-950/40", "border-indigo-500/50", "text-indigo-300", "cursor-not-allowed");
+                } else {
+                    if (selectedCellIndex === i) {
+                        cell.classList.add("bg-indigo-900/60", "border-indigo-400", "text-white", "ring-2", "ring-indigo-400");
+                    } else {
+                        cell.classList.add("bg-slate-900", "border-slate-700", "text-slate-100", "hover:border-slate-600");
+                    }
+                }
+            }
+        }
+
+        function selectCell(index) {
+            if (hints[index]) {
+                showToast("Esta casilla es una guía, ¡no se puede cambiar!", "info");
+                return;
+            }
+            playSound('select');
+            selectedCellIndex = index;
+            renderBoard();
+        }
+
+        function writeNumber(num) {
+            if (hints[selectedCellIndex]) return;
+            
+            playerGrid[selectedCellIndex] = num;
+            playSound('select');
+            
+            let nextEmpty = -1;
+            for (let i = 1; i < 4; i++) {
+                let candidate = (selectedCellIndex + i) % 4;
+                if (!hints[candidate] && playerGrid[candidate] === "") {
+                    nextEmpty = candidate;
+                    break;
+                }
+            }
+            if (nextEmpty !== -1) {
+                selectedCellIndex = nextEmpty;
+            }
+
+            renderBoard();
+            checkEquations();
+        }
+
+        function deleteNumber() {
+            if (hints[selectedCellIndex]) return;
+            playerGrid[selectedCellIndex] = "";
+            playSound('select');
+            renderBoard();
+            checkEquations();
+        }
+
+        function checkEquations() {
+            const v0 = parseInt(playerGrid[0]);
+            const v1 = parseInt(playerGrid[1]);
+            const v2 = parseInt(playerGrid[2]);
+            const v3 = parseInt(playerGrid[3]);
+
+            let completedCount = 0;
+
+            if (!isNaN(v0) && !isNaN(v1) && (v0 * v1 === targets.r1)) {
+                document.getElementById('target-r1').classList.add('glow-success');
+                completedCount++;
+            } else {
+                document.getElementById('target-r1').classList.remove('glow-success');
+            }
+
+            if (!isNaN(v2) && !isNaN(v3) && (v2 * v3 === targets.r2)) {
+                document.getElementById('target-r2').classList.add('glow-success');
+                completedCount++;
+            } else {
+                document.getElementById('target-r2').classList.remove('glow-success');
+            }
+
+            if (!isNaN(v0) && !isNaN(v2) && (v0 * v2 === targets.c1)) {
+                document.getElementById('target-c1').classList.add('glow-success');
+                completedCount++;
+            } else {
+                document.getElementById('target-c1').classList.remove('glow-success');
+            }
+
+            if (!isNaN(v1) && !isNaN(v3) && (v1 * v3 === targets.c2)) {
+                document.getElementById('target-c2').classList.add('glow-success');
+                completedCount++;
+            } else {
+                document.getElementById('target-c2').classList.remove('glow-success');
+            }
+
+            if (completedCount === 4) {
+                triggerWin();
+            }
+        }
+
+        function resetLayoutStyles() {
+            document.getElementById('target-r1').className = "w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-300 font-kids text-lg font-bold flex items-center justify-center shadow-inner";
+            document.getElementById('target-r2').className = "w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-300 font-kids text-lg font-bold flex items-center justify-center shadow-inner";
+            document.getElementById('target-c1').className = "w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-300 font-kids text-lg font-bold flex items-center justify-center shadow-inner";
+            document.getElementById('target-c2').className = "w-12 h-12 md:w-14 md:h-14 rounded-xl border-2 border-slate-800 bg-slate-900/40 text-slate-300 font-kids text-lg font-bold flex items-center justify-center shadow-inner";
+        }
+
+        function triggerWin() {
+            clearInterval(timerInterval);
+            playSound('victory');
+            
+            score += 10;
+            document.getElementById('score-val').textContent = score;
+
+            document.getElementById('win-mode').textContent = currentMode === 'soup' ? 'Sopa de Números (División)' : (currentMode === 'adventure' ? 'MultiCruz Aventura' : 'MultiCruz Práctica');
+            document.getElementById('win-score').textContent = '+10 Estrellas';
+            document.getElementById('win-modal').classList.remove('hidden');
+        }
+
+        function nextLevel() {
+            document.getElementById('win-modal').classList.add('hidden');
+            if (currentMode === 'adventure') {
+                level++;
+                document.getElementById('level-val').textContent = level;
+                setupBoard();
+            } else if (currentMode === 'soup') {
+                generateSoupPuzzle();
+            } else {
+                setupBoard();
+            }
+        }
+
+        function toggleHelpModal(show) {
+            playSound('select');
+            const modal = document.getElementById('help-modal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function showToast(msg, type = "info") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+
+            if (!toast || !toastMsg || !toastIcon) return;
+
+            toastMsg.textContent = msg;
+
+            if (type === 'error') {
+                toastIcon.className = "fa-solid fa-triangle-exclamation text-rose-400";
+            } else if (type === 'success') {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-info text-indigo-400";
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 2500);
+        }
+
+        function startDivisionSoup() {
+            playSound('select');
+            currentMode = 'soup';
+            
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('soup-screen').classList.remove('hidden');
+
+            generateSoupPuzzle();
+        }
+
+        function generateSoupPuzzle() {
+            selectedSoupIndices = [];
+            solvedSoupEquations = [];
+            allPossibleDivisions = [];
+            updateSelectionDisplay();
+
+            // Rellenar cuadrícula 6x6 inicialmente vacía (36 celdas)
+            soupGridData = Array(soupSize * soupSize).fill("");
+
+            // Amplio catálogo de tríos de divisiones válidos de las tablas de multiplicar del 1 al 10
+            const baseTriplets = [
+                {a: 12, b: 3, c: 4}, {a: 12, b: 4, c: 3}, {a: 12, b: 2, c: 6}, {a: 12, b: 6, c: 2},
+                {a: 15, b: 5, c: 3}, {a: 15, b: 3, c: 5},
+                {a: 16, b: 4, c: 4}, {a: 16, b: 2, c: 8}, {a: 16, b: 8, c: 2},
+                {a: 18, b: 6, c: 3}, {a: 18, b: 3, c: 6}, {a: 18, b: 2, c: 9}, {a: 18, b: 9, c: 2},
+                {a: 20, b: 4, c: 5}, {a: 20, b: 5, c: 4}, {a: 20, b: 2, c: 10},
+                {a: 24, b: 3, c: 8}, {a: 24, b: 8, c: 3}, {a: 24, b: 4, c: 6}, {a: 24, b: 6, c: 4},
+                {a: 30, b: 5, c: 6}, {a: 30, b: 6, c: 5}, {a: 30, b: 3, c: 10},
+                {a: 32, b: 4, c: 8}, {a: 32, b: 8, c: 4},
+                {a: 36, b: 6, c: 6}, {a: 36, b: 4, c: 9}, {a: 36, b: 9, c: 4},
+                {a: 40, b: 8, c: 5}, {a: 40, b: 5, c: 8}, {a: 40, b: 4, c: 10},
+                {a: 42, b: 6, c: 7}, {a: 42, b: 7, c: 6},
+                {a: 45, b: 5, c: 9}, {a: 45, b: 9, c: 5},
+                {a: 48, b: 8, c: 6}, {a: 48, b: 6, c: 8},
+                {a: 50, b: 5, c: 10}, {a: 50, b: 10, c: 5}
+            ];
+
+            // Intentar cruzar hasta 8 operaciones reales en el mismo tablero
+            const chosenTriplets = [...baseTriplets].sort(() => 0.5 - Math.random());
+            let placedCount = 0;
+
+            for (let k = 0; k < chosenTriplets.length && placedCount < 8; k++) {
+                const triplet = chosenTriplets[k];
+                let placed = false;
+                let attempts = 0;
+
+                while (!placed && attempts < 150) {
+                    const isHorizontal = Math.random() < 0.5;
+                    const maxR = isHorizontal ? soupSize : (soupSize - 2);
+                    const maxC = isHorizontal ? (soupSize - 2) : soupSize;
+
+                    const r = Math.floor(Math.random() * maxR);
+                    const c = Math.floor(Math.random() * maxC);
+
+                    // Índices lineales de las 3 celdas consecutivas en la sopa
+                    const idxs = [
+                        r * soupSize + c,
+                        (isHorizontal ? r : r + 1) * soupSize + (isHorizontal ? c + 1 : c),
+                        (isHorizontal ? r : r + 2) * soupSize + (isHorizontal ? c + 2 : c)
+                    ];
+
+                    // REGLA DE CRUCE SEGURO (Overlapping): 
+                    // Se puede colocar si cada celda está vacía O contiene exactamente el mismo número
+                    const canPlace = idxs.every((idx, indexInTriplet) => {
+                        const existingVal = soupGridData[idx];
+                        const targetVal = indexInTriplet === 0 ? triplet.a : (indexInTriplet === 1 ? triplet.b : triplet.c);
+                        return existingVal === "" || existingVal === targetVal;
+                    });
+
+                    // Evitamos que se solapen totalmente anulando la adición de nuevos números
+                    const hasEmptyCell = idxs.some(idx => soupGridData[idx] === "");
+
+                    if (canPlace && hasEmptyCell) {
+                        soupGridData[idxs[0]] = triplet.a;
+                        soupGridData[idxs[1]] = triplet.b;
+                        soupGridData[idxs[2]] = triplet.c;
+                        placed = true;
+                        placedCount++;
+                    }
+                    attempts++;
+                }
+            }
+
+            // Rellenar el resto de las casillas vacías con números comunes de tablas de multiplicar (como distractores)
+            const distractors = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 18, 20, 24, 25, 27, 28, 30, 32, 35, 36, 40, 45, 48, 50];
+            for (let i = 0; i < soupGridData.length; i++) {
+                if (soupGridData[i] === "") {
+                    soupGridData[i] = distractors[Math.floor(Math.random() * distractors.length)];
+                }
+            }
+
+            // Escanear la sopa al completo para catalogar absolutamente todas las combinaciones reales matemáticas válidas
+            scanGridForDivisions();
+
+            // Medida defensiva: Si por alguna anomalía estadística extrema no hay divisiones, regenerar
+            if (allPossibleDivisions.length === 0) {
+                generateSoupPuzzle();
+                return;
+            }
+
+            renderSoupGrid();
+            renderAchievementsList();
+            updateSoupProgressDisplay();
+        }
+
+        function scanGridForDivisions() {
+            allPossibleDivisions = [];
+            const tempKeys = new Set();
+
+            const addIfValid = (i1, i2, i3) => {
+                const v1 = parseInt(soupGridData[i1]);
+                const v2 = parseInt(soupGridData[i2]);
+                const v3 = parseInt(soupGridData[i3]);
+
+                // Dirección normal: i1 ÷ i2 = i3
+                if (v2 > 1 && v3 > 1 && (v1 % v2 === 0) && (v1 / v2 === v3)) {
+                    const keyForward = `${i1}-${i2}-${i3}`;
+                    if (!tempKeys.has(keyForward)) {
+                        tempKeys.add(keyForward);
+                        allPossibleDivisions.push({
+                            cells: [i1, i2, i3],
+                            equation: `${v1} ÷ ${v2} = ${v3}`,
+                            key: keyForward
+                        });
+                    }
+                }
+
+                // Dirección inversa: i3 ÷ i2 = i1 (Ej: "5 ➔ 3 ➔ 15" leído al revés es "15 ÷ 3 = 5")
+                if (v2 > 1 && v1 > 1 && (v3 % v2 === 0) && (v3 / v2 === v1)) {
+                    const keyBackward = `${i3}-${i2}-${i1}`;
+                    if (!tempKeys.has(keyBackward)) {
+                        tempKeys.add(keyBackward);
+                        allPossibleDivisions.push({
+                            cells: [i3, i2, i1],
+                            equation: `${v3} ÷ ${v2} = ${v1}`,
+                            key: keyBackward
+                        });
+                    }
+                }
+            };
+
+            // Escaneo Horizontal (Bloques de 3 adyacentes por fila)
+            for (let r = 0; r < soupSize; r++) {
+                for (let c = 0; c < soupSize - 2; c++) {
+                    const i1 = r * soupSize + c;
+                    const i2 = i1 + 1;
+                    const i3 = i1 + 2;
+                    addIfValid(i1, i2, i3);
+                }
+            }
+
+            // Escaneo Vertical (Bloques de 3 adyacentes por columna)
+            for (let r = 0; r < soupSize - 2; r++) {
+                for (let c = 0; c < soupSize; c++) {
+                    const i1 = r * soupSize + c;
+                    const i2 = i1 + soupSize;
+                    const i3 = i1 + (soupSize * 2);
+                    addIfValid(i1, i2, i3);
+                }
+            }
+        }
+
+        function renderSoupGrid() {
+            const gridContainer = document.getElementById('soup-grid');
+            if (!gridContainer) return;
+            gridContainer.innerHTML = '';
+
+            soupGridData.forEach((val, idx) => {
+                const cellBtn = document.createElement('button');
+                cellBtn.id = `soup-cell-${idx}`;
+                cellBtn.textContent = val;
+                
+                // Estilo general de las celdas de la sopa
+                cellBtn.className = "w-full aspect-square rounded-2xl text-base md:text-lg font-bold font-kids transition flex items-center justify-center shadow-md active:scale-95";
+                cellBtn.classList.add("bg-slate-900", "border-2", "border-slate-800", "hover:border-pink-500/50", "text-slate-100");
+
+                cellBtn.onclick = () => selectSoupCell(idx);
+                gridContainer.appendChild(cellBtn);
+            });
+        }
+
+        function renderAchievementsList() {
+            const targetsContainer = document.getElementById('soup-targets-container');
+            if (!targetsContainer) return;
+            targetsContainer.innerHTML = '';
+
+            if (solvedSoupEquations.length === 0) {
+                targetsContainer.innerHTML = `
+                    <div class="text-slate-500 text-xs italic text-center py-6 flex flex-col items-center gap-2">
+                        <i class="fa-solid fa-compass text-2xl text-slate-700 animate-pulse"></i>
+                        <span>¡Presiona 3 números vecinos que formen una división para empezar!</span>
+                    </div>
+                `;
+                return;
+            }
+
+            solvedSoupEquations.forEach((eq, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-500/30 flex items-center justify-between text-xs transition duration-300 shadow-sm animate-bounce";
+                
+                const leftContent = document.createElement('div');
+                leftContent.className = "flex flex-col gap-0.5";
+                
+                const tag = document.createElement('span');
+                tag.className = "text-[9px] text-emerald-400 font-bold uppercase tracking-wider";
+                tag.textContent = `¡Lograda #${index + 1}!`;
+
+                const formulaText = document.createElement('span');
+                formulaText.className = "font-kids text-sm font-bold text-white";
+                formulaText.textContent = eq.equation;
+
+                leftContent.appendChild(tag);
+                leftContent.appendChild(formulaText);
+
+                const badge = document.createElement('span');
+                badge.className = "p-1.5 rounded-full text-xs font-bold bg-emerald-500 text-slate-950 flex items-center justify-center w-6 h-6";
+                badge.innerHTML = `<i class="fa-solid fa-check"></i>`;
+
+                itemDiv.appendChild(leftContent);
+                itemDiv.appendChild(badge);
+
+                targetsContainer.appendChild(itemDiv);
+            });
+        }
+
+        function selectSoupCell(index) {
+            playSound('select');
+
+            // Evitar seleccionar celdas que ya pertenecen a una división resuelta
+            const isPartofSolved = solvedSoupEquations.some(eq => eq.cells.includes(index));
+            if (isPartofSolved) {
+                showToast("Esta celda ya forma parte de una división resuelta.", "info");
+                return;
+            }
+
+            const currentPos = selectedSoupIndices.indexOf(index);
+
+            if (currentPos > -1) {
+                selectedSoupIndices.splice(currentPos, 1);
+            } else {
+                if (selectedSoupIndices.length >= 3) {
+                    showToast("Selecciona un máximo de 3 números para tu división.", "info");
+                    return;
+                }
+                selectedSoupIndices.push(index);
+            }
+
+            highlightSoupCells();
+            updateSelectionDisplay();
+
+            if (selectedSoupIndices.length === 3) {
+                checkSelectedSoupEquation();
+            }
+        }
+
+        function highlightSoupCells() {
+            for (let idx = 0; idx < soupSize * soupSize; idx++) {
+                const cellBtn = document.getElementById(`soup-cell-${idx}`);
+                if (!cellBtn) continue;
+
+                const isSolvedCell = solvedSoupEquations.some(eq => eq.cells.includes(idx));
+
+                if (isSolvedCell) {
+                    cellBtn.className = "w-full aspect-square rounded-2xl text-base md:text-lg font-bold font-kids transition flex items-center justify-center shadow-lg bg-emerald-950 border-2 border-emerald-500 text-emerald-200 cursor-default";
+                } else if (selectedSoupIndices.includes(idx)) {
+                    cellBtn.className = "w-full aspect-square rounded-2xl text-base md:text-lg font-bold font-kids transition flex items-center justify-center shadow-md bg-pink-600 border-2 border-pink-400 text-white ring-2 ring-pink-300/50";
+                } else {
+                    cellBtn.className = "w-full aspect-square rounded-2xl text-base md:text-lg font-bold font-kids transition flex items-center justify-center shadow-md bg-slate-900 border-2 border-slate-800 hover:border-pink-500/50 text-slate-100";
+                }
+            }
+        }
+
+        function updateSelectionDisplay() {
+            const display = document.getElementById('soup-current-selection');
+            if (!display) return;
+            if (selectedSoupIndices.length === 0) {
+                display.textContent = "-";
+                return;
+            }
+
+            const selectedValues = selectedSoupIndices.map(idx => soupGridData[idx]);
+            display.textContent = selectedValues.join(" ➔ ");
+        }
+
+        function clearSoupSelection() {
+            selectedSoupIndices = [];
+            highlightSoupCells();
+            updateSelectionDisplay();
+        }
+
+        function checkSelectedSoupEquation() {
+            const userKey = selectedSoupIndices.join('-');
+
+            // Comprobar si el triplete seleccionado por el usuario coincide con alguna de las divisiones posibles
+            const match = allPossibleDivisions.find(item => item.key === userKey);
+
+            if (match) {
+                const alreadySolved = solvedSoupEquations.some(eq => eq.key === match.key);
+
+                if (!alreadySolved) {
+                    playSound('success');
+                    showToast(`¡Excelente! Encontraste: ${match.equation}`, "success");
+
+                    solvedSoupEquations.push({
+                        cells: [...selectedSoupIndices],
+                        equation: match.equation,
+                        key: match.key
+                    });
+
+                    selectedSoupIndices = [];
+                    highlightSoupCells();
+                    updateSelectionDisplay();
+                    renderAchievementsList();
+                    updateSoupProgressDisplay();
+
+                    // El objetivo de victoria es encontrar el 60% de las divisiones que hay en la sopa (mínimo 3)
+                    const targetToWin = Math.max(3, Math.floor(allPossibleDivisions.length * 0.6));
+                    if (solvedSoupEquations.length >= targetToWin) {
+                        setTimeout(() => {
+                            triggerWin();
+                        }, 800);
+                    }
+                } else {
+                    showToast("Ya has descubierto esta ecuación.", "info");
+                    selectedSoupIndices = [];
+                    highlightSoupCells();
+                    updateSelectionDisplay();
+                }
+            } else {
+                // No es una división válida secuencial en el tablero
+                playSound('error');
+                showToast("Intenta en orden: Dividendo ➔ Divisor ➔ Resultado", "error");
+                
+                selectedSoupIndices = [];
+                setTimeout(() => {
+                    highlightSoupCells();
+                    updateSelectionDisplay();
+                }, 400);
+            }
+        }
+
+        function updateSoupProgressDisplay() {
+            const prog = document.getElementById('soup-progress');
+            if (!prog) return;
+            const targetToWin = Math.max(3, Math.floor(allPossibleDivisions.length * 0.6));
+            prog.textContent = `${solvedSoupEquations.length} / ${targetToWin}`;
+        }
+    </script>
+</body>
+</html>

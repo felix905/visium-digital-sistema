@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retos Financieros - Debate en Clase</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuente Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Tabler Icons (para coherencia con header/footer) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    <!-- Font Awesome (para mantener iconos específicos del contenido) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        /* Estilos para tarjetas claras */
+        .light-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        .light-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
+        }
+        .progress-bar-light {
+            transition: width 0.3s linear;
+        }
+        .danger-pulse {
+            animation: pulse-soft 1s infinite;
+        }
+        @keyframes pulse-soft {
+            0%, 100% { background-color: #fee2e2; border-color: #fecaca; }
+            50% { background-color: #fecaca; border-color: #f87171; }
+        }
+        .number-btn {
+            transition: all 0.2s ease;
+        }
+        .number-btn.active {
+            background-color: #16a34a;
+            color: white;
+            border-color: #16a34a;
+            box-shadow: 0 4px 8px rgba(22,163,74,0.2);
+        }
+        .glass-card-light {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(203,213,225,0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 antialiased">
+
+    <!-- HEADER (exacto del segundo código, con logo de texto por si falta la imagen) -->
+    <!-- Header con Logo -->
+    <header class="sticky top-0 z-50 pt-6 pb-3">
+        <div class="container mx-auto px-4">
+            <nav class="flex items-center justify-between text-sm font-normal bg-white/80 py-3 pl-2 pr-4 backdrop-blur-md rounded-xl shadow-sm">
+                <a href="index.html" class="flex items-center">
+                    <img src="img/logo_v.svg" alt="Visium Digital" class="ml-3 h-7">
+                </a>
+                <div class="hidden md:block text-right">
+                    <div class="text-sm font-normal text-gray-800 leading-tight">Escuela de diseño</div>
+                    <div class="text-sm font-normal text-gray-800 leading-tight">e innovación</div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+
+    <div class="max-w-7xl mx-auto pt-6 px-4">
+        <!-- Título y descripción (estilo segundo código) -->
+        <div class="text-center mb-10">
+            <span class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+                <i class="ti ti-cards"></i>
+                Actividad de Liderazgo y Debate
+            </span>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Mazo de <span class="text-green-600">Retos Financieros</span>
+            </h1>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                Selecciona una tarjeta, analiza el dilema y defiende tu postura en 2 minutos.
+            </p>
+        </div>
+
+        <!-- Layout principal: dos columnas (como el primer código, pero estilo light) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
+            
+            <!-- COLUMNA IZQUIERDA: Tarjeta activa (7/12) -->
+            <div class="lg:col-span-7">
+                <div class="light-card rounded-3xl p-6 md:p-8 min-h-[480px] flex flex-col justify-between transition-all">
+                    <div id="card-display-area" class="h-full">
+                        <!-- Estado inicial -->
+                        <div id="initial-state" class="text-center py-12 flex flex-col items-center justify-center">
+                            <div class="w-24 h-24 bg-green-100 rounded-3xl flex items-center justify-center text-green-600 mb-6">
+                                <i class="fas fa-layer-group text-4xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-black text-gray-800">¡Selecciona un Reto Financiero!</h3>
+                            <p class="text-gray-500 text-sm md:text-base mt-2 max-w-md mx-auto">
+                                Haz clic en cualquiera de las 12 tarjetas de abajo para cargar un dilema del mundo real y debatir en equipo.
+                            </p>
+                        </div>
+
+                        <!-- Contenido dinámico de la tarjeta -->
+                        <div id="card-active-content" class="hidden flex-col justify-between h-full">
+                            <div>
+                                <div class="flex justify-between items-center mb-6">
+                                    <span id="card-badge" class="bg-green-100 text-green-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider">
+                                        Reto #0
+                                    </span>
+                                    <span class="text-gray-500 text-xs font-bold uppercase tracking-wider">
+                                        <i class="fas fa-comments text-green-500 mr-1"></i> Defensa de 2 Minutos
+                                    </span>
+                                </div>
+                                <h2 id="card-title" class="text-3xl font-extrabold text-gray-900 leading-tight mb-4">Título</h2>
+                                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 mb-6">
+                                    <h4 class="text-gray-500 text-xs font-black uppercase tracking-wider mb-2">
+                                        <i class="fas fa-book-open text-green-600 mr-1"></i> El Caso
+                                    </h4>
+                                    <p id="card-case" class="text-gray-700 text-base md:text-lg leading-relaxed"></p>
+                                </div>
+                                <div class="bg-green-50 p-5 rounded-2xl border border-green-100 mb-6">
+                                    <h4 class="text-green-700 text-xs font-black uppercase tracking-wider mb-2">
+                                        <i class="fas fa-question-circle mr-1"></i> Preguntas para el Debate
+                                    </h4>
+                                    <p id="card-questions" class="text-gray-800 text-lg font-bold italic leading-snug"></p>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-200 pt-5">
+                                <h4 class="text-gray-500 text-xs font-black uppercase tracking-wider mb-3">
+                                    <i class="fas fa-award text-yellow-600 mr-1"></i> Conceptos a Defender
+                                </h4>
+                                <div id="card-concepts" class="flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: Temporizador + instrucciones (5/12) -->
+            <div class="lg:col-span-5 space-y-6">
+                <!-- Tarjeta del cronómetro -->
+                <div class="light-card rounded-3xl p-6 md:p-8 text-center">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-black text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                            <span class="inline-block w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" id="timer-dot"></span>
+                            TIEMPO DE DEFENSA
+                        </span>
+                    </div>
+                    <div id="timer-display" class="text-6xl md:text-7xl font-black font-mono text-green-600 py-3 select-none">02:00</div>
+                    <!-- Barra de progreso -->
+                    <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden mb-6">
+                        <div id="timer-progress" class="bg-green-500 h-full w-full progress-bar-light" style="width: 100%"></div>
+                    </div>
+                    <div class="flex gap-3 w-full">
+                        <button id="btn-toggle" onclick="toggleTimer()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-black py-4 px-4 rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 text-base">
+                            <i id="btn-toggle-icon" class="fas fa-play"></i> <span id="btn-toggle-text">INICIAR DEFENSA</span>
+                        </button>
+                        <button onclick="resetTimer()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-4 px-5 rounded-2xl transition-all">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Instrucciones rápidas -->
+                <div class="light-card rounded-3xl p-6">
+                    <h4 class="text-sm font-black text-gray-700 uppercase tracking-wider mb-4">
+                        <i class="fas fa-route text-green-600 mr-2"></i>Flujo Práctico:
+                    </h4>
+                    <ol class="space-y-3 text-sm font-medium text-gray-600">
+                        <li class="flex items-start gap-3"><span class="flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-700 text-xs font-black">1</span> Seleccionen una tarjeta. Lean el caso y las preguntas.</li>
+                        <li class="flex items-start gap-3"><span class="flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-700 text-xs font-black">2</span> Prepárense usando los <strong>Conceptos a Defender</strong>.</li>
+                        <li class="flex items-start gap-3"><span class="flex items-center justify-center w-5 h-5 rounded-full bg-green-100 text-green-700 text-xs font-black">3</span> Presionen <strong>Iniciar Defensa</strong> y argumenten antes de la alarma.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER: Mazo de selección (botones 1-12) -->
+        <div class="mt-6 pt-4 border-t border-gray-200">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-5 gap-2">
+                <h3 class="text-sm font-black text-gray-500 uppercase tracking-widest">
+                    <i class="fas fa-layer-group text-green-600 mr-2"></i>MAZO DE SELECCIÓN DE CASOS
+                </h3>
+                <span class="text-xs text-gray-400 font-semibold">12 retos financieros reales</span>
+            </div>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-3" id="deck-grid">
+                <!-- Los botones se generan con JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER INSTITUCIONAL (tomado del segundo código) -->
+    <footer class="mt-20 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 border-t border-gray-300">
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Visium Digital</h3>
+                    <p class="text-gray-600 text-sm">Escuela de diseño e innovación</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Contactos</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-brand-whatsapp"></i> (+58) 424 152 9071
+                        </li>
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-mail"></i> visiumdigitalca@gmail.com
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Síguenos</h3>
+                    <div class="flex space-x-3">
+                        <a href="https://www.instagram.com/visium.digital.c.a/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-instagram text-xl"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/visium-digital/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-500">© 2025 Visium Digital</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL de tiempo agotado (estilo light) -->
+    <div id="modal-container" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center border-2 border-red-300 shadow-xl">
+            <div class="w-20 h-20 rounded-full bg-red-100 text-red-500 flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-hourglass-end text-3xl animate-bounce"></i>
+            </div>
+            <h3 class="text-2xl font-black text-gray-800 uppercase tracking-tight mb-2">¡TIEMPO AGOTADO!</h3>
+            <p class="text-gray-600 text-base mb-6">
+                El tiempo de defensa oficial ha terminado. Es hora de recibir preguntas, réplicas o pasar al siguiente equipo.
+            </p>
+            <button onclick="closeModal()" class="w-full bg-red-600 hover:bg-red-500 text-white font-black py-4 rounded-2xl transition-all text-sm uppercase tracking-wider">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // MAZO DE TARJETAS (12 casos reales con conceptos, igual que el primer código)
+        const cards = [
+            { id: 1, title: "El Nuevo Smartphone", sit: "Camilo tiene un teléfono que funciona bien, pero salió el último modelo que usan todos sus creadores de contenido. No le alcanza el dinero, así que piensa usar todos sus ahorros para la graduación y pedirle prestado el resto a sus papás.", q: "¿Es una decisión inteligente vaciar sus ahorros y endeudarse por este teléfono? ¿Representa una necesidad o un deseo?", concepts: ["Necesidad vs. Deseo", "Costo de oportunidad"] },
+            { id: 2, title: "El Concierto del Año y los Gastos Ocultos", sit: "Valeria quiere ir al concierto de su banda favorita en tres meses y la entrada cuesta $150. Ella gana $800 al mes, pero siente que el dinero 'se le evapora'. Vive alquilada ($250) y paga $150 en servicios e internet. Sus papás la ayudan con el 60% de su universidad, por lo que ella debe cubrir el 40% restante (que equivale a $200 mensuales). El resto de su dinero se le va en suscripciones automáticas de streaming que casi no usa, salidas a comer con amigas y productos de skin care que compra todas las semanas.", q: "Con los $200 que le quedan libres tras pagar lo obligatorio, ¿qué ajustes matemáticos y de hábitos debe hacer Valeria en su presupuesto para ahorrar los $150 de la entrada en tres meses? ¿Qué gastos son deseos negociables en su día a día?", concepts: ["Presupuesto", "Gastos hormiga vs. Gastos fijos"] },
+            { id: 3, title: "Monedas de Videojuegos y 'Skins'", sit: "Mateo gasta dinero real comprando monedas digitales dentro de su videojuego favorito para adquirir ropa exclusiva para su personaje. Él dice que es una 'inversión' porque el juego está de moda; su papá dice que es botar el dinero.", q: "¿Quién tiene la razón en esta discusión? ¿El dinero virtual de un juego tiene el mismo valor económico que el dinero real?", concepts: ["Evolución del dinero", "Monedas digitales", "Gasto vs. Inversión"] },
+            { id: 4, title: "El Negocio de las Galletas", sit: "Sofía y su equipo vendieron todas sus galletas en el colegio el primer mes y ganaron 50 dólares. Emocionados, se gastaron 30 dólares en una pizza para celebrar. Ahora no tienen suficiente dinero para comprar los ingredientes de la próxima semana.", q: "¿Cuál fue el error financiero clave del equipo? ¿Qué deben hacer ahora para salvar el negocio sin pedir dinero prestado?", concepts: ["Ingreso bruto vs. Margen neto", "Reinversión de capital"] },
+            { id: 5, title: "La Laptop Financiada", sit: "Diego necesita una laptop de 600 dólares para un curso de programación que le dará empleo en unos meses. No tiene el dinero, pero la tienda se la ofrece en 24 cuotas de 35 dólares (pagando al final 840 dólares).", q: "¿Debería Diego aceptar este trato y endeudarse para conseguir la laptop? ¿Vale la pena pagar esos 240 dólares de diferencia en intereses?", concepts: ["Deuda Buena vs. Deuda Mala", "Intereses de financiamiento"] },
+            { id: 6, title: "Emergencia en el Presupuesto Familiar", sit: "En casa de la familia Pérez se dañó la nevera. El papá propone usar el dinero ahorrado para las vacaciones de fin de año. La mamá sugiere pedir una tarjeta de crédito prestada para pagarla en cuotas y no cancelar el viaje.", q: "¿Cuál de las dos opciones es la más responsable para la estabilidad del presupuesto familiar? ¿Por qué?", concepts: ["Presupuesto familiar", "Fondo de emergencia"] },
+            { id: 7, title: "El Dinero Bajo el Colchón", sit: "Lucas guardó 100 dólares en efectivo durante un año para comprar una bicicleta. Cuando va a la tienda un año después, la misma bicicleta cuesta 115 dólares por el aumento general de precios. Su billete sigue siendo el mismo, pero ya no le alcanza.", q: "¿Qué le pasó al dinero de Lucas si físicamente el billete está intacto? ¿Qué estrategia debió usar para proteger el valor de su ahorro?", concepts: ["Inflación", "Ahorro estático vs. Instrumentos de rendimiento"] },
+            { id: 8, title: "El Gurú de TikTok", sit: "Daniela sigue a un 'influencer' que dice que ahorrar no sirve y que debe meter todo el dinero de su futura universidad en una nueva criptomoneda que promete duplicarse en un mes. Daniela quiere arriesgarse.", q: "¿Debería Daniela hacerle caso al video? ¿Cuáles son los pasos obligatorios para evaluar el riesgo antes de meter dinero en un activo digital?", concepts: ["Criptoactivos", "Gestión de riesgo", "Especulación financiera"] },
+            { id: 9, title: "La Cuota de la Fiesta de Graduación", sit: "El comité de graduación del colegio quiere fijar una cuota muy alta para tener una fiesta de lujo. Tres compañeros dicen que sus familias no pueden pagarla sin descuidar su presupuesto básico, pero el resto dice: 'Es una vez en la vida, pueden pedir un préstamo'.", q: "¿Cómo resolverían este conflicto de forma justa? ¿Es válido presionar a alguien a adquirir una deuda mala por un evento social?", concepts: ["Deseos colectivos vs. Presupuesto familiar", "Presión social del gasto"] },
+            { id: 10, title: "El Premio en Efectivo", sit: "Tomás ganó un premio de dinero en el colegio, por participar en el concurso de Finanzas. Sus amigos le dicen que compre ropa de marca (gastar), su mamá que lo guarde todo en el banco sin tocarlo (ahorrar), y su profesor le sugiere pagar un curso de fotografía para hacer trabajos los fines de semana (invertir).", q: "Si fueran Tomás, ¿cómo dividirían ese dinero usando una regla de porcentajes? ¿Qué porcentaje asignarían a la 'inversión en uno mismo'?", concepts: ["Distribución de Ingresos", "Ahorro con propósito", "Inversión en educación"] },
+            { id: 11, title: "El 'Efecto Caschea' y los Antojos Financiados", sit: "Carlos usa la aplicación Caschea para comprar ropa y tecnología, pero últimamente ha empezado a usarla en las líneas aliadas para pagar hamburguesas en la feria, cafés con sus amigos y compras pequeñas del supermercado, porque 'así solo pago un poquito cada quince días'. Al llegar la quincena, se da cuenta de que la suma de todas las 'mini-cuotas' se come casi todo su dinero.", q: "¿Es sano utilizar herramientas de crédito (Buy Now, Pay Later) para cubrir gastos hormiga y comida? ¿Qué le está pasando al presupuesto futuro de Carlos?", concepts: ["Gastos hormiga", "Financiamiento de consumibles", "Capacidad de pago real"] },
+            { id: 12, title: "El Estudiante como Agente de Cambio", sit: "Muchos jóvenes piensan que la economía del hogar es un problema exclusivo de los adultos y que la educación financiera 'debería' enseñarse en los colegios, pero nadie toma la iniciativa. Como estudiantes de último año de bachillerato, están a punto de salir a la sociedad y se dan cuenta de que sus familias cometen errores por falta de planificación y que en su comunidad no existen herramientas para aprender a manejar el dinero.", q: "Como estudiantes, ¿qué acciones concretas pueden proponer para ayudar a mejorar la economía de sus hogares sin necesidad de trabajar a tiempo completo? Si tuvieran que diseñar una propuesta para que la educación financiera sea una materia obligatoria en su escuela, ¿qué temas clave exigirían que se enseñen?", concepts: ["Ciudadanía económica", "Propuesta curricular", "Impacto financiero familiar"] }
+        ];
+
+        let countdown;
+        let defaultTime = 120;
+        let timeLeft = 120;
+        let isRunning = false;
+        let activeCardId = null;
+
+        function renderDeck() {
+            const grid = document.getElementById('deck-grid');
+            grid.innerHTML = '';
+            cards.forEach(card => {
+                const btn = document.createElement('button');
+                btn.id = `btn-card-${card.id}`;
+                btn.onclick = () => loadCard(card.id);
+                btn.className = "number-btn flex flex-col items-center justify-center p-3 rounded-2xl bg-gray-100 hover:bg-green-600 hover:text-white text-gray-800 font-extrabold border border-gray-200 transition-all text-center shadow-sm";
+                btn.innerHTML = `<span class="text-[10px] text-green-600 font-bold block mb-1 uppercase">Reto</span><span class="text-lg font-black block">${card.id}</span>`;
+                grid.appendChild(btn);
+            });
+        }
+
+        function loadCard(id) {
+            if (activeCardId) {
+                const prevBtn = document.getElementById(`btn-card-${activeCardId}`);
+                if (prevBtn) {
+                    prevBtn.classList.remove('active', 'bg-green-600', 'text-white', 'border-green-600');
+                    prevBtn.classList.add('bg-gray-100', 'text-gray-800', 'border-gray-200');
+                    const span = prevBtn.querySelector('span:first-child');
+                    if (span) span.classList.remove('text-white');
+                }
+            }
+            activeCardId = id;
+            const card = cards.find(c => c.id === id);
+            const currentBtn = document.getElementById(`btn-card-${id}`);
+            if (currentBtn) {
+                currentBtn.classList.add('active', 'bg-green-600', 'text-white', 'border-green-600');
+                currentBtn.classList.remove('bg-gray-100', 'text-gray-800');
+                const span = currentBtn.querySelector('span:first-child');
+                if (span) span.classList.add('text-white');
+            }
+            document.getElementById('initial-state').classList.add('hidden');
+            const activeContent = document.getElementById('card-active-content');
+            activeContent.classList.remove('hidden');
+            activeContent.classList.add('flex');
+            document.getElementById('card-badge').innerText = `Reto #${card.id}`;
+            document.getElementById('card-title').innerText = card.title;
+            document.getElementById('card-case').innerText = card.sit;
+            document.getElementById('card-questions').innerText = card.q;
+            const conceptsContainer = document.getElementById('card-concepts');
+            conceptsContainer.innerHTML = '';
+            card.concepts.forEach(concept => {
+                const badge = document.createElement('span');
+                badge.className = "px-3 py-1 bg-yellow-50 text-yellow-700 rounded-xl text-xs font-bold border border-yellow-200 flex items-center gap-1.5";
+                badge.innerHTML = `<i class="fas fa-bookmark text-[9px]"></i> ${concept}`;
+                conceptsContainer.appendChild(badge);
+            });
+            resetTimer();
+        }
+
+        function triggerAudioAlert() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                [0, 0.25, 0.5, 0.75].forEach(offset => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(580, audioCtx.currentTime + offset);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime + offset);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + offset + 0.2);
+                    osc.start(audioCtx.currentTime + offset);
+                    osc.stop(audioCtx.currentTime + offset + 0.22);
+                });
+            } catch(e) { console.log("Audio no soportado"); }
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(countdown);
+                isRunning = false;
+                updateControlsDisplay();
+            } else {
+                isRunning = true;
+                updateControlsDisplay();
+                countdown = setInterval(() => {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    if (timeLeft <= 15) {
+                        document.getElementById('timer-display').classList.add('text-red-600');
+                        document.getElementById('timer-progress').classList.add('bg-red-500');
+                        document.getElementById('timer-progress').classList.remove('bg-green-500');
+                        document.querySelector('#timer-card')?.classList.add('danger-pulse');
+                    }
+                    if (timeLeft <= 0) {
+                        clearInterval(countdown);
+                        isRunning = false;
+                        updateControlsDisplay();
+                        triggerAudioAlert();
+                        showModal();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(countdown);
+            isRunning = false;
+            timeLeft = defaultTime;
+            document.getElementById('timer-display').classList.remove('text-red-600');
+            document.getElementById('timer-progress').classList.remove('bg-red-500');
+            document.getElementById('timer-progress').classList.add('bg-green-500');
+            document.querySelector('#timer-card')?.classList.remove('danger-pulse');
+            updateTimerDisplay();
+            updateControlsDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+            const percent = (timeLeft / defaultTime) * 100;
+            document.getElementById('timer-progress').style.width = `${percent}%`;
+        }
+
+        function updateControlsDisplay() {
+            const btn = document.getElementById('btn-toggle');
+            const icon = document.getElementById('btn-toggle-icon');
+            const text = document.getElementById('btn-toggle-text');
+            const dot = document.getElementById('timer-dot');
+            if (isRunning) {
+                btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btn.classList.add('bg-amber-500', 'hover:bg-amber-600');
+                icon.className = 'fas fa-pause';
+                text.innerText = 'PAUSAR DEFENSA';
+                dot.classList.add('animate-ping');
+            } else {
+                btn.classList.remove('bg-amber-500', 'hover:bg-amber-600');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                icon.className = 'fas fa-play';
+                text.innerText = 'INICIAR DEFENSA';
+                dot.classList.remove('animate-ping');
+            }
+        }
+
+        function showModal() { document.getElementById('modal-container').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('modal-container').classList.add('hidden'); resetTimer(); }
+
+        window.onload = () => { renderDeck(); updateTimerDisplay(); };
+    </script>
+</body>
+</html>

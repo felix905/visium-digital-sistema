@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Stop! Palabras y Finanzas</title>
+    <!-- Usamos Tailwind CSS para un diseño ágil, moderno y atractivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+
+        body {
+            font-family: 'Comic Neue', cursive, sans-serif;
+            background-color: #f0fdf4; /* Fondo verde claro suave */
+            background-image: radial-gradient(#bbf7d0 1px, transparent 1px);
+            background-size: 20px 20px;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #game-board {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            height: 440px;
+            background-color: #ffffff;
+            border: 8px solid #4ade80;
+            border-radius: 24px;
+            box-shadow: 0 15px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+            user-select: none;
+        }
+
+        .word-item {
+            position: absolute;
+            padding: 10px 16px;
+            background-color: #fef08a; /* Amarillo alegre */
+            border-radius: 12px;
+            border: 3px solid #eab308;
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: #1e293b;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            user-select: none;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            will-change: transform, left, top;
+        }
+
+        .word-item:hover {
+            transform: scale(1.08);
+            background-color: #fde047;
+            z-index: 10;
+        }
+
+        .word-item.selected {
+            background-color: #3b82f6; /* Azul brillante */
+            border-color: #1d4ed8;
+            color: white;
+            transform: scale(1.1);
+            z-index: 15;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        
+        .word-item.wrong {
+            background-color: #f87171; /* Rojo error */
+            border-color: #b91c1c;
+            color: white;
+            animation: shake 0.5s;
+        }
+
+        /* Trampas o señuelos visuales con ortografía incorrecta */
+        .word-item.decoy {
+            background-color: #ffedd5; /* Naranja muy suave */
+            border-color: #f97316;
+        }
+
+        /* Gastos Hormiga que flotan por la pantalla */
+        .gasto-hormiga {
+            position: absolute;
+            font-size: 1.8rem;
+            cursor: pointer;
+            user-select: none;
+            z-index: 20;
+            transition: transform 0.1s;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.15));
+        }
+        .gasto-hormiga:hover {
+            transform: scale(1.2);
+        }
+
+        /* Minas de Deuda que parpadean */
+        .mina-deuda {
+            position: absolute;
+            font-size: 2rem;
+            cursor: pointer;
+            user-select: none;
+            z-index: 25;
+            filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.5));
+            animation: pulse-mine 1s infinite alternate;
+        }
+        
+        @keyframes pulse-mine {
+            0% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.4)); }
+            100% { transform: scale(1.2); filter: drop-shadow(0 0 14px rgba(239, 68, 68, 0.8)); }
+        }
+
+        /* Animación para simular la explosión física de la deuda */
+        .explosion {
+            position: absolute;
+            z-index: 30;
+            pointer-events: none;
+            animation: explode-anim 0.6s ease-out forwards;
+        }
+
+        @keyframes explode-anim {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(2.8); opacity: 1; filter: brightness(1.3); }
+            100% { transform: scale(3.5); opacity: 0; }
+        }
+
+        /* Sacudida violenta del tablero al explotar una mina */
+        .shake-board {
+            animation: shake-heavy 0.5s ease-in-out;
+        }
+
+        @keyframes shake-heavy {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            10% { transform: translate(-8px, -6px) rotate(-1deg); }
+            20% { transform: translate(8px, 6px) rotate(1deg); }
+            30% { transform: translate(-6px, 8px) rotate(-1deg); }
+            40% { transform: translate(6px, -4px) rotate(1deg); }
+            50% { transform: translate(-8px, 6px) rotate(-1deg); }
+            60% { transform: translate(8px, -8px) rotate(1deg); }
+            70% { transform: translate(-4px, 4px) rotate(0deg); }
+            80% { transform: translate(4px, -4px) rotate(1deg); }
+            90% { transform: translate(-6px, 6px) rotate(-1deg); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Animación para pérdida de puntos */
+        @keyframes shrink-out {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .point-loss-anim {
+            animation: shrink-out 0.8s forwards;
+        }
+
+        /* Botones interactivos con relieve adaptados para niños */
+        .btn-game {
+            transition: all 0.1s;
+            box-shadow: 0 6px 0 0 rgba(0,0,0,0.15);
+        }
+        .btn-game:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 0 rgba(0,0,0,0.15);
+        }
+        .btn-game:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 6px 0 0 rgba(0,0,0,0.05);
+        }
+
+        /* Modales adaptados */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.75);
+            z-index: 50;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 2rem;
+            max-width: 30rem;
+            width: 92%;
+            text-align: center;
+            border: 8px solid #facc15;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            animation: popIn 0.3s ease-out forwards;
+            transform: scale(0.8);
+            opacity: 0;
+        }
+
+        @keyframes popIn {
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Barra de Inflación (Tiempo) */
+        .inflation-container {
+            width: 100%;
+            max-width: 650px;
+            background-color: #e2e8f0;
+            border-radius: 9999px;
+            height: 16px;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+
+        .inflation-bar {
+            width: 100%;
+            height: 100%;
+            background-color: #22c55e; /* Comienza verde */
+            transition: width 0.1s linear, background-color 0.5s ease;
+        }
+
+        /* Notificación Toast Personalizada */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            pointer-events: none;
+        }
+        .toast {
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out forwards;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6">
+
+    <header class="text-center mb-4">
+        <h1 class="text-4xl md:text-5xl text-green-600 font-extrabold tracking-wider drop-shadow-md">
+            ¡STOP! Súper Inversores 🐜📈
+        </h1>
+        <p class="text-gray-600 mt-1 text-base md:text-lg font-bold">Lee con cuidado, ¡evita las minas de deudas y los gastos hormiga!</p>
+    </header>
+
+    <!-- Panel de Información General -->
+    <div class="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-5 mb-4 flex flex-col md:flex-row items-center justify-between gap-4 border-4 border-yellow-300">
+        
+        <!-- Botones Principales -->
+        <div class="flex gap-3 w-full md:w-auto justify-center">
+            <button id="btn-start" class="btn-game bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full text-lg border-2 border-green-700">
+                ▶ INICIO
+            </button>
+            <button id="btn-stop" disabled class="btn-game bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full text-lg border-2 border-red-700">
+                ⏹ STOP
+            </button>
+        </div>
+
+        <!-- Instrucción o Palabra Objetivo -->
+        <div class="flex-1 text-center bg-blue-50 py-3 px-4 rounded-xl border-2 border-blue-200 w-full">
+            <span class="text-gray-500 block text-xs uppercase font-bold tracking-wider mb-1">Busca exactamente esta palabra:</span>
+            <span id="target-word" class="text-3xl text-blue-600 font-black tracking-wide">---</span>
+        </div>
+
+        <!-- Marcador de Ahorros -->
+        <div class="bg-yellow-100 py-2 px-5 rounded-xl border-2 border-yellow-300 text-center min-w-[130px]">
+            <span class="text-gray-600 block text-xs uppercase font-bold">Mis Ahorros 💰</span>
+            <span id="score" class="text-3xl text-yellow-600 font-black">0</span>
+        </div>
+    </div>
+
+    <!-- Indicador de Inflación / Tiempo -->
+    <div class="w-full max-w-3xl flex flex-col gap-1 mb-4 items-center">
+        <div class="flex justify-between w-full max-w-[650px] text-sm font-bold text-gray-600 px-1">
+            <span>🚀 Bono de Rapidez Máximo</span>
+            <span id="inflation-status" class="text-green-600 font-extrabold">¡Dinero Seguro! 🟢</span>
+            <span>⚠️ Inflación Máxima</span>
+        </div>
+        <div class="inflation-container">
+            <div id="inflation-bar" class="inflation-bar"></div>
+        </div>
+    </div>
+
+    <!-- Tablero de Juego -->
+    <div id="game-board">
+        <div id="overlay-start" class="absolute inset-0 bg-white/95 flex flex-col items-center justify-center z-30 backdrop-blur-sm p-6 text-center">
+            <span class="text-7xl mb-4 animate-bounce">🏦</span>
+            <h2 class="text-3xl text-gray-800 font-bold mb-2">¿Estás listo para el mercado de palabras?</h2>
+            <p class="text-gray-500 max-w-md text-sm mb-6">
+                Encuentra la palabra correcta y presiona <strong>STOP</strong>. ¡Ten muchísimo cuidado con los impostores de mala ortografía, los <strong>Gastos Hormiga 🐜</strong> y las peligrosas <strong>Minas de Deudas 💣</strong> que explotan si las tocas!
+            </p>
+            <span class="bg-yellow-100 text-yellow-800 text-xs px-3 py-1 rounded-full font-bold">Consejo: ¡Lee despacio y con atención para no equivocarte! 🧐</span>
+        </div>
+    </div>
+
+    <!-- Modal Principal de Resultados -->
+    <div id="message-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modal-icon" class="text-7xl mb-4">🎉</div>
+            <h2 id="modal-title" class="text-3xl font-bold text-gray-800 mb-2">¡Excelente!</h2>
+            <p id="modal-message" class="text-lg text-gray-600 mb-6">Encontraste la palabra perfecta en el banco.</p>
+            
+            <div id="modal-actions" class="flex flex-col gap-3">
+                <button id="btn-continue" onclick="closeMainModal()" class="btn-game bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-xl border-2 border-blue-700 w-full">
+                    Siguiente Ronda 🪙
+                </button>
+                <button id="btn-challenge" onclick="openChallengeModal()" class="btn-game bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-8 rounded-full text-xl border-2 border-purple-700 w-full flex items-center justify-center gap-2">
+                    🌟 Reto Financiero (+20 pts Extra!)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Retos -->
+    <div id="challenge-modal" class="modal-overlay">
+        <div class="modal-content border-purple-400">
+            <div class="text-6xl mb-2">🎭</div>
+            <h2 class="text-2xl font-bold text-purple-700 mb-2">¡Desafío del Súper Inversor!</h2>
+            <p class="text-gray-600 mb-4 text-sm">Realiza el siguiente reto financiero usando la palabra: <strong id="challenge-word-display" class="text-blue-600 uppercase"></strong></p>
+            
+            <div class="bg-purple-50 p-4 rounded-xl border border-purple-200 mb-6">
+                <p id="challenge-text" class="text-lg font-bold text-gray-800"></p>
+            </div>
+
+            <p class="text-sm text-gray-500 mb-4">¿Completaste el reto hablando con tus padres, amigos o maestro?</p>
+
+            <div class="flex gap-4">
+                <button onclick="completeChallenge(false)" class="flex-1 btn-game bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full border-2 border-gray-600">
+                    No pude
+                </button>
+                <button onclick="completeChallenge(true)" class="flex-1 btn-game bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full border-2 border-green-700">
+                    ¡Completado! ⭐
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificaciones flotantes de estado -->
+    <div id="toast-container"></div>
+
+    <script>
+        // Vocabulario financiero con las nuevas palabras añadidas correctamente
+        const vocabulario = [
+            "ahorro", "dinero", "banco", "moneda", "billete", "comprar", "vender", 
+            "precio", "caro", "barato", "gasto", "alcancía", "premio", "trabajo", 
+            "esfuerzo", "meta", "futuro", "riqueza", "pagar", "tienda", "mercado", 
+            "valor", "cambio", "caja", "cuenta", "interés", "inversión", "presupuesto", 
+            "negocio", "ganancia", "pérdida", "tarjeta", "préstamo", "donación", 
+            "seguro", "crédito", "trueque", "oferta", "escasez", "abundancia",
+            "gastos", "ingresos", "propósito", "valores", "experimentos", "billeteras",
+            "ahorros", "dollar", "bolivares", "necesidades", "deseo", "organización", "planificación"
+        ];
+
+        // Mapeo educativo de "Señuelos Ortográficos" (incluyendo las nuevas palabras y sus errores típicos)
+        const senuelosMap = {
+            "ahorro": "ahoro",
+            "dinero": "dimero",
+            "banco": "vanco",
+            "moneda": "monesa",
+            "billete": "bilete",
+            "comprar": "conprar",
+            "vender": "bender",
+            "precio": "presio",
+            "caro": "carro",
+            "barato": "varato",
+            "gasto": "gato",
+            "alcancía": "alcansia",
+            "premio": "premo",
+            "trabajo": "trabago",
+            "esfuerzo": "esfuerso",
+            "meta": "mita",
+            "futuro": "futoru",
+            "riqueza": "riquesa",
+            "pagar": "pacar",
+            "tienda": "tinda",
+            "mercado": "merco",
+            "valor": "balor",
+            "cambio": "canbio",
+            "caja": "caga",
+            "cuenta": "cuanta",
+            "interés": "interez",
+            "inversión": "imbersion",
+            "presupuesto": "prezupuesto",
+            "negocio": "negosio",
+            "ganancia": "ganansia",
+            "pérdida": "perdida",
+            "tarjeta": "targjeta",
+            "préstamo": "preztamo",
+            "donación": "donasion",
+            "seguro": "zeguro",
+            "crédito": "crezito",
+            "trueque": "truece",
+            "oferta": "oferto",
+            "escasez": "escaces",
+            "abundancia": "abundansia",
+            "gastos": "gaztos",
+            "ingresos": "ingrezos",
+            "propósito": "propocito",
+            "valores": "balores",
+            "experimentos": "ezperimentos",
+            "billeteras": "biyeteras",
+            "ahorros": "ahoros",
+            "dollar": "dolar",
+            "bolivares": "bolibares",
+            "necesidades": "nesecidades",   // Error común S/C
+            "deseo": "deceo",               // Confusión común S/C
+            "organización": "organisación", // Confusión Z/S
+            "planificación": "planificasión" // Confusión C/S
+        };
+
+        const retos = [
+            "Dinos: ¿Por qué es importante llevar un control de tus gastos semanales?",
+            "Imagina que tienes ingresos extra esta semana. ¿Qué porcentaje ahorrarías y por qué?",
+            "¿Cuál es tu propósito financiero de este año? (Por ejemplo: comprar un libro, un juguete, etc.)",
+            "Los valores nos guían a compartir. ¿Cómo usarías tu dinero para hacer una donación?",
+            "Hagamos experimentos: ¿Cuántas monedas crees que necesitas ahorrar para comprar un dulce?",
+            "Las billeteras guardan billetes, pero ¿dónde es más seguro guardar tus ahorros de verdad?",
+            "Menciona 2 necesidades reales (como comer) y 2 deseos (como un juguete de moda). ¿Cuál es más importante?",
+            "¿Por qué es importante tener planificación antes de salir a comprar dulces o juguetes?",
+            "¿Cómo nos ayuda una buena organización a no gastar todo nuestro dinero de golpe?"
+        ];
+
+        // Estado del juego
+        let palabrasEnTablero = [];
+        let palabraObjetivo = "";
+        let puntuacion = 0;
+        let juegoActivo = false;
+        let palabraSeleccionadaPorUsuario = null;
+        let elementsArray = []; // Guarda referencias físicas de las palabras
+        let obstaculosArray = []; // Guarda referencias de las hormigas
+        let minasArray = []; // Guarda referencias físicas de las bombas/minas
+
+        // Variables de la Inflación / Tiempo
+        let tiempoRestante = 100; // Porcentaje
+        let inflacionInterval = null;
+        let baseReward = 10;
+        let bonusReward = 10;
+
+        // Elementos DOM
+        const boardEl = document.getElementById('game-board');
+        const targetWordEl = document.getElementById('target-word');
+        const scoreEl = document.getElementById('score');
+        const btnStart = document.getElementById('btn-start');
+        const btnStop = document.getElementById('btn-stop');
+        const overlayStart = document.getElementById('overlay-start');
+        const inflationBar = document.getElementById('inflation-bar');
+        const inflationStatus = document.getElementById('inflation-status');
+        
+        // Modales
+        const mainModal = document.getElementById('message-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalIcon = document.getElementById('modal-icon');
+        const btnChallenge = document.getElementById('btn-challenge');
+        const challengeModal = document.getElementById('challenge-modal');
+        const challengeText = document.getElementById('challenge-text');
+        const challengeWordDisplay = document.getElementById('challenge-word-display');
+        const toastContainer = document.getElementById('toast-container');
+
+        // Genera posiciones de grilla sin superposiciones
+        function generarPosicionesGrilla(cantidad) {
+            const filas = 3;
+            const columnas = 4;
+            const posiciones = [];
+            
+            const boardW = boardEl.clientWidth || 650;
+            const boardH = boardEl.clientHeight || 440;
+
+            const anchoCelda = boardW / columnas;
+            const altoCelda = boardH / filas;
+
+            for (let f = 0; f < filas; f++) {
+                for (let c = 0; c < columnas; c++) {
+                    posiciones.push({
+                        x: (c * anchoCelda) + (anchoCelda / 2),
+                        y: (f * altoCelda) + (altoCelda / 2)
+                    });
+                }
+            }
+
+            const posicionesMezcladas = posiciones.sort(() => 0.5 - Math.random());
+            
+            return posicionesMezcladas.slice(0, cantidad).map(pos => {
+                const jiggleX = (Math.random() - 0.5) * 35;
+                const jiggleY = (Math.random() - 0.5) * 30;
+                return {
+                    x: Math.max(30, Math.min(pos.x + jiggleX - 60, boardW - 140)),
+                    y: Math.max(20, Math.min(pos.y + jiggleY - 25, boardH - 60))
+                };
+            });
+        }
+
+        function showToast(mensaje, tipo = "info") {
+            const toast = document.createElement('div');
+            toast.className = `toast border-2 ${tipo === 'danger' ? 'border-red-500 bg-red-900/90' : 'border-green-400 bg-slate-900/95'}`;
+            
+            const icon = tipo === 'danger' ? '💥' : '🌟';
+            toast.innerHTML = `<span>${icon}</span> <p class="text-sm font-bold">${mensaje}</p>`;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = "slideIn 0.3s ease-out reverse forwards";
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        let animationFrameId = null;
+
+        function updatePositionsLoop() {
+            if (!juegoActivo) return;
+
+            const boardW = boardEl.clientWidth;
+            const boardH = boardEl.clientHeight;
+
+            // Actualizar Palabras Flotantes
+            elementsArray.forEach(item => {
+                item.x += item.vx;
+                item.y += item.vy;
+
+                const maxW = boardW - item.el.offsetWidth;
+                const maxH = boardH - item.el.offsetHeight;
+
+                if (item.x < 5) { item.x = 5; item.vx *= -1; }
+                if (item.x > maxW - 5) { item.x = maxW - 5; item.vx *= -1; }
+                if (item.y < 5) { item.y = 5; item.vy *= -1; }
+                if (item.y > maxH - 5) { item.y = maxH - 5; item.vy *= -1; }
+
+                item.el.style.left = `${item.x}px`;
+                item.el.style.top = `${item.y}px`;
+            });
+
+            // Actualizar Gastos Hormiga (Obstáculos)
+            obstaculosArray.forEach(hormiga => {
+                hormiga.x += hormiga.vx;
+                hormiga.y += hormiga.vy;
+
+                const size = 35;
+                const maxW = boardW - size;
+                const maxH = boardH - size;
+
+                if (hormiga.x < 5) { hormiga.x = 5; hormiga.vx *= -1; }
+                if (hormiga.x > maxW - 5) { hormiga.x = maxW - 5; hormiga.vx *= -1; }
+                if (hormiga.y < 5) { hormiga.y = 5; hormiga.vy *= -1; }
+                if (hormiga.y > maxH - 5) { hormiga.y = maxH - 5; hormiga.vy *= -1; }
+
+                hormiga.el.style.left = `${hormiga.x}px`;
+                hormiga.el.style.top = `${hormiga.y}px`;
+            });
+
+            // Actualizar Minas de Deuda (Moverlas muy lento para hacerlo orgánico)
+            minasArray.forEach(mina => {
+                mina.x += mina.vx;
+                mina.y += mina.vy;
+
+                const size = 40;
+                const maxW = boardW - size;
+                const maxH = boardH - size;
+
+                if (mina.x < 5) { mina.x = 5; mina.vx *= -1; }
+                if (mina.x > maxW - 5) { mina.x = maxW - 5; mina.vx *= -1; }
+                if (mina.y < 5) { mina.y = 5; mina.vy *= -1; }
+                if (mina.y > maxH - 5) { mina.y = maxH - 5; mina.vy *= -1; }
+
+                mina.el.style.left = `${mina.x}px`;
+                mina.el.style.top = `${mina.y}px`;
+            });
+
+            animationFrameId = requestAnimationFrame(updatePositionsLoop);
+        }
+
+        function iniciarRelojDeInflacion() {
+            tiempoRestante = 100;
+            bonusReward = 10;
+            inflationBar.style.width = '100%';
+            inflationBar.style.backgroundColor = '#22c55e';
+            inflationStatus.textContent = "¡Ahorro Seguro! 🟢";
+            inflationStatus.className = "text-green-600 font-extrabold";
+
+            if (inflacionInterval) clearInterval(inflacionInterval);
+
+            inflacionInterval = setInterval(() => {
+                if (!juegoActivo) {
+                    clearInterval(inflacionInterval);
+                    return;
+                }
+
+                tiempoRestante -= 1.3; // Velocidad de desgaste de la barra de tiempo
+
+                if (tiempoRestante <= 0) {
+                    tiempoRestante = 0;
+                    bonusReward = 0;
+                    inflationBar.style.width = '0%';
+                    inflationStatus.textContent = "📈 INFLACIÓN ALTA (Puntos reducidos)";
+                    inflationStatus.className = "text-red-500 font-extrabold animate-pulse";
+                    clearInterval(inflacionInterval);
+                } else {
+                    inflationBar.style.width = `${tiempoRestante}%`;
+                    
+                    if (tiempoRestante > 50) {
+                        inflationBar.style.backgroundColor = '#22c55e';
+                        bonusReward = 10;
+                    } else if (tiempoRestante > 20) {
+                        inflationBar.style.backgroundColor = '#f59e0b';
+                        inflationStatus.textContent = "Ahorros estables 🟡";
+                        inflationStatus.className = "text-yellow-600 font-extrabold";
+                        bonusReward = 5;
+                    } else {
+                        inflationBar.style.backgroundColor = '#ef4444';
+                        inflationStatus.textContent = "¡Cuidado, viene la inflación! 🟠";
+                        inflationStatus.className = "text-orange-500 font-extrabold";
+                        bonusReward = 2;
+                    }
+                }
+            }, 250);
+        }
+
+        // Lógica explosiva de las minas
+        function detonarMina(el) {
+            if (!juegoActivo) return;
+
+            // Reemplazar emoji visualmente
+            el.textContent = "💥";
+            el.className = "explosion";
+
+            // Sacudir pantalla
+            boardEl.classList.add('shake-board');
+            setTimeout(() => {
+                boardEl.classList.remove('shake-board');
+            }, 500);
+
+            // Reducir ahorros significativamente por caer en deudas explosivas
+            actualizarPuntos(-15);
+            showToast("¡PUM! Pisaste una Mina de Deudas. Perdiste -15 ahorros 💣💸", "danger");
+
+            // Remover el elemento después de la animación de explosión
+            setTimeout(() => {
+                el.remove();
+            }, 600);
+        }
+
+        function dibujarTablero() {
+            boardEl.innerHTML = '';
+            elementsArray = [];
+            obstaculosArray = [];
+            minasArray = [];
+
+            // 1. Obtener palabra objetivo y aleatorias
+            const cantidadTotalPalabras = 8; 
+            const palabrasAleatorias = [...vocabulario].sort(() => 0.5 - Math.random()).slice(0, cantidadTotalPalabras);
+            
+            if (!palabrasAleatorias.includes(palabraObjetivo)) {
+                palabrasAleatorias[0] = palabraObjetivo;
+            }
+
+            // 2. Generar el señuelo ortográfico
+            const senuelo = senuelosMap[palabraObjetivo] || (palabraObjetivo + "o");
+            palabrasAleatorias.push(senuelo);
+
+            const totalElementos = palabrasAleatorias.length;
+            const posicionesGrid = generarPosicionesGrilla(totalElementos);
+
+            // 3. Renderizar palabras
+            palabrasAleatorias.forEach((palabra, index) => {
+                const span = document.createElement('span');
+                span.textContent = palabra;
+                span.className = 'word-item';
+
+                const esSenuelo = (palabra === senuelo);
+                if (esSenuelo) {
+                    span.classList.add('decoy');
+                }
+
+                const pos = posicionesGrid[index] || { x: 50, y: 50 };
+                span.style.left = `${pos.x}px`;
+                span.style.top = `${pos.y}px`;
+
+                const rot = (Math.random() - 0.5) * 12;
+                span.style.transform = `rotate(${rot}deg)`;
+
+                span.addEventListener('click', (e) => seleccionarPalabra(e.target, palabra, esSenuelo));
+
+                boardEl.appendChild(span);
+
+                const vx = (Math.random() - 0.5) * 0.6;
+                const vy = (Math.random() - 0.5) * 0.6;
+
+                elementsArray.push({
+                    el: span,
+                    x: pos.x,
+                    y: pos.y,
+                    vx: Math.abs(vx) < 0.1 ? 0.3 : vx,
+                    vy: Math.abs(vy) < 0.1 ? 0.3 : vy
+                });
+            });
+
+            // 4. Crear Obstáculos: "Gastos Hormiga 🐜"
+            const cantidadHormigas = 3;
+            const boardW = boardEl.clientWidth || 650;
+            const boardH = boardEl.clientHeight || 440;
+
+            for (let i = 0; i < cantidadHormigas; i++) {
+                const hormigaEl = document.createElement('div');
+                hormigaEl.textContent = '🐜';
+                hormigaEl.className = 'gasto-hormiga';
+                
+                const hX = Math.random() * (boardW - 45) + 10;
+                const hY = Math.random() * (boardH - 45) + 10;
+
+                hormigaEl.style.left = `${hX}px`;
+                hormigaEl.style.top = `${hY}px`;
+
+                hormigaEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    impactarGastoHormiga(hormigaEl);
+                });
+
+                boardEl.appendChild(hormigaEl);
+
+                const vx = (Math.random() - 0.5) * 1.8;
+                const vy = (Math.random() - 0.5) * 1.8;
+
+                obstaculosArray.push({
+                    el: hormigaEl,
+                    x: hX,
+                    y: hY,
+                    vx: Math.abs(vx) < 0.4 ? 0.8 : vx,
+                    vy: Math.abs(vy) < 0.4 ? 0.8 : vy
+                });
+            }
+
+            // 5. Crear Obstáculos Nuevos: "Minas de Deuda 💣"
+            const cantidadMinas = 3;
+            for (let i = 0; i < cantidadMinas; i++) {
+                const minaEl = document.createElement('div');
+                minaEl.textContent = '💣';
+                minaEl.className = 'mina-deuda';
+
+                // Generar posición aleatoria cuidando de no salirse del contenedor
+                const mX = Math.random() * (boardW - 55) + 15;
+                const mY = Math.random() * (boardH - 55) + 15;
+
+                minaEl.style.left = `${mX}px`;
+                minaEl.style.top = `${mY}px`;
+
+                minaEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    detonarMina(minaEl);
+                });
+
+                boardEl.appendChild(minaEl);
+
+                // Movimiento sumamente lento para que actúen como trampas flotantes casi estáticas
+                const vx = (Math.random() - 0.5) * 0.3;
+                const vy = (Math.random() - 0.5) * 0.3;
+
+                minasArray.push({
+                    el: minaEl,
+                    x: mX,
+                    y: mY,
+                    vx: vx,
+                    vy: vy
+                });
+            }
+
+            updatePositionsLoop();
+        }
+
+        function impactarGastoHormiga(el) {
+            if (!juegoActivo) return;
+
+            actualizarPuntos(-5);
+            showToast("¡Ay! Caíste en un Gasto Hormiga. Perdiste -5 de Ahorro. 🐜💸", "danger");
+
+            el.style.transform = "scale(1.8)";
+            setTimeout(() => {
+                el.style.transform = "scale(1)";
+            }, 200);
+        }
+
+        function seleccionarPalabra(elemento, palabra, esSenuelo) {
+            if (!juegoActivo) return;
+
+            const todosElementos = document.querySelectorAll('.word-item');
+            todosElementos.forEach(el => el.classList.remove('selected', 'wrong'));
+
+            elemento.classList.add('selected');
+            palabraSeleccionadaPorUsuario = palabra;
+
+            if (esSenuelo) {
+                showToast("¡Ojo con la lectura! Ese es un impostor con mala ortografía... 🧐🔍", "info");
+            }
+        }
+
+        function iniciarRonda() {
+            juegoActivo = true;
+            palabraSeleccionadaPorUsuario = null;
+
+            palabraObjetivo = vocabulario[Math.floor(Math.random() * vocabulario.length)];
+            targetWordEl.textContent = palabraObjetivo;
+
+            overlayStart.style.display = 'none';
+            btnStart.disabled = true;
+            btnStop.disabled = false;
+
+            dibujarTablero();
+            iniciarRelojDeInflacion();
+        }
+
+        function evaluarStop() {
+            if (!juegoActivo) return;
+            juegoActivo = false;
+
+            cancelAnimationFrame(animationFrameId);
+            clearInterval(inflacionInterval);
+
+            btnStart.disabled = false;
+            btnStop.disabled = true;
+
+            if (palabraSeleccionadaPorUsuario === palabraObjetivo) {
+                const gananciaBase = bonusReward > 0 ? baseReward : 4;
+                const bonoFinal = bonusReward;
+                const premioTotal = gananciaBase + bonoFinal;
+
+                actualizarPuntos(premioTotal);
+
+                let tituloModal = "¡Felicidades Súper Inversor! 🏦🌟";
+                let mensajeModal = `Encontraste "${palabraObjetivo}" con éxito.<br><br>` + 
+                                   `💵 Premio base: <strong>+${gananciaBase}</strong> ahorros.<br>` +
+                                   `⚡ Bono de Rapidez: <strong>+${bonoFinal}</strong> ahorros.<br>` +
+                                   `💰 Total ganado: <strong>+${premioTotal}</strong>.`;
+
+                if (bonoFinal === 0) {
+                    tituloModal = "¡Buen trabajo! (Pero subió la inflación) 📈🏃‍♂️";
+                    mensajeModal = `Encontraste la palabra, pero tardaste demasiado y la inflación redujo tus ganancias.<br><br>` +
+                                   `💰 Solo ganaste: <strong>+${gananciaBase}</strong> ahorros.<br>¡Intenta ser más rápido la próxima!`;
+                }
+
+                mostrarModalPrincipal(tituloModal, mensajeModal, "🏆", true);
+            } else {
+                if (palabraSeleccionadaPorUsuario === null) {
+                    mostrarModalPrincipal(
+                        "¡No elegiste palabra! ⏱️", 
+                        `Presionaste STOP sin hacer clic en ninguna palabra. Recuerda buscar <strong>"${palabraObjetivo}"</strong> en el tablero antes de detener el tiempo.`, 
+                        "🤔", 
+                        false
+                    );
+                } else {
+                    const esSenuelo = (senuelosMap[palabraObjetivo] === palabraSeleccionadaPorUsuario);
+                    let razonError = `Seleccionaste "${palabraSeleccionadaPorUsuario}", pero la palabra correcta era "${palabraObjetivo}".`;
+                    
+                    if (esSenuelo) {
+                        razonError = `¡Caíste en la trampa ortográfica! Elegiste <strong>"${palabraSeleccionadaPorUsuario}"</strong>, pero se escribe correctamente <strong>"${palabraObjetivo}"</strong>. ¡Entrena tu vista de lector!`;
+                    }
+
+                    const elementos = document.querySelectorAll('.word-item');
+                    elementos.forEach(el => {
+                        if (el.textContent === palabraSeleccionadaPorUsuario) {
+                            el.classList.remove('selected');
+                            el.classList.add('wrong');
+                        }
+                    });
+
+                    mostrarModalPrincipal("¡Ups, casi! 💸", razonError + "<br><br>¡Prueba otra vez en la siguiente ronda!", "😅", false);
+                }
+            }
+        }
+
+        function actualizarPuntos(cantidad) {
+            puntuacion += cantidad;
+            if (puntuacion < 0) puntuacion = 0; 
+            
+            scoreEl.textContent = puntuacion;
+            
+            scoreEl.parentElement.classList.add('bg-yellow-300', 'scale-105');
+            setTimeout(() => {
+                scoreEl.parentElement.classList.remove('bg-yellow-300', 'scale-105');
+            }, 300);
+        }
+
+        function mostrarModalPrincipal(titulo, mensaje, icono, mostrarBotonReto) {
+            modalTitle.innerHTML = titulo;
+            modalMessage.innerHTML = mensaje;
+            modalIcon.textContent = icono;
+            
+            btnChallenge.style.display = mostrarBotonReto ? 'flex' : 'none';
+            
+            setTimeout(() => {
+                mainModal.style.display = 'flex';
+            }, 350);
+        }
+
+        function closeMainModal() {
+            mainModal.style.display = 'none';
+            prepararNuevaRonda();
+        }
+
+        function openChallengeModal() {
+            mainModal.style.display = 'none';
+            
+            const retoAleatorio = retos[Math.floor(Math.random() * retos.length)];
+            
+            challengeWordDisplay.textContent = palabraObjetivo;
+            challengeText.textContent = retoAleatorio;
+            challengeModal.style.display = 'flex';
+        }
+
+        function completeChallenge(exito) {
+            challengeModal.style.display = 'none';
+            
+            if (exito) {
+                actualizarPuntos(20);
+                showToast("¡Reto superado! Ganaste +20 de ahorro extra por tu conocimiento. 🪙📈", "success");
+            } else {
+                showToast("No te preocupes. ¡Puedes hacer el reto financiero en la siguiente ronda! 💪", "info");
+            }
+            
+            prepararNuevaRonda();
+        }
+
+        function prepararNuevaRonda() {
+            cancelAnimationFrame(animationFrameId);
+            boardEl.innerHTML = '';
+            boardEl.appendChild(overlayStart);
+            overlayStart.style.display = 'flex';
+            targetWordEl.textContent = "---";
+            
+            inflationBar.style.width = '100%';
+            inflationBar.style.backgroundColor = '#22c55e';
+            inflationStatus.textContent = "¡Ahorro Seguro! 🟢";
+            inflationStatus.className = "text-green-600 font-extrabold";
+        }
+
+        btnStart.addEventListener('click', iniciarRonda);
+        btnStop.addEventListener('click', evaluarStop);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Slide 14 - El flujo de tu dinero personal</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                        'visium-blue': '#1e3a8a',
+                        'pastel-mint': '#A8E6CF',
+                        'pastel-yellow': '#FDFD96',
+                        'pastel-lavender': '#D4B8E8',
+                        'pastel-lime': '#C1E1C1',
+                        'accent-orange': '#FF9F43',
+                    },
+                    animation: { 'fade-in': 'fadeIn 0.4s ease-out' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #F8F9FA; font-family: 'Inter', sans-serif; }
+        .nav-btn { transition: all 0.2s; backdrop-filter: blur(8px); }
+        .nav-btn:hover { transform: scale(1.05); background-color: rgba(59,130,246,0.15); }
+        .card { transition: transform 0.3s ease; }
+        .card:hover { transform: translateY(-4px); }
+        .wave-decoration {
+            position: absolute;
+            width: 200px;
+            height: 100px;
+            background: linear-gradient(135deg, #A8E6CF 0%, #D4B8E8 100%);
+            border-radius: 50%;
+            opacity: 0.3;
+            filter: blur(40px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-4">
+
+<!-- Main Content -->
+<div class="flex-1 flex items-center justify-center relative overflow-hidden">
+    <div class="wave-decoration top-20 right-20"></div>
+    
+    <div class="max-w-7xl w-full mx-auto animate-fade-in relative z-10">
+        <div class="bg-white rounded-3xl p-10 card">
+            <div class="text-center mb-8">
+                <span class="text-sm font-semibold text-accent-orange">Concepto clave</span>
+                <h2 class="text-3xl font-bold text-gray-800 mt-2">El flujo de tu dinero personal</h2>
+            </div>
+            <div class="bg-gradient-to-r from-pastel-mint/20 to-pastel-lavender/20 rounded-2xl p-6">
+                <div class="flex flex-col md:flex-row justify-around gap-6">
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white mb-3">
+                            <i class="ti ti-arrow-down-circle text-3xl text-green-600"></i>
+                        </div>
+                        <p class="font-bold text-green-700">Ingresos</p>
+                        <p class="text-gray-600 text-sm">Salario, ingresos extra, regalos, negocios</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white mb-3">
+                            <i class="ti ti-arrow-up-circle text-3xl text-red-600"></i>
+                        </div>
+                        <p class="font-bold text-red-700">Gastos</p>
+                        <p class="text-gray-600 text-sm">Alquiler, comida, transporte, ocio</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 p-4 bg-pastel-lime/20 rounded-xl">
+                <p class="font-semibold text-gray-800"><i class="ti ti-check mr-2 text-green-600"></i>Si ahorras → Oportunidad para tu futuro</p>
+                <p class="font-semibold text-red-600 mt-2"><i class="ti ti-x mr-2"></i>Si gastas más de lo que ganas → Problema que debes resolver</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer with Pagination -->
+<footer class="bg-white border-t border-gray-200 py-4 px-6">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-500">Slide</span>
+            <span class="text-sm font-bold text-gray-800">14</span>
+            <span class="text-sm text-gray-500">de</span>
+            <span class="text-sm font-bold text-gray-800">40</span>
+        </div>
+        
+        <!-- Pagination Dots -->
+        <div class="flex items-center gap-2">
+            <a href="slide_13.html" class="nav-btn bg-white/80 p-3 rounded-full inline-flex items-center justify-center border border-gray-200">
+                <i class="ti ti-arrow-left text-gray-600"></i>
+            </a>
+            <div class="flex gap-1 mx-4">
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-accent-orange"></span>
+            </div>
+            <a href="slide_15.html" class="nav-btn bg-white/80 p-3 rounded-full inline-flex items-center justify-center border border-gray-200">
+                <i class="ti ti-arrow-right text-gray-600"></i>
+            </a>
+        </div>
+        
+        <div class="text-sm text-gray-400">Visium Digital</div>
+    </div>
+</footer>
+
+</body>
+</html>

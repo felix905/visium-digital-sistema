@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanzas Craft - Debate Único</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .glass-card { background: white; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .card-hover:hover { transform: translateY(-4px); transition: all 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.4s ease-out forwards; }
+        .profession-btn { transition: all 0.2s ease; }
+        .profession-btn:hover:not(:disabled) { transform: scale(1.05); }
+        .profession-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        /* Ajuste para iconos dentro de botones */
+        .profession-btn i { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+
+    <!-- Header con Logo -->
+    <header class="sticky top-0 z-50 pt-6 pb-3">
+        <div class="container mx-auto px-4">
+            <nav class="flex items-center justify-between text-sm font-normal bg-white/80 py-3 pl-2 pr-4 backdrop-blur-md rounded-xl shadow-sm">
+                <a href="index.html" class="flex items-center">
+                    <img src="img/logo_v.svg" alt="Visium Digital" class="ml-3 h-7">
+                </a>
+                <div class="hidden md:block text-right">
+                    <div class="text-sm font-normal text-gray-800 leading-tight">Escuela de diseño</div>
+                    <div class="text-sm font-normal text-gray-800 leading-tight">e innovación</div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto pt-8">
+        <div id="app" class="flex flex-col items-center justify-center min-h-[60vh]">
+            <!-- Pantalla de selección de profesiones - visible por defecto -->
+            <div id="selection-screen" class="animate-fade flex flex-col items-center w-full max-w-4xl">
+                <div class="text-center mb-8">
+                    <span class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+                        <i class="ti ti-users"></i> Multijugador Local
+                    </span>
+                    <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-3">Finanzas Craft</h1>
+                    <p class="text-gray-500 text-lg">Mazo de 15 Casos de Vida Real</p>
+                </div>
+
+                <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 w-full mb-8">
+                    <p class="text-center text-gray-600 font-medium mb-6">Cada jugador selecciona una profesión</p>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="professions-grid">
+                        <!-- Se genera dinámicamente -->
+                    </div>
+                    <div id="selected-players" class="mt-6 pt-6 border-t border-gray-100">
+                        <p class="text-sm font-bold text-gray-500 uppercase mb-3">Jugadores seleccionados:</p>
+                        <div id="players-list" class="flex flex-wrap gap-2">
+                            <span class="text-gray-400 text-sm">Ninguno aún...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="start-btn" onclick="startLocalGame()" class="px-12 py-4 bg-gray-300 text-gray-500 font-bold rounded-2xl uppercase cursor-not-allowed" disabled>
+                    <i class="ti ti-cards"></i> Mezclar y Empezar
+                </button>
+                <p id="waiting-msg" class="text-gray-500 text-sm mt-3">Selecciona al menos 2 jugadores</p>
+            </div>
+
+            <!-- Pantalla del juego - oculta inicialmente -->
+            <div id="game-screen" class="hidden w-full">
+                <!-- Se genera dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 border-t border-gray-300">
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Visium Digital</h3>
+                    <p class="text-gray-600 text-sm">Escuela de diseño e innovación</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Contactos</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-brand-whatsapp"></i> (+58) 424 152 9071
+                        </li>
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-mail"></i> visiumdigitalca@gmail.com
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Síguenos</h3>
+                    <div class="flex space-x-3">
+                        <a href="https://www.instagram.com/visium.digital.c.a/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-instagram text-xl"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/visium-digital/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-500">© 2025 Visium Digital</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Modo local - sin Firebase
+        const MAX_ROUNDS = 5;
+        const MIN_PLAYERS = 2;
+
+        // Estado global del juego
+        let gameState = {
+            status: 'waiting',
+            round: 1,
+            currentPlayerIndex: 0,
+            activeChallenge: null,
+            votesReceived: {},
+            deck: [],
+            currentCardIndex: 0
+        };
+
+        let localPlayers = [];
+
+        // Casos de vida
+        const LIFE_CASES = [
+            { id: 1, block: "DINERO Y EVOLUCIÓN", title: "El trueque moderno", situation: "Tienes una habilidad: editas videos. Un amigo te ofrece intercambiarte una sudadera por editarle 3 videos. ¿Aceptarías el trueque o preferirías dinero? ¿Por qué?" },
+            { id: 2, block: "DINERO Y EVOLUCIÓN", title: "¿Efectivo o digital?", situation: "Te dan €20 en efectivo o €20 en saldo digital (tipo wallet). ¿Cuál eliges y por qué?" },
+            { id: 3, block: "DINERO Y EVOLUCIÓN", title: "Dinero invisible", situation: "Pagas todo con tarjeta o app. A fin de mes no sabes en qué gastaste. ¿El dinero digital ayuda o perjudica el control financiero?" },
+            { id: 4, block: "NECESIDAD vs DESEO", title: "El celular nuevo", situation: "Tu celular funciona bien, pero salió el último modelo. ¿Lo compras o no? Justifica." },
+            { id: 5, block: "NECESIDAD vs DESEO", title: "Moda o funcionalidad", situation: "Tienes €50. Puedes comprar ropa de marca o ropa básica más útil. ¿Qué eliges y por qué?" },
+            { id: 6, block: "NECESIDAD vs DESEO", title: "Salida con amigos", situation: "Tus amigos quieren salir, pero ese dinero lo ibas a ahorrar. ¿Qué haces?" },
+            { id: 7, block: "DEUDA", title: "Comprar a crédito", situation: "Quieres unos audífonos caros y puedes pagarlos en cuotas. ¿Es buena o mala deuda?" },
+            { id: 8, block: "DEUDA", title: "Deuda para aprender", situation: "Te ofrecen un curso que puede ayudarte a ganar dinero, pero no tienes el dinero completo. ¿Te endeudas o no?" },
+            { id: 9, block: "DEUDA", title: "Préstamo entre amigos", situation: "Un amigo te pide dinero prestado y promete devolvértelo. ¿Le prestas o no? ¿Bajo qué condiciones?" },
+            { id: 10, block: "INGRESOS", title: "Primer ingreso", situation: "Puedes trabajar unas horas o enfocarte en estudiar. ¿Qué haces y por qué?" },
+            { id: 11, block: "INGRESOS", title: "Emprender joven", situation: "Quieres vender postres en el colegio o por redes. ¿Qué necesitas antes de empezar?" },
+            { id: 12, block: "INGRESOS", title: "Dinero rápido", situation: "Te ofrecen ganar dinero rápido sin mucho esfuerzo, pero no entiendes bien cómo funciona. ¿Aceptas o investigas más?" },
+            { id: 13, block: "AHORRO E INVERSIÓN", title: "Ahorro o inversión", situation: "Tienes €100. ¿Lo guardas o lo inviertes? ¿Dónde?" },
+            { id: 14, block: "AHORRO E INVERSIÓN", title: "Riesgo vs seguridad", situation: "Puedes invertir en algo seguro con baja ganancia o en algo riesgoso con alta ganancia. ¿Qué eliges y por qué?" },
+            { id: 15, block: "AHORRO E INVERSIÓN", title: "Rendimiento del dinero", situation: "Guardas dinero durante 1 año sin usarlo. ¿Pierde, mantiene o gana valor? Explica." }
+        ];
+
+        // Profesiones con su clase completa de Tabler (ti + ti-nombre)
+        const PROFESSIONS = [
+            { id: 'eng', name: 'Arquitecto de Software', iconClass: 'ti ti-building-skyscraper' },
+            { id: 'doc', name: 'Cirujano Especialista', iconClass: 'ti ti-stethoscope' },
+            { id: 'art', name: 'Diseñador Freelance', iconClass: 'ti ti-pencil' },
+            { id: 'chef', name: 'Dueño de Restaurante', iconClass: 'ti ti-chef-hat' },
+            { id: 'inv', name: 'Analista de Inversiones', iconClass: 'ti ti-chart-line' }
+        ];
+
+        // --- FUNCIONES DE LÓGICA LOCAL ---
+        function shuffleDeck() {
+            const deck = [...LIFE_CASES];
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            return deck;
+        }
+
+        function initProfessionsGrid() {
+            const grid = document.getElementById('professions-grid');
+            grid.innerHTML = PROFESSIONS.map((p, i) => `
+                <button onclick="selectLocalProfession(${i})" id="prof-btn-${i}"
+                    class="profession-btn p-6 rounded-2xl border-2 flex flex-col items-center border-gray-200 bg-gray-50 hover:border-green-500 hover:bg-green-50">
+                    <i class="${p.iconClass} text-5xl mb-2"></i>
+                    <span class="text-xs font-bold text-gray-700 text-center">${p.name}</span>
+                </button>
+            `).join('');
+        }
+
+        window.selectLocalProfession = function(index) {
+            const prof = PROFESSIONS[index];
+            
+            if (localPlayers.some(p => p.professionId === prof.id)) {
+                localPlayers = localPlayers.filter(p => p.professionId !== prof.id);
+                document.getElementById(`prof-btn-${index}`).classList.remove('border-green-500', 'bg-green-100');
+                document.getElementById(`prof-btn-${index}`).classList.add('border-gray-200', 'bg-gray-50');
+            } else {
+                if (localPlayers.length >= 5) return;
+                localPlayers.push({
+                    id: `player_${prof.id}_${Date.now()}`,
+                    professionId: prof.id,
+                    name: prof.name,
+                    iconClass: prof.iconClass,
+                    totalScore: 0
+                });
+                document.getElementById(`prof-btn-${index}`).classList.remove('border-gray-200', 'bg-gray-50');
+                document.getElementById(`prof-btn-${index}`).classList.add('border-green-500', 'bg-green-100');
+            }
+            updatePlayersList();
+        };
+
+        function updatePlayersList() {
+            const list = document.getElementById('players-list');
+            const startBtn = document.getElementById('start-btn');
+            const waitingMsg = document.getElementById('waiting-msg');
+            
+            if (localPlayers.length === 0) {
+                list.innerHTML = '<span class="text-gray-400 text-sm">Ninguno aún...</span>';
+                startBtn.disabled = true;
+                startBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                startBtn.classList.remove('bg-green-600', 'text-white', 'hover:bg-green-700');
+                waitingMsg.textContent = `Selecciona al menos ${MIN_PLAYERS} jugadores`;
+            } else {
+                list.innerHTML = localPlayers.map(p => `
+                    <span class="inline-flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                        <i class="${p.iconClass} text-base"></i> ${p.name.split(' ')[0]}
+                    </span>
+                `).join('');
+                
+                if (localPlayers.length >= MIN_PLAYERS) {
+                    startBtn.disabled = false;
+                    startBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                    startBtn.classList.add('bg-green-600', 'text-white', 'hover:bg-green-700');
+                    waitingMsg.textContent = '¡Listo para comenzar!';
+                } else {
+                    startBtn.disabled = true;
+                    startBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                    startBtn.classList.remove('bg-green-600', 'text-white', 'hover:bg-green-700');
+                    waitingMsg.textContent = `Necesitas ${MIN_PLAYERS - localPlayers.length} jugador(es) más`;
+                }
+            }
+        }
+
+        window.startLocalGame = function() {
+            if (localPlayers.length < MIN_PLAYERS) return;
+            
+            gameState.status = 'defense';
+            gameState.round = 1;
+            gameState.currentPlayerIndex = 0;
+            gameState.activeChallenge = null;
+            gameState.votesReceived = {};
+            gameState.deck = shuffleDeck();
+            gameState.currentCardIndex = 0;
+            
+            localPlayers.forEach(p => {
+                gameState.votesReceived[p.id] = 0;
+                p.totalScore = 0;
+            });
+            
+            document.getElementById('selection-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            renderGame();
+        };
+
+        window.drawCard = function() {
+            if (!gameState.deck || gameState.currentCardIndex >= gameState.deck.length) return;
+            gameState.activeChallenge = gameState.deck[gameState.currentCardIndex];
+            gameState.status = 'defense';
+            gameState.currentCardIndex++;
+            const currentId = localPlayers[gameState.currentPlayerIndex].id;
+            gameState.votesReceived[currentId] = 0;
+            renderGame();
+        };
+
+        window.startVoting = function() {
+            gameState.status = 'voting';
+            renderGame();
+        };
+
+        window.submitVote = function(pts) {
+            const currentPlayer = localPlayers[gameState.currentPlayerIndex];
+            currentPlayer.totalScore += pts;
+            const currentId = currentPlayer.id;
+            gameState.votesReceived[currentId]++;
+            renderGame();
+        };
+
+        window.nextTurn = function() {
+            const isLastPlayer = gameState.currentPlayerIndex === localPlayers.length - 1;
+            
+            if (isLastPlayer) {
+                if (gameState.round >= MAX_ROUNDS) {
+                    gameState.status = 'finished';
+                } else {
+                    gameState.currentPlayerIndex = 0;
+                    gameState.round++;
+                    gameState.status = 'defense';
+                    gameState.activeChallenge = null;
+                }
+            } else {
+                gameState.currentPlayerIndex++;
+                gameState.status = 'defense';
+                gameState.activeChallenge = null;
+            }
+            renderGame();
+        };
+
+        window.resetGame = function() {
+            localPlayers = [];
+            gameState = {
+                status: 'waiting',
+                round: 1,
+                currentPlayerIndex: 0,
+                activeChallenge: null,
+                votesReceived: {},
+                deck: [],
+                currentCardIndex: 0
+            };
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('selection-screen').classList.remove('hidden');
+            initProfessionsGrid();
+            updatePlayersList();
+        };
+
+        // --- RENDERIZADO DEL JUEGO ---
+        function renderGame() {
+            const container = document.getElementById('game-screen');
+            const { status, round, activeChallenge, currentPlayerIndex, currentCardIndex } = gameState;
+            
+            if (status === 'finished') {
+                const winners = [...localPlayers].sort((a,b) => b.totalScore - a.totalScore);
+                container.innerHTML = `
+                    <div class="animate-fade text-center w-full max-w-2xl mx-auto">
+                        <div class="mb-8">
+                            <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="ti ti-trophy text-4xl text-yellow-600"></i>
+                            </div>
+                            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">¡Debate Finalizado!</h1>
+                            <p class="text-gray-500">Resultados finales del juego</p>
+                        </div>
+
+                        <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden mb-8">
+                            ${winners.map((w, i) => `
+                                <div class="flex items-center justify-between p-6 ${i !== winners.length - 1 ? 'border-b border-gray-100' : ''} ${i === 0 ? 'bg-green-50' : ''}">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold ${i === 0 ? 'bg-yellow-400 text-yellow-900' : 'bg-gray-200 text-gray-700'}">
+                                            ${i === 0 ? '1' : i + 1}
+                                        </div>
+                                        <i class="${w.iconClass} text-3xl"></i>
+                                        <span class="font-bold text-gray-900">${w.name}</span>
+                                    </div>
+                                    <span class="text-xl font-bold ${i === 0 ? 'text-green-600' : 'text-gray-600'}">${w.totalScore} pts</span>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <button onclick="resetGame()" class="px-10 py-4 bg-gray-900 text-white font-bold rounded-xl uppercase hover:bg-gray-800 transition-all flex items-center gap-2">
+                            <i class="ti ti-refresh"></i> Nuevo Debate
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const currentPlayer = localPlayers[currentPlayerIndex];
+            const votesNeeded = localPlayers.length - 1;
+            const currentVotes = gameState.votesReceived[currentPlayer.id] || 0;
+
+            container.innerHTML = `
+                <div class="animate-fade w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Sidebar -->
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-3xl p-6 shadow-lg border border-gray-100 text-center">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">Ronda ${round}/${MAX_ROUNDS}</span>
+                                <span class="text-gray-400 text-xs font-medium">Caso ${currentCardIndex}/15</span>
+                            </div>
+                            <i class="${currentPlayer.iconClass} text-6xl mb-3 block"></i>
+                            <h2 class="text-lg font-bold text-gray-900">${currentPlayer.name}</h2>
+                            <p class="text-sm text-gray-500">Turno actual</p>
+                        </div>
+
+                        <div class="bg-white rounded-3xl p-6 shadow-lg border border-gray-100">
+                            <p class="text-xs font-bold text-gray-400 uppercase text-center mb-4">Marcador</p>
+                            ${localPlayers.sort((a,b)=>b.totalScore-a.totalScore).map((p, idx) => `
+                                <div class="flex justify-between items-center py-2 ${idx === currentPlayerIndex ? 'bg-green-50 -mx-2 px-2 rounded-lg' : ''}">
+                                    <div class="flex items-center gap-2">
+                                        <i class="${p.iconClass} text-xl"></i>
+                                        <span class="text-sm ${idx === currentPlayerIndex ? 'text-green-700 font-bold' : 'text-gray-600'}">${p.name.split(' ')[0]}</span>
+                                    </div>
+                                    <span class="text-sm font-bold ${idx === currentPlayerIndex ? 'text-green-600' : 'text-gray-400'}">${p.totalScore}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Main Challenge -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 min-h-[500px] flex flex-col justify-between card-hover">
+                            ${!activeChallenge ? `
+                                <div class="flex-1 flex flex-col items-center justify-center space-y-6">
+                                    <div class="w-24 h-32 bg-green-100 border-2 border-green-300 rounded-xl flex items-center justify-center text-4xl">
+                                        <i class="ti ti-cards text-green-600 text-5xl"></i>
+                                    </div>
+                                    <button onclick="drawCard()" class="px-10 py-4 bg-green-600 text-white font-bold rounded-2xl uppercase hover:bg-green-700 transition-all shadow-lg flex items-center gap-2">
+                                        <i class="ti ti-eye"></i> Revelar Siguiente Caso
+                                    </button>
+                                    <p class="text-gray-500 text-sm">Casos restantes: ${15 - currentCardIndex}</p>
+                                </div>
+                            ` : `
+                                <div class="animate-fade">
+                                    <div class="mb-6">
+                                        <span class="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold uppercase mb-3">${activeChallenge.block}</span>
+                                        <h3 class="text-3xl font-bold text-gray-900 mb-4">${activeChallenge.title}</h3>
+                                        <div class="bg-gray-50 p-6 rounded-2xl border-l-4 border-green-500">
+                                            <p class="text-lg text-gray-700 leading-relaxed">${activeChallenge.situation}</p>
+                                        </div>
+                                    </div>
+
+                                    ${gameState.status === 'defense' ? `
+                                        <button onclick="startVoting()" class="w-full py-4 bg-gray-900 text-white font-bold rounded-xl uppercase hover:bg-gray-800 transition-all flex items-center justify-center gap-2">
+                                            <i class="ti ti-microphone"></i> Finalizar Argumentación
+                                        </button>
+                                    ` : `
+                                        <div class="mt-6">
+                                            <div class="flex justify-between items-center mb-4">
+                                                <p class="text-sm font-bold text-gray-500 uppercase">Valoración del Grupo</p>
+                                                <p class="text-green-600 font-bold">${currentVotes}/${votesNeeded} votos</p>
+                                            </div>
+                                            ${currentVotes < votesNeeded ? `
+                                                <div class="grid grid-cols-2 gap-3">
+                                                    ${[0, 25, 75, 150].map(v => `
+                                                        <button onclick="submitVote(${v})" class="py-4 bg-gray-100 border border-gray-200 rounded-xl font-bold hover:bg-green-100 hover:border-green-300 transition-all text-gray-700">
+                                                            +${v} pts
+                                                        </button>
+                                                    `).join('')}
+                                                </div>
+                                            ` : `
+                                                <button onclick="nextTurn()" class="w-full py-4 bg-green-600 text-white font-bold rounded-xl uppercase hover:bg-green-700 transition-all flex items-center justify-center gap-2">
+                                                    <span>Continuar Debate</span>
+                                                    <i class="ti ti-arrow-right"></i>
+                                                </button>
+                                            `}
+                                        </div>
+                                    `}
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Inicializar la interfaz de selección
+        initProfessionsGrid();
+        updatePlayersList();
+    </script>
+</body>
+</html>

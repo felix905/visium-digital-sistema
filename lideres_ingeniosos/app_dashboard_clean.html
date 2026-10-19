@@ -1,0 +1,174 @@
+<!-- ============================================ -->
+<!-- CLEAN DASHBOARD - LÍDERES INGENIOSOS -->
+<!-- Focus: Single action, minimal cognitive load -->
+<!-- ============================================ -->
+
+<!-- 1. HERO: Today's Mission -->
+<div class="relative mb-6">
+  <!-- Floating Character -->
+  <div class="absolute right-4 -top-8 z-20 pointer-events-none">
+    <img src="img/03.png" alt="Character" class="w-[280px] h-auto object-contain drop-shadow-2xl hero-bounce">
+  </div>
+
+  <!-- Main Mission Card -->
+  <div class="bg-gradient-to-br from-violet-500 to-purple-600 rounded-3xl p-8 relative overflow-hidden">
+    <!-- Decorative circles -->
+    <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4"></div>
+    <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4"></div>
+    
+    <div class="relative z-10 max-w-[65%]">
+      <!-- Mission Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full mb-4">
+        <span class="text-lg">🎯</span>
+        <span class="text-white font-bold text-sm">Misión de Hoy</span>
+      </div>
+      
+      <h2 class="text-3xl font-bold text-white mb-2 leading-tight">
+        Aprende sobre el Ahorro
+      </h2>
+      <p class="text-purple-100 text-sm mb-6">
+        Completa esta lección para desbloquear tu próximo juego
+      </p>
+
+      <!-- Primary CTA -->
+      <button onclick="startTodaysMission()" 
+        class="group bg-white text-purple-600 px-8 py-4 rounded-2xl font-bold text-base flex items-center gap-3 transition-all shadow-lg hover:shadow-xl hover:scale-105">
+        <span>Continuar Misión</span>
+        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 2. EMOTIONAL PROGRESS -->
+<div class="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
+  <div class="flex items-center gap-4">
+    <!-- Progress Mascot -->
+    <div class="relative">
+      <div class="w-16 h-16 bg-gradient-to-br from-amber-300 to-yellow-400 rounded-2xl flex items-center justify-center text-3xl shadow-md">
+        🌟
+      </div>
+      <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white">
+        3
+      </div>
+    </div>
+    
+    <div class="flex-1">
+      <p class="text-gray-900 font-bold text-lg">¡Vas muy bien!</p>
+      <p class="text-gray-500 text-sm">Solo 2 misiones más para tu próxima recompensa</p>
+      
+      <!-- Simple progress dots -->
+      <div class="flex items-center gap-2 mt-3">
+        <div class="w-8 h-2 bg-purple-500 rounded-full"></div>
+        <div class="w-8 h-2 bg-purple-500 rounded-full"></div>
+        <div class="w-8 h-2 bg-purple-500 rounded-full"></div>
+        <div class="w-8 h-2 bg-gray-200 rounded-full"></div>
+        <div class="w-8 h-2 bg-gray-200 rounded-full"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. NEXT STEPS: Only 1-2 actions -->
+<div class="mb-6">
+  <h3 class="text-gray-900 font-bold text-lg mb-4">Siguientes Pasos</h3>
+  
+  <div class="space-y-3">
+    <!-- Primary Next Step -->
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-5 flex items-center gap-4 cursor-pointer hover:shadow-md transition-all group" onclick="startTodaysMission()">
+      <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center text-white text-xl shadow-sm group-hover:scale-110 transition-transform">
+        📚
+      </div>
+      <div class="flex-1">
+        <p class="font-bold text-gray-900">Completar lección de Ahorro</p>
+        <p class="text-gray-500 text-sm">+50 puntos • 5 minutos</p>
+      </div>
+      <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Optional Secondary -->
+    <div class="bg-white border border-gray-200 rounded-2xl p-5 flex items-center gap-4 opacity-60">
+      <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 text-xl">
+        🔒
+      </div>
+      <div class="flex-1">
+        <p class="font-bold text-gray-500">Juego: Sopa de Letras Financiera</p>
+        <p class="text-gray-400 text-sm">Completa la misión anterior para desbloquear</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. REWARDS: Games as Incentives -->
+<div class="mb-6">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-gray-900 font-bold text-lg">Tus Recompensas</h3>
+    <span class="text-purple-600 text-sm font-medium">2 desbloqueados</span>
+  </div>
+  
+  <div class="grid grid-cols-4 gap-3">
+    <!-- Unlocked 1 -->
+    <div class="bg-gradient-to-br from-rose-400 to-pink-500 rounded-2xl p-4 aspect-square flex flex-col items-center justify-center text-white cursor-pointer hover:scale-105 transition-transform shadow-md" onclick="openGame('wordsearch')">
+      <span class="text-3xl mb-2">🎮</span>
+      <span class="text-xs font-bold text-center">Sopa de Letras</span>
+      <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full mt-1">JUGAR</span>
+    </div>
+
+    <!-- Unlocked 2 -->
+    <div class="bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl p-4 aspect-square flex flex-col items-center justify-center text-white cursor-pointer hover:scale-105 transition-transform shadow-md" onclick="openGame('puzzle')">
+      <span class="text-3xl mb-2">🧩</span>
+      <span class="text-xs font-bold text-center">Puzzle Mapa</span>
+      <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full mt-1">JUGAR</span>
+    </div>
+
+    <!-- Locked 1 -->
+    <div class="bg-gray-100 rounded-2xl p-4 aspect-square flex flex-col items-center justify-center text-gray-400 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gray-100/80 backdrop-blur-[1px]"></div>
+      <span class="text-3xl mb-2 relative z-10">🎯</span>
+      <span class="text-xs font-bold text-center relative z-10">Quiz Financiero</span>
+      <div class="relative z-10 mt-1">
+        <span class="text-[10px] bg-gray-300 px-2 py-0.5 rounded-full">🔒 2 misiones</span>
+      </div>
+    </div>
+
+    <!-- Locked 2 -->
+    <div class="bg-gray-100 rounded-2xl p-4 aspect-square flex flex-col items-center justify-center text-gray-400 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gray-100/80 backdrop-blur-[1px]"></div>
+      <span class="text-3xl mb-2 relative z-10">🏆</span>
+      <span class="text-xs font-bold text-center relative z-10">Desafío Final</span>
+      <div class="relative z-10 mt-1">
+        <span class="text-[10px] bg-gray-300 px-2 py-0.5 rounded-full">🔒 5 misiones</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hero-bounce {
+    animation: gentle-bounce 3s ease-in-out infinite;
+  }
+  
+  @keyframes gentle-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+</style>
+
+<script>
+  function startTodaysMission() {
+    // Navigate to current lesson or modules page
+    showPage('modules');
+    // Could also trigger a specific modal or lesson
+  }
+  
+  function openGame(gameId) {
+    // Open specific game
+    alert('Abriendo juego: ' + gameId);
+  }
+</script>

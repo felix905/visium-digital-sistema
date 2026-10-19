@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visium Digital | Educación Financiera para Familias | Venezuela</title>
+    <meta name="description" content="Escuela de educación financiera en Venezuela. Programas prácticos para familias: ahorro, presupuesto e inversión. Inscripciones abiertas. Consulta sin compromiso.">
+    <meta name="keywords" content="educación financiera Venezuela, cursos finanzas familiares, ahorro familiar, presupuesto hogar, inversión para principiantes, Visium Digital">
+    <link rel="canonical" href="https://www.visiumdigital.com/">
+    <!-- Open Graph / Redes sociales -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.visiumdigital.com/">
+    <meta property="og:title" content="Visium Digital | Educación Financiera para Familias">
+    <meta property="og:description" content="Escuela de educación financiera. Programas prácticos para familias: ahorro, presupuesto e inversión. Inscripciones abiertas. Venezuela.">
+    <meta property="og:image" content="https://www.visiumdigital.com/img/og-visium.jpg">
+    <meta property="og:locale" content="es_VE">
+    <meta property="og:site_name" content="Visium Digital">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Visium Digital | Educación Financiera para Familias">
+    <meta name="twitter:description" content="Escuela de educación financiera. Programas prácticos para familias: ahorro, presupuesto e inversión. Inscripciones abiertas. Venezuela.">
+    <meta name="twitter:image" content="https://www.visiumdigital.com/img/og-visium.jpg">
+    
+    <!-- Google tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HL7Y4PVPL0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-HL7Y4PVPL0');
+    </script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+
+    <!-- #favicon -->
+        <link rel="shortcut icon" href="img/fav.png" type="image/x-icon" />
+    
+    <!-- Tailwind Config: set Inter as default font -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui']
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Estilos personalizados adicionales si son necesarios */
+        .bg_courses_1 { background-color: #e570b554; }
+        .bg_courses_2 { background-color: #e6de6694; }
+        .bg_courses_3 { background-color: #c3e9a1cf; }
+        .bg_courses_4 { background-color: #a3ddcbbd; }
+        .bg_courses_5 { background-color: #bbf7d0c9; }
+        .bg_courses_6 { background-color: #ddd6fedb; }
+        .bg_courses_7 { background-color: #f5d0fed9; }
+        .bg_courses_8 { background-color: #d9f99dc9; }
+        
+       
+        
+        /* Animaciones personalizadas */
+        .cmnhover:hover {
+            transform: translateY(-7px);
+            transition: all 0.3s ease;
+            
+        }
+        
+        .kewta-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .kewta-btn .kt-one,
+        .kewta-btn .kt-two {
+            transition: transform 0.3s ease;
+        }
+        
+        .kewta-btn:hover .kt-one {
+            transform: translateX(100%);
+        }
+        
+        .kewta-btn:hover .kt-two {
+            transform: translateX(0);
+        }
+        
+        /* Asegurar que los dropdowns se muestren correctamente */
+        .dropdown-group:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-menu {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        /* Estilos para el acordeón FAQ */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .accordion-open .accordion-content {
+            max-height: 500px;
+        }
+        
+        .accordion-open .accordion-chevron {
+            transform: rotate(180deg);
+        }
+
+        .arrow-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .arrow-hover:hover i {
+            transform: rotate(45deg);
+            transition: transform 0.3s ease;
+        }
+
+        /* Menú móvil: despliegue desde el header (estilo panel full-width) */
+        #mobileMenuPanel {
+            --mobile-nav-top: 5.5rem;
+            --mobile-nav-max-h: calc(100dvh - var(--mobile-nav-top) - 0.75rem - env(safe-area-inset-bottom, 0px));
+            --mobile-nav-footer-h: 88px;
+        }
+        #mobileMenuPanel .mobile-menu-sheet {
+            transform: translateY(-100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            will-change: transform;
+            max-height: var(--mobile-nav-max-h);
+            height: fit-content;
+        }
+        #mobileMenuPanel .mobile-menu-scroll {
+            max-height: calc(var(--mobile-nav-max-h) - var(--mobile-nav-footer-h));
+            overflow-y: auto;
+        }
+        #mobileMenuPanel.is-open .mobile-menu-sheet {
+            transform: translateY(0);
+        }
+        details.mobile-nav-details[open] .mobile-nav-chevron {
+            transform: rotate(180deg);
+        }
+    </style>
+
+        <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui']
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        'accent-blue': '#B6C8E0',
+                        'accent-gray': '#A0A0A0',
+                        'accent-lime': '#DFFF85',
+                        'text-gray': '#6D6D6D',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .accordion-item.active .accordion-content {
+            max-height: 300px;
+        }
+        
+        .accordion-item.active .plus-icon {
+            display: none;
+        }
+        
+        .accordion-item:not(.active) .minus-icon {
+            display: none;
+        }
+    </style>
+</head>
+<body class="font-['Inter'] bg-gray-200/50">
+
+     <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+    <!-- Header Section -->
+    <header id="siteHeader" class="sticky top-0 z-50 pt-6 pb-3">
+        <div class="container mx-auto px-4">
+
+
+
+
+
+            <nav class="flex items-center justify-between text-sm font-normal  bg-gray-200/60 py-3 pl-2 pr-4 backdrop-blur-md rounded-xl">
+                <!-- Logo -->
+                
+                
+  <div class="flex items-center space-x-3">
+                     <a href="index.html" class="flex items-center">
+                    <img src="img/logo_v.svg" alt="Visium Digital" class="ml-3 h-7">
+                </a>
+                    <div class="hidden md:block border-l border-gray-300 h-6"></div>
+                    <div class="hidden md:block">
+                        <div class="text-sm font-normal text-dark-800 leading-tight">Escuela de</div>
+                        <div class="text-sm font-normal text-dark-800 leading-tight">educación financiera</div>
+                    </div>
+                </div>
+
+                <!-- Navigation Menu (Desktop) -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="el_instituto.html" class="text-gray-700 hover:text-gray-900">La Academia</a>
+
+                    <!-- Negocios y Finanzas Dropdown -->
+                    <div class="relative group">
+                        <button class="text-gray-700 hover:text-gray-900 flex items-center">
+                            Negocios y Finanzas
+                            <i class="ti ti-chevron-down ml-1 h-4 w-4 transition-transform group-hover:rotate-180"></i>
+                        </button>
+                        <div class="absolute left-0 mt-2 w-[420px] bg-white rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+                            <div class="p-4 space-y-1">
+                                <a href="economia_digital.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <div class="w-10 h-10 bg_courses_5 rounded-lg flex items-center justify-center flex-shrink-0"><i class="ti ti-wallet text-gray-700"></i></div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="font-medium text-gray-800 block">Economía Digital</span>
+                                        <span class="text-sm text-gray-500">Prepárate para el entorno digital</span>
+                                    </div>
+                                    <i class="ti ti-arrow-right text-gray-400 flex-shrink-0"></i>
+                                </a>
+                                <a href="digital_empower.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <div class="w-10 h-10 bg_courses_6 rounded-lg flex items-center justify-center flex-shrink-0"><i class="ti ti-coins text-gray-700"></i></div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="font-medium text-gray-800 block">Digital Empower</span>
+                                        <span class="text-sm text-gray-500">Herramientas digitales</span>
+                                    </div>
+                                    <i class="ti ti-arrow-right text-gray-400 flex-shrink-0"></i>
+                                </a>
+                                <a href="edufintech.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <div class="w-10 h-10 bg_courses_7 rounded-lg flex items-center justify-center flex-shrink-0"><i class="ti ti-pig-money text-gray-700"></i></div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="font-medium text-gray-800 block">Edufintech</span>
+                                        <span class="text-sm text-gray-500">Educación financiera</span>
+                                    </div>
+                                    <i class="ti ti-arrow-right text-gray-400 flex-shrink-0"></i>
+                                </a>
+                                <a href="economia_digital.html" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <div class="w-10 h-10 bg_courses_8 rounded-lg flex items-center justify-center flex-shrink-0"><i class="ti ti-file-spreadsheet text-gray-700"></i></div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="font-medium text-gray-800 block">Mercados Financieros</span>
+                                        <span class="text-sm text-gray-500">Control y análisis</span>
+                                    </div>
+                                    <i class="ti ti-arrow-right text-gray-400 flex-shrink-0"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="blog_t.html" class="text-gray-700 hover:text-gray-900 font-medium opacity-90">Biblioteca</a>
+                </div>
+                
+                <!-- CTA (escritorio) + menú móvil -->
+                <div class="flex items-center gap-1 shrink-0">
+                    <a href="iniciar_estudios.html" class="hidden lg:flex bg-gray-900 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full items-center transition-colors">
+                        <span>Consulta</span>
+                        <i class="ti ti-arrow-up-right ml-2"></i>
+                    </a>
+                    <button type="button" id="mobileMenuButton" class="lg:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-800 transition-colors hover:bg-gray-100/90" aria-expanded="false" aria-controls="mobileMenuPanel" aria-label="Abrir menú de navegación">
+                        <i id="mobileMenuButtonIcon" class="ti ti-menu-2 text-2xl" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </nav>
+
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+    </header>
+
+    <!-- Mobile Menu fuera del nav: fixed debe anclar al viewport (backdrop-blur en el nav rompía el posicionamiento) -->
+    <div id="mobileMenuPanel" class="fixed bottom-0 left-0 right-0 z-[100] hidden overflow-hidden px-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] lg:hidden" style="top: var(--mobile-nav-top, 5.5rem);" aria-hidden="true">
+        <div class="mobile-menu-sheet flex min-h-0 flex-col overflow-hidden rounded-2xl border border-gray-200/90 bg-white shadow-[0_12px_48px_rgba(0,0,0,0.12)] ring-1 ring-black/5">
+            <nav class="mobile-menu-scroll overscroll-y-contain pt-1 [scrollbar-gutter:stable]">
+                <a href="el_instituto.html" class="block border-b border-gray-200 px-4 py-4 text-base font-semibold text-gray-900 active:bg-gray-50">La Academia</a>
+                <details class="mobile-nav-details border-b border-gray-200">
+                    <summary class="flex cursor-pointer list-none items-center justify-between px-4 py-4 text-base font-semibold text-gray-900 [&::-webkit-details-marker]:hidden">
+                        <span>Negocios y Finanzas</span>
+                        <i class="ti ti-chevron-down mobile-nav-chevron text-xl text-gray-500 transition-transform duration-200" aria-hidden="true"></i>
+                    </summary>
+                    <div class="border-t border-gray-100 bg-gray-50/70">
+                        <a href="economia_digital.html" class="block border-b border-gray-100 px-4 py-3.5 pl-5 text-[0.9375rem] font-medium text-gray-800 active:bg-white">Economía Digital</a>
+                        <a href="digital_empower.html" class="block border-b border-gray-100 px-4 py-3.5 pl-5 text-[0.9375rem] font-medium text-gray-800 active:bg-white">Digital Empower</a>
+                        <a href="edufintech.html" class="block border-b border-gray-100 px-4 py-3.5 pl-5 text-[0.9375rem] font-medium text-gray-800 active:bg-white">Edufintech</a>
+                        <a href="economia_digital.html" class="block px-4 py-3.5 pl-5 text-[0.9375rem] font-medium text-gray-800 active:bg-white">Mercados Financieros</a>
+                    </div>
+                </details>
+                <a href="blog_t.html" class="block border-b border-gray-200 px-4 py-4 text-base font-semibold text-gray-900 active:bg-gray-50">Biblioteca</a>
+            </nav>
+            <div id="mobileMenuFooter" class="shrink-0 border-t border-gray-200 bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))]">
+                <a href="iniciar_estudios.html" class="flex w-full items-center justify-center rounded-xl bg-gray-900 py-4 text-center text-base font-semibold text-white shadow-sm transition-colors hover:bg-gray-800">Consulta</a>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+  <!-- Hero Section -->
+  <section class="min-h-[80vh] flex items-center">
+    <div class="container mx-auto px-4 pt-10 pb-36">
+      <div class="max-w-4xl mx-auto text-center">
+        
+        <!-- Badge superior -->
+        <div class="inline-flex items-center gap-2 bg-white/30 px-4 py-2 rounded-full mb-8 border border-gray-200">
+          <span class="w-2 h-2 bg-gray-900 rounded-full animate-pulse"></span>
+          <span class="text-sm font-medium text-gray-700">Nuevo · Educación financiera para familias</span>
+        </div>
+
+        <!-- Headline principal -->
+        <h1 class="text-3xl md:text-5xl lg:text-6xl font-medium text-gray-900 leading-[1.1] tracking-tight mb-6">
+          Aprende finanzas en familia para construir un mejor futuro
+        </h1>
+
+        <!-- Subheadline -->
+        <p class="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-3xl mx-auto mb-8">
+          Programas simples y prácticos para aprender a manejar el dinero, <span class="text-gray-900 font-medium">enseñar a tus hijos hábitos financieros saludables</span> y mejorar la economía del hogar.
+        </p>
+
+        <!-- Social proof -->
+        <div class="flex items-center justify-center gap-6 mb-10 text-sm text-gray-500">
+          <div class="flex items-center gap-2">
+            <div class="flex -space-x-2">
+              <div class="w-14 h-14 rounded-full border-2 border-white bg-cover bg-center" style="background-image: url('img/avatar_1.png')"></div>
+              <div class="w-14 h-14 rounded-full border-2 border-white bg-cover bg-center" style="background-image: url('img/avatar_2.png')"></div>
+              <div class="w-14 h-14 rounded-full border-2 border-white bg-cover bg-center" style="background-image: url('img/avatar_3.png')"></div>
+            </div>
+            <span class="text-md">+200 familias aprendiendo finanzas</span>
+          </div>
+          <span class="hidden md:block text-lg">·</span>
+          <span class="hidden md:block text-md">Padres y jóvenes mejorando su relación con el dinero</span>
+        </div>
+
+        <!-- CTAs -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <a href="#programas" class="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-4 rounded-full text-base font-medium transition hover:bg-gray-800 hover:scale-105 shadow-lg shadow-gray-900/25">
+            <span>Empezar a aprender</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 256 256" class="text-white">
+              <path fill="currentColor" d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"></path>
+            </svg>
+          </a>
+          <a href="#programas-familiares" class="inline-flex items-center gap-2 border border-gray-300 text-gray-700 px-8 py-4 rounded-full text-base font-medium transition hover:border-gray-400 hover:text-gray-900 bg-white">
+            <span>Ver programas familiares</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+<!-- header-section end -->
+<!-- Featured Learning Section -->
+<section class="pb-36 ">
+  <div class="container mx-auto px-4">
+
+    <!-- Heading -->
+    <div class="mb-14">
+   
+      <h2 class="text-4xl md:text-5xl font-medium text-gray-900 leading-[1.05] tracking-[-0.03em] max-w-4xl">
+        Empieza a aprender con nuestros programas de
+        <span class="text-gray-400">educación financiera</span>
+      </h2>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- LEFT CARD -->
+      <div class="bg-white rounded-3xl overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+
+        <!-- Image -->
+        <div class="p-4 pb-0">
+          <div class="relative overflow-hidden rounded-[18px] h-[280px]">
+            <img 
+              src="img/familia_finanzas.jpg"
+              alt="Finanzas en familia"
+              class="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+            >
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+          <h3 class="text-3xl font-medium text-gray-900 mb-3">
+            Finanzas en Familia
+          </h3>
+
+          <p class="text-gray-500 leading-tight text-lg mb-8">
+            Aprende junto a tus hijos hábitos financieros saludables,
+            ahorro inteligente y organización del dinero para el día a día.
+          </p>
+
+          <div class="flex items-center justify-between">
+            <a href="#" class="text-sm font-medium text-gray-900">
+              Explorar programa
+            </a>
+
+            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center">
+              <i class="ti ti-arrow-up-right text-gray-900"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CENTER CARD -->
+      <div class="bg-[#BF8FE9] rounded-3xl overflow-hidden relative group hover:-translate-y-1 transition-all duration-300 min-h-[500px]">
+
+        <!-- Floating Author -->
+        <div class="absolute top-5 left-5 z-10 flex items-center gap-2 bg-white rounded-full px-3 py-2 shadow-sm">
+          <img 
+            src="img/avatar_1.png"
+            alt=""
+            class="w-8 h-8 rounded-full object-cover"
+          >
+
+          <div class="leading-tight">
+            <p class="text-[10px] text-gray-400">Facilitador</p>
+            <p class="text-xs font-medium text-gray-900">
+              Arnaldo Mijares
+            </p>
+          </div>
+        </div>
+
+        <!-- Abstract Shape -->
+        <div class="absolute inset-0 overflow-hidden">
+          <svg class="absolute inset-0 w-full h-full" viewBox="0 0 500 500" fill="none">
+            <path 
+              d="M-30 180C70 120 120 250 220 210C310 175 280 80 380 70C470 60 500 120 560 200" 
+              stroke="#FF7A00"
+              stroke-width="18"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+
+        <!-- Content -->
+        <div class="relative z-10 h-full flex flex-col justify-end p-7">
+
+          <span class="text-sm text-white/80 mb-3">
+            Educación práctica para jóvenes y adultos
+          </span>
+
+          <h3 class="text-3xl font-medium text-white leading-tight mb-4 max-w-sm">
+            Aprende a usar el dinero con inteligencia desde temprano
+          </h3>
+
+          <p class="text-white/80 text-lg leading-tight mb-8 max-w-sm">
+            Programas modernos sobre ahorro, presupuesto,
+            inversiones y herramientas financieras para la vida real.
+          </p>
+
+          <div class="flex items-center justify-between">
+            <a href="#" class="text-white text-sm font-medium">
+              Ver programas
+            </a>
+
+            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center">
+              <i class="ti ti-arrow-up-right text-violet-700"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="flex flex-col gap-6">
+
+        <!-- TOP RIGHT -->
+        <div class="bg-white rounded-3xl p-7 flex-1 group hover:-translate-y-1 transition-all duration-300">
+
+          <h3 class="text-3xl font-medium text-gray-900 leading-tight mb-4">
+            Talleres y programas para colegios y comunidades
+          </h3>
+
+          <p class="text-gray-500 text-lg leading-tight mb-8">
+            Llevamos educación financiera moderna a instituciones,
+            familias y espacios educativos con metodologías prácticas.
+          </p>
+
+          <div class="flex items-center justify-between">
+            <a href="#" class="text-sm font-medium text-gray-900">
+              Conocer más
+            </a>
+
+            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center">
+              <i class="ti ti-arrow-up-right text-gray-900"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM RIGHT -->
+        <div class=" bg-white rounded-3xl p-7 flex items-center justify-between gap-6 group hover:-translate-y-1 transition-all duration-300">
+
+          <div class="flex items-center gap-4">
+
+           
+            <div>
+              <h4 class="text-2xl font-semibold text-gray-900 mb-1 leading-tight ">
+                Finanzas simples <br>para la vida real
+              </h4>
+
+              <p class="text-lg text-gray-500 max-w-[320px] leading-tight">
+                Aprende a ahorrar, organizar y tomar mejores decisiones financieras.
+              </p>
+            </div>
+          </div>
+
+          <div class="text-violet-400">
+            <i class="ti ti-arrow-right-lines text-4xl"></i>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<!-- Tabler Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.30.0/tabler-icons.min.css" />
+
+
+
+    <!-- Business Programs Section -->
+    <section class="pb-10 ">
+        <div class="container mx-auto px-4">
+
+             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10">
+                <div>
+                    <span class=" text-gray-800 text-sm font-medium  py-2 rounded-full flex items-center">
+                               Programas de estudio
+                            </span>
+                    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 leading-tight tracking-tighter mb-2">
+                        Negocios y Finanzas
+                    </h2>
+                   <p class="text-gray-600">
+          Formación en herramientas digitales que usan las empresas ahora: IA, automatización, análisis de datos y control financiero.
+        </p>
+                </div>
+               
+            </div>
+            
+          
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+
+
+                <!-- Program Card 1 -->
+              <div class="bg-white/80 rounded-3xl transition-all duration-300 cmnhover p-3">
+        <div class="bg_courses_5 rounded-2xl p-6 mb-5">
+          <div class="flex justify-between items-center mb-3">
+            <span class="bg-white text-gray-800 text-sm font-medium px-3 py-2 rounded-full flex items-center">
+              <i class="ti ti-checklist mr-1"></i> Disponible
+            </span>
+            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+              <i class="ti ti-brain text-gray-700 text-xl"></i>
+            </div>
+          </div>
+          <h3 class="text-xl font-medium text-gray-800 mb-4">Contabilidad con uso de IA</h3>
+          <p class="text-gray-600">Automatiza procesos contables repetitivos.</p>
+        </div>
+
+        <div class="space-y-4 mb-2 mx-2">
+          <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+            <div class="flex items-center"><i class="ti ti-video mr-2 text-gray-700"></i><span class="font-medium text-gray-700">Modalidad</span></div>
+            <span class="text-gray-600 text-sm">Presencial / Remoto</span>
+          </div>
+          <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+            <div class="flex items-center"><i class="ti ti-clock mr-2 text-gray-700"></i><span class="font-medium text-gray-700">Duración</span></div>
+            <span class="text-gray-600 text-sm">1 día</span>
+          </div>
+          <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+            <div class="flex items-center"><i class="ti ti-stack-pop mr-2 text-gray-700"></i><span class="font-medium text-gray-700">Nivel</span></div>
+            <span class="text-gray-600 text-sm">Básico</span>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center">
+         <div class="flex -space-x-2">
+            <!-- <img src="img/icons_home/finanzas/03.png" class="w-8 h-8 rounded-full border-2 border-white">
+            <img src="img/icons_home/finanzas/02.png" class="w-8 h-8 rounded-full border-2 border-white">
+            <img src="img/icons_home/finanzas/01.png" class="w-8 h-8 rounded-full border-2 border-white">-->
+          </div>
+          <a href="contabilidad_inteligente.html" class="arrow-hover w-9 h-9 bg-gray-900 hover:bg-gray-700 rounded-full flex items-center justify-center">
+            <i class="ti ti-arrow-up-right text-white"></i>
+          </a>
+        </div>
+      </div>
+
+
+
+                
+                <!-- More program cards with similar structure -->
+                <!-- Program Card 2 -->
+
+
+ <!-- Program Card 2 -->
+                <div class="bg-white rounded-3xl  transition-all duration-300 cmnhover p-3">
+                    <div class="bg_courses_6 rounded-2xl p-6 mb-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="bg-white text-gray-800 text-sm font-medium px-3 py-2 rounded-full flex items-center">
+                                <i class="ti ti-checklist mr-1"></i> Disponible
+                            </span>
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                                <i class="ti ti-wallet text-gray-700 text-xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-normal text-gray-800 mb-4">Excel para productividad real</h3>
+                        <p class="text-gray-600">Análisis de datos sin complicaciones.</p>
+                    </div>
+                    
+                    <div class="space-y-4 mb-2 mx-2">
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+                            <div class="flex items-center">
+                                <i class="ti ti-video text-gray-700 mr-2"></i>
+                                <span class="font-medium text-gray-700">Modalidad</span>
+                            </div>
+                            <span class="text-gray-600 text-sm">Presencial/Remoto</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+                            <div class="flex items-center">
+                                <i class="ti ti-clock text-gray-700 mr-2"></i>
+                                <span class="font-medium text-gray-700">Duración</span>
+                            </div>
+                            <span class="text-gray-600 text-sm">2 meses</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+                            <div class="flex items-center">
+                                <i class="ti ti-stack-pop text-gray-700 mr-2"></i>
+                                <span class="font-medium text-gray-700">Nivel</span>
+                            </div>
+                            <span class="text-gray-600 text-sm">Intermedio</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="flex -space-x-2">
+            <!-- <img src="img/icons_home/finanzas/03.png" class="w-8 h-8 rounded-full border-2 border-white">
+            <img src="img/icons_home/finanzas/02.png" class="w-8 h-8 rounded-full border-2 border-white">
+            <img src="img/icons_home/finanzas/01.png" class="w-8 h-8 rounded-full border-2 border-white">-->
+          </div>
+                        <a href="economia_digital.html" class="arrow-hover w-9 h-9 bg-gray-900 hover:bg-gray-700 rounded-full flex items-center justify-center transition-colors">
+            <i class="ti ti-arrow-up-right text-white transition-transform duration-300"></i>
+        </a>
+                    </div>
+                </div>
+
+
+             
+                
+                <!-- Program Card 3 -->
+
+
+     <div class="bg-white rounded-3xl  transition-all duration-300 cmnhover p-3">
+                    <div class="bg_courses_7 rounded-2xl p-6 mb-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="bg-white text-gray-800 text-sm font-medium px-3 py-2 rounded-full flex items-center">
+                                <i class="ti ti-checklist mr-1"></i> Disponible
+                            </span>
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                                <i class="ti ti-wallet text-gray-700 text-xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-normal text-gray-800 mb-4">Finanzas personales digitales</h3>
+                        <p class="text-gray-600">Herramientas prácticas para ahorrar e invertir.</p>
+                    </div>
+                    
+                    <div class="space-y-4 mb-2 mx-2">
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+                            <div class="flex items-center">
+                                <i class="ti ti-video text-gray-700 mr-2"></i>
+                                <span class="font-medium text-gray-700">Modalidad</span>
+                            </div>
+                            <span class="text-gray-600 text-sm">Online</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+                            <div class="flex items-center">
+                                <i class="ti ti-clock text-gray-700 mr-2"></i>
+                                <span class="font-medium text-gray-700">Duración</span>
+                            </div>
+                            <span class="text-gray-600 text-sm">1 mes</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+                            <div class="flex items-center">
+                                <i class="ti ti-stack-pop text-gray-700 mr-2"></i>
+                                <span class="font-medium text-gray-700">Nivel</span>
+                            </div>
+                            <span class="text-gray-600 text-sm">Básico</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                          <div class="flex -space-x-2">
+            <!-- <img src="img/icons_home/finanzas/03.png" class="w-8 h-8 rounded-full border-2 border-white">
+            <img src="img/icons_home/finanzas/02.png" class="w-8 h-8 rounded-full border-2 border-white">
+            <img src="img/icons_home/finanzas/01.png" class="w-8 h-8 rounded-full border-2 border-white">-->
+          </div>
+                        <a href="economia_digital.html" class="arrow-hover w-9 h-9 bg-gray-900 hover:bg-gray-700 rounded-full flex items-center justify-center transition-colors">
+            <i class="ti ti-arrow-up-right text-white transition-transform duration-300"></i>
+        </a>
+                    </div>
+                </div>
+
+
+              
+                
+                <!-- Program Card 4 -->
+
+
+     <div class="bg-white rounded-3xl  transition-all duration-300 cmnhover p-3">
+                    <div class="bg_courses_8 rounded-2xl p-6 mb-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="bg-white text-gray-800 text-sm font-medium px-3 py-2 rounded-full flex items-center">
+                                <i class="ti ti-checklist mr-1"></i> Disponible
+                            </span>
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                                <i class="ti ti-wallet text-gray-700 text-xl"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-normal text-gray-800 mb-4">Economía Digital aplicada</h3>
+                        <p class="text-gray-600">Control y análisis financiero en entornos digitales.</p>
+                    </div>
+                    
+                    <div class="space-y-4 mb-2 mx-2">
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+                            <div class="flex items-center">
+                                <i class="ti ti-video text-gray-700 mr-2"></i>
+                                <span class="font-medium text-gray-700">Modalidad</span>
+                            </div>
+                            <span class="text-gray-600 text-sm">Híbrido</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+                            <div class="flex items-center">
+                                <i class="ti ti-clock text-gray-700 mr-2"></i>
+                                <span class="font-medium text-gray-700">Duración</span>
+                            </div>
+                            <span class="text-gray-600 text-sm">3 meses</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+                            <div class="flex items-center">
+                                <i class="ti ti-stack-pop text-gray-700 mr-2"></i>
+                                <span class="font-medium text-gray-700">Nivel</span>
+                            </div>
+                            <span class="text-gray-600 text-sm">Avanzado</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="flex -space-x-2">
+            <!-- <img src="img/icons_home/finanzas/03.png" class="w-8 h-8 rounded-full border-2 border-white">
+            <img src="img/icons_home/finanzas/02.png" class="w-8 h-8 rounded-full border-2 border-white">
+            <img src="img/icons_home/finanzas/01.png" class="w-8 h-8 rounded-full border-2 border-white">-->
+          </div>
+                        <a href="economia_digital.html" class="arrow-hover w-9 h-9 bg-gray-900 hover:bg-gray-700 rounded-full flex items-center justify-center transition-colors">
+            <i class="ti ti-arrow-up-right text-white transition-transform duration-300"></i>
+        </a>
+                    </div>
+                </div>
+
+
+               
+            </div>
+        </div>
+    </section>
+
+
+
+    
+
+<!-- Líderes Ingeniosos Section -->
+<section class="py-12 md:py-16 lg:py-20">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-10 gap-6 md:gap-8">
+      
+      <!-- Card Morado - Copy e Imagen -->
+      <div class="lg:col-span-7 bg-[#BF8FE9] rounded-3xl overflow-visible relative " style="background-image: url('img/bg.png'); background-size: cover; background-position: center; background-blend-mode: overlay;">
+        <!-- Overlay para legibilidad -->
+        <div class="absolute inset-0 bg-[#BF8FE9]/60 rounded-3xl"></div>
+        <!-- Decoración de fondo -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 z-0"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2 z-0"></div>
+        
+        <div class="relative z-10 p-2 md:p-4 lg:p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <!-- Columna Copy -->
+            <div class="bg-[#8842c58a] rounded-3xl p-6">
+              <!-- Badge -->
+              <div class="inline-flex items-center gap-2 bg-purple-800/20 backdrop-blur-sm px-3 py-1.5 rounded-full mb-5">
+                <i class="ti ti-sparkles text-white text-md"></i>
+                <span class="text-xs font-semibold text-white tracking-wide uppercase">Programa Especial</span>
+              </div>
+
+              
+              <h1 class="text-2xl md:text-3xl lg:text-4xl font-medium text-white leading-tight mb-5">
+                Preparamos niños para tomar<span class=" font-bold"> mejores decisiones</span>
+              </h1>
+
+
+
+              
+            
+               <!-- Título con logo -->
+              <div class="mb-5">
+                <img src="img/logo.svg" alt="" class="w-[120px] md:w-[180px] lg:w-[260px]">
+              </div>
+              <!-- Features -->
+              
+            </div>
+
+            <!-- Columna Imagen -->
+            <div class="flex justify-center relative hidden md:flex">
+              <img src="img/03.png" alt="Niños aprendiendo" class="absolute -right-16 top-1/2 -translate-y-1/2 w-[320px] md:w-[400px] lg:w-[500px] object-contain">
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Card Amarillo - Formulario -->
+      <div class="lg:col-span-3 bg-yellow-400/90 rounded-3xl p-6 md:p-8 lg:p-10 ">
+        <!-- Título -->
+        <h3 class="text-lg md:text-xl lg:text-2xl font-semibold text-gray-900 mb-6">
+         Regístrate y obtén una <strong>clase gratis</strong> de prueba para tu hijo.
+        </h3>
+       
+        
+        <!-- Formulario -->
+        <form class="space-y-4 flex-grow flex flex-col">
+          <div>
+            <label class="block text-md font-medium text-gray-800 mb-2">Nombre del padre/madre</label>
+            <input type="text" placeholder="Tu nombre completo" class="w-full px-4 py-3 rounded-lg border-0 bg-white/90 focus:bg-white focus:ring-2 focus:ring-gray-900 transition-all text-sm">
+          </div>
+          
+          <div>
+            <label class="block text-md font-medium text-gray-800 mb-2">WhatsApp</label>
+            <input type="tel" placeholder="+58 424 000 0000" class="w-full px-4 py-3 rounded-lg border-0 bg-white/90 focus:bg-white focus:ring-2 focus:ring-gray-900 transition-all text-sm">
+          </div>
+          
+          <button type="submit" class="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-gray-800 transition-all mt-auto text-sm">
+            <i class="ti ti-calendar"></i>
+            Agendar clase gratis
+          </button>
+        </form>
+        
+      
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+<section class="pt-20 pb-20 border-t border-gray-300 ">
+  <div class="container mx-auto px-4 sm:px-4 lg:px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-20">
+
+
+      <!-- Sidebar Sticky -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-40">
+          <div class="mb-8">
+            <span class="text-gray-800 text-sm font-medium py-2 rounded-full flex items-center">
+              Soluciones Financieras
+            </span>
+            <h2 class="text-2xl md:text-3xl font-medium text-gray-900 leading-tight tracking-tighter mb-2">
+              Consultoria & Servicios
+            </h2>
+            <p class="text-gray-600">
+              Acompañamos a familias y personas en su camino hacia una mejor salud financiera. Educación práctica, sin complicaciones.
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row lg:flex-col gap-4">
+            <a href="#"
+              class="group max-w-60 relative bg-gray-900 hover:bg-gray-800 text-white px-4 py-4 rounded-full transition-all duration-300 overflow-hidden flex items-center justify-center">
+              <span class="relative z-10 font-medium text-sm">Consultar disponibilidad</span>
+              <div class="ml-3 flex">
+                <i class="ti ti-arrow-right ml-3 group-hover:translate-x-1 transition-transform"></i>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Servicios -->
+      <div class="lg:col-span-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+          <!-- 01 -->
+          <div class="bg-white rounded-xl p-6 group">
+            <div class="flex items-center gap-6 mb-4">
+              <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i class="ti ti-chart-bar text-3xl text-gray-700"></i>
+              </div>
+              <h3 class="text-xl font-normal text-gray-900">Formación en finanzas digitales</h3>
+            </div>
+            <hr class="border-gray-200 mb-4">
+            <p class="text-gray-600 leading-relaxed font-light">
+              Capacitamos personas y familias en gestión del dinero, ahorro inteligente y planificación financiera personalizada.
+            </p>
+          </div>
+
+          <!-- 02 -->
+          <div class="bg-white rounded-xl p-6 group">
+            <div class="flex items-center gap-6 mb-4">
+              <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i class="ti ti-calculator text-3xl text-gray-700"></i>
+              </div>
+              <h3 class="text-xl font-normal text-gray-900">Consultoría financiera personalizada</h3>
+            </div>
+            <hr class="border-gray-200 mb-4">
+            <p class="text-gray-600 leading-relaxed font-light">
+              Análisis detallado de tu situación económica con recomendaciones prácticas para mejorar tu salud financiera familiar.
+            </p>
+          </div>
+
+          <!-- 03 -->
+          <div class="bg-white rounded-xl p-6 group">
+            <div class="flex items-center gap-6 mb-4">
+              <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i class="ti ti-zoom-check text-3xl text-gray-700"></i>
+              </div>
+              <h3 class="text-xl font-normal text-gray-900">Auditorías financieras</h3>
+            </div>
+            <hr class="border-gray-200 mb-4">
+            <p class="text-gray-600 leading-relaxed font-light">
+              Revisión exhaustiva de gastos, deudas y flujo de caja. Identificamos fugas de dinero y oportunidades de ahorro.
+            </p>
+          </div>
+
+          <!-- 04 -->
+          <div class="bg-white rounded-xl p-6 group">
+            <div class="flex items-center gap-6 mb-4">
+              <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i class="ti ti-pig-money text-3xl text-gray-700"></i>
+              </div>
+              <h3 class="text-xl font-normal text-gray-900">Talleres de ahorro familiar</h3>
+            </div>
+            <hr class="border-gray-200 mb-4">
+            <p class="text-gray-600 leading-relaxed font-light">
+              Sesiones prácticas para toda la familia. Aprende a establecer metas de ahorro y hábitos financieros saludables juntos.
+            </p>
+          </div>
+
+          <!-- 05 -->
+          <div class="bg-white rounded-xl p-6 group">
+            <div class="flex items-center gap-6 mb-4">
+              <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i class="ti ti-trending-up text-3xl text-gray-700"></i>
+              </div>
+              <h3 class="text-xl font-normal text-gray-900">Capacitación en inversión</h3>
+            </div>
+            <hr class="border-gray-200 mb-4">
+            <p class="text-gray-600 leading-relaxed font-light">
+              Introducción a instrumentos de inversión accesibles. Desde fondos mutuos hasta criptomonedas, explicado en términos simples.
+            </p>
+          </div>
+
+          <!-- 06 -->
+          <div class="bg-white rounded-xl p-6 group">
+            <div class="flex items-center gap-6 mb-4">
+              <div class="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <i class="ti ti-users-group text-3xl text-gray-700"></i>
+              </div>
+              <h3 class="text-xl font-normal text-gray-900">Mentoría en gestión del dinero</h3>
+            </div>
+            <hr class="border-gray-200 mb-4">
+            <p class="text-gray-600 leading-relaxed font-light">
+              Acompañamiento continuo para alcanzar tus objetivos financieros. De la teoría a la práctica con seguimiento personalizado.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<!-- Sponsors Section -->
+<section class="py-12 md:py-16 lg:py-20  border-b border-gray-300">
+    <div class="container mx-auto px-4">
+       
+ <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
+                <div>
+                  
+                    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 leading-tight tracking-tighter mb-2">
+                       Trabajamos con quienes mueven la industria
+                    </h2>
+                    <p class="text-gray-600">
+                       Herramientas y plataformas que usamos en cada proyecto para entregar resultados profesionales.
+                    </p>
+                </div>
+               
+            </div>
+        
+        <!-- Grid de logos responsive -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-2 md:gap-2 lg:gap-2 items-center justify-items-center">
+            <!-- Logo 1 -->
+            <div class="w-full bg-gray-200 rounded-lg max-w-[120px] sm:max-w-[160px] lg:max-w-[200px] p-2 sm:p-3 transition-all duration-300 hover:scale-105 hover:opacity-100 opacity-80">
+                <img src="img/logo_01.png" alt="Sponsor 1" class="w-full h-auto object-contain">
+            </div>
+            
+            <!-- Logo 2 -->
+            <div class="w-full bg-gray-200 rounded-lg max-w-[120px] sm:max-w-[160px] lg:max-w-[200px] p-2 sm:p-3 transition-all duration-300 hover:scale-105 hover:opacity-100 opacity-80">
+                <img src="img/logo_02.png" alt="Sponsor 2" class="w-full h-auto object-contain">
+            </div>
+            
+            <!-- Logo 3 -->
+            <div class="w-full bg-gray-200 rounded-lg max-w-[120px] sm:max-w-[160px] lg:max-w-[200px] p-2 sm:p-3 transition-all duration-300 hover:scale-105 hover:opacity-100 opacity-80">
+                <img src="img/logo_03.png" alt="Sponsor 3" class="w-full h-auto object-contain">
+            </div>
+            
+            <!-- Logo 4 -->
+            <div class="w-full bg-gray-200 rounded-lg max-w-[120px] sm:max-w-[160px] lg:max-w-[200px] p-2 sm:p-3 transition-all duration-300 hover:scale-105 hover:opacity-100 opacity-80">
+                <img src="img/logo_04.png" alt="Sponsor 4" class="w-full h-auto object-contain">
+            </div>
+            
+            <!-- Logo 5 -->
+            <div class="w-full bg-gray-200 rounded-lg max-w-[120px] sm:max-w-[160px] lg:max-w-[200px] p-2 sm:p-3 transition-all duration-300 hover:scale-105 hover:opacity-100 opacity-80">
+                <img src="img/logo_05.png" alt="Sponsor 5" class="w-full h-auto object-contain">
+            </div>
+            
+            <!-- Logo 6 -->
+            <div class="w-full bg-gray-200 rounded-lg max-w-[120px] sm:max-w-[160px] lg:max-w-[200px] p-2 sm:p-3 transition-all duration-300 hover:scale-105 hover:opacity-100 opacity-80">
+                <img src="img/logo_06.png" alt="Sponsor 6" class="w-full h-auto object-contain">
+            </div>
+            
+            <!-- Logo 7 -->
+            <div class="w-full bg-gray-200 rounded-lg max-w-[120px] sm:max-w-[160px] lg:max-w-[200px] p-2 sm:p-3 transition-all duration-300 hover:scale-105 hover:opacity-100 opacity-80">
+                <img src="img/logo_07.png" alt="Sponsor 7" class="w-full h-auto object-contain">
+            </div>
+            
+            <!-- Logo 8 -->
+            <div class="w-full bg-gray-200 rounded-lg max-w-[120px] sm:max-w-[160px] lg:max-w-[200px] p-2 sm:p-3 transition-all duration-300 hover:scale-105 hover:opacity-100 opacity-80">
+                <img src="img/logo_08.png" alt="Sponsor 8" class="w-full h-auto object-contain">
+            </div>
+        </div>
+        
+        <!-- Versión alternativa con slider para móviles -->
+        <div class="mt-8 md:hidden">
+            <div class="flex flex-wrap justify-center gap-6 py-4 px-4">
+                <div class="w-32 h-16 flex items-center justify-center">
+                    <img src="img/logo_01.png" alt="Sponsor 1" class="max-h-12 w-auto">
+                </div>
+                <div class="w-32 h-16 flex items-center justify-center">
+                    <img src="img/logo_02.png" alt="Sponsor 2" class="max-h-12 w-auto">
+                </div>
+                <div class="w-32 h-16 flex items-center justify-center">
+                    <img src="img/logo_03.png" alt="Sponsor 3" class="max-h-12 w-auto">
+                </div>
+                <div class="w-32 h-16 flex items-center justify-center">
+                    <img src="img/logo_04.png" alt="Sponsor 4" class="max-h-12 w-auto">
+                </div>
+                <div class="w-32 h-16 flex items-center justify-center">
+                    <img src="img/logo_05.png" alt="Sponsor 5" class="max-h-12 w-auto">
+                </div>
+                <div class="w-32 h-16 flex items-center justify-center">
+                    <img src="img/logo_06.png" alt="Sponsor 6" class="max-h-12 w-auto">
+                </div>
+                <div class="w-32 h-16 flex items-center justify-center">
+                    <img src="img/logo_07.png" alt="Sponsor 7" class="max-h-12 w-auto">
+                </div>
+                <div class="w-32 h-16 flex items-center justify-center">
+                    <img src="img/logo_08.png" alt="Sponsor 8" class="max-h-12 w-auto">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .hide-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari and Opera */
+        }
+    </style>
+</section>
+
+
+
+
+
+
+
+    <!-- FAQ Section -->
+    <section class="py-20  border-b border-gray-300">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+
+
+   <!-- Sidebar Sticky -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-40">
+                    <!-- Title -->
+                    <div class="mb-8">
+                         <span class=" text-gray-800 text-sm font-medium  py-2 rounded-full flex items-center">
+                                <i class="ti ti-checklist mr-1"></i>Consultores 
+                            </span>
+                        <h2 class="text-2xl md:text-3xl font-medium text-gray-900 leading-tight tracking-tighter mb-2">
+                           Preguntas frecuentes
+                        </h2>
+                        <p class="text-gray-600">
+                      Resolvemos dudas con respuestas claras. Lo que necesitas saber antes de empezar.
+                    </p>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+
+
+               
+
+
+
+
+                
+                <div class="lg:col-span-2">
+                    <div class="space-y-6">
+                        <!-- FAQ Item 1 -->
+                        <div class="bg-white rounded-xl  p-6">
+                            <button class="faq-toggle flex justify-between items-center w-full text-left">
+                                <h3 class="text-lg font-normal text-gray-800">
+                                    ¿En qué consiste la mentoría personalizada?
+                                </h3>
+                                <i class="ti ti-chevron-down text-gray-500"></i>
+                            </button>
+                            <div class="hidden mt-4 pt-4 border-t border-gray-200">
+                                <p class="text-gray-600">
+                                    Sesiones uno a uno donde trabajamos directamente en tus necesidades. Desde mejorar tu perfil profesional hasta implementar herramientas específicas en tu trabajo. Incluye acceso a nuestra comunidad de profesionales y sesiones de seguimiento trimestral.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- FAQ Item 2 -->
+                        <div class="bg-white rounded-xl  p-6">
+                            <button class="faq-toggle flex justify-between items-center w-full text-left">
+                                <h3 class="text-lg font-normal text-gray-800">
+                                    ¿Qué formato tienen los programas?
+                                </h3>
+                                <i class="ti ti-chevron-down text-gray-500"></i>
+                            </button>
+                            <div class="hidden mt-4 pt-4 border-t border-gray-200">
+                                <p class="text-gray-600">
+                                    Sesiones prácticas donde realizas las operaciones guiado por instructores. No es teoría grabada: es aprender haciendo, con acompañamiento en cada paso. Modalidades presencial, remota o híbrida según el programa.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- FAQ Item 3 -->
+                        <div class="bg-white rounded-xl  p-6">
+                            <button class="faq-toggle flex justify-between items-center w-full text-left">
+                                <h3 class="text-lg font-normal text-gray-800">
+                                    ¿Cómo funcionan las inscripciones?
+                                </h3>
+                                <i class="ti ti-chevron-down text-gray-500"></i>
+                            </button>
+                            <div class="hidden mt-4 pt-4 border-t border-gray-200">
+                                <p class="text-gray-600">
+                                    Puedes iniciar con el 50% del costo y completar el resto durante el programa. Ofrecemos flexibilidad porque creemos que la formación de calidad debe ser accesible.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const faqButtons = document.querySelectorAll(".faq-toggle");
+
+  faqButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const content = btn.nextElementSibling;
+      const icon = btn.querySelector("i");
+
+      // Cierra los demás
+      faqButtons.forEach((otherBtn) => {
+        const otherContent = otherBtn.nextElementSibling;
+        const otherIcon = otherBtn.querySelector("i");
+
+        if (otherBtn !== btn) {
+          otherContent.classList.add("hidden");
+          otherIcon.classList.remove("rotate-180");
+        }
+      });
+
+      // Alterna el actual
+      content.classList.toggle("hidden");
+      icon.classList.toggle("rotate-180");
+    });
+  });
+});
+</script>
+
+
+
+
+
+
+
+
+    <!-- Footer -->
+    <footer class=" pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="mb-12">
+                <h2 class="text-2xl md:text-3xl font-medium text-gray-900 leading-tight tracking-tighter mb-2">
+                    Su éxito es
+                    <br>nuestra prioridad
+                </h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 py-10 border-t border-b border-gray-300">
+                <!-- Navigation -->
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Navegación</h3>
+                    <ul class="space-y-2">
+                        <li><a href="el_instituto.html" class="text-gray-600 hover:text-gray-700 transition-colors">El Instituto</a></li>
+                        <li><a href="blog_t.html" class="text-gray-600 hover:text-gray-700 transition-colors">Biblioteca</a></li>
+                    </ul>
+                    <div class="flex space-x-3 mt-6">
+                        <a href="https://www.linkedin.com/company/visium-digital/" class="text-gray-600 hover:text-gray-700 transition-colors">
+                            <i class="ti ti-brand-linkedin text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-600 hover:text-gray-700 transition-colors">
+                            <i class="ti ti-brand-x text-xl"></i>
+                        </a>
+                        <a href="https://www.instagram.com/visium.digital.c.a/" class="text-gray-600 hover:text-gray-700 transition-colors">
+                            <i class="ti ti-brand-instagram text-xl"></i>
+                        </a>
+                        <a href="https://chat.whatsapp.com/DiuJOk1J1uF9keuVIxOcA0" class="text-gray-600 hover:text-gray-700 transition-colors">
+                            <i class="ti ti-brand-whatsapp text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Business Programs -->
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Capacitaciones</h3>
+                    <ul class="space-y-2">
+                        <li><a href="economia_digital.html" class="text-gray-600 hover:text-gray-700 transition-colors">Economía Digital</a></li>
+                        <li><a href="digital_empower.html" class="text-gray-600 hover:text-gray-700 transition-colors">Digital Empower</a></li>
+                        <li><a href="edufintech.html" class="text-gray-600 hover:text-gray-700 transition-colors">Edufintech</a></li>
+                        <li><a href="economia_digital.html" class="text-gray-600 hover:text-gray-700 transition-colors">Mercados Financieros</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Contactos</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="ti ti-brand-whatsapp text-gray-500 mt-1 mr-2"></i>
+                            <a href="https://chat.whatsapp.com/DiuJOk1J1uF9keuVIxOcA0" class="text-gray-600 hover:text-gray-700 transition-colors">(+58) 424 152 9071</a>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="ti ti-mail-opened text-gray-500 mt-1 mr-2"></i>
+                            <a href="mailto:visiumdigitalca@gmail.com" class="text-gray-600 hover:text-gray-700 transition-colors">visiumdigitalca@gmail.com</a>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="ti ti-map-pin-check text-gray-500 mt-1 mr-2"></i>
+                            <span class="text-gray-600">Caracas - Venezuela</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Consulting -->
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Consultoría</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <p class="text-gray-600">
+                                Soluciones personalizadas <br>para tus necesidades digitales
+                            </p>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="ti ti-calendar text-gray-500 mt-1 mr-2"></i>
+                            <a href="https://cal.com/visium-digital-z0lnvg" class="text-gray-600 hover:text-gray-700 transition-colors">Agendar Reunión</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Copyright -->
+            <div class="flex flex-col md:flex-row justify-between items-center pt-8">
+                <div class="flex items-center space-x-6 mb-4 md:mb-0">
+                    <img src="img/logo_v.svg" alt="Visium Digital" class="h-6">
+                    <a href="index.html" class="text-gray-600 hover:text-gray-700 transition-colors">Código de Conducta</a>
+                </div>
+                <p class="font-normal text-sm text-gray-600">
+                    <a href="index.html">© 2025 Visium Digital</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Simple accordion functionality
+        document.querySelectorAll('.bg-white.rounded-xl.shadow-sm button').forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.nextElementSibling;
+                const isExpanded = content.style.display === 'block';
+                
+                // Close all other accordions
+                document.querySelectorAll('.bg-white.rounded-xl.shadow-sm .mt-4').forEach(item => {
+                    item.style.display = 'none';
+                });
+                
+                // Toggle current accordion
+                content.style.display = isExpanded ? 'none' : 'block';
+            });
+        });
+    </script>
+
+
+    <script>
+        // Funcionalidad del acordeón
+        document.querySelectorAll('.accordion-item').forEach(item => {
+            const header = item.querySelector('.flex.justify-between');
+            
+            header.addEventListener('click', () => {
+                // Cerrar todos los acordeones
+                document.querySelectorAll('.accordion-item').forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+                
+                // Alternar el acordeón actual
+                item.classList.toggle('active');
+            });
+        });
+    </script>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var openBtn = document.getElementById('mobileMenuButton');
+    var menuIcon = document.getElementById('mobileMenuButtonIcon');
+    var panel = document.getElementById('mobileMenuPanel');
+    var header = document.getElementById('siteHeader');
+    var sheet = panel && panel.querySelector('.mobile-menu-sheet');
+    var closeTimer;
+    var sheetTransitionEnd = function (e) {
+      if (!panel || e.propertyName !== 'transform') return;
+      window.clearTimeout(closeTimer);
+      if (sheet) sheet.removeEventListener('transitionend', sheetTransitionEnd);
+      panel.classList.add('hidden');
+    };
+
+    function syncMenuButtonIcon(open) {
+      if (!menuIcon || !openBtn) return;
+      if (open) {
+        menuIcon.className = 'ti ti-x text-2xl';
+        openBtn.setAttribute('aria-label', 'Cerrar menú');
+      } else {
+        menuIcon.className = 'ti ti-menu-2 text-2xl';
+        openBtn.setAttribute('aria-label', 'Abrir menú de navegación');
+      }
+    }
+
+    function updateMobileNavTop() {
+      if (!panel || !header) return;
+      var bottom = header.getBoundingClientRect().bottom;
+      panel.style.setProperty('--mobile-nav-top', Math.max(0, bottom) + 'px');
+    }
+
+    function updateMobileNavMetrics() {
+      if (!panel || !header) return;
+      var top = Math.max(0, header.getBoundingClientRect().bottom);
+      panel.style.setProperty('--mobile-nav-top', top + 'px');
+
+      var available = window.innerHeight - top - 12;
+      panel.style.setProperty('--mobile-nav-max-h', Math.max(240, available) + 'px');
+
+      var footer = document.getElementById('mobileMenuFooter');
+      if (footer) {
+        panel.style.setProperty('--mobile-nav-footer-h', Math.max(0, footer.getBoundingClientRect().height) + 'px');
+      }
+    }
+
+    function setMenuOpen(open) {
+      if (!panel || !openBtn) return;
+      window.clearTimeout(closeTimer);
+      if (sheet) sheet.removeEventListener('transitionend', sheetTransitionEnd);
+      if (open) {
+        updateMobileNavMetrics();
+        panel.classList.remove('hidden');
+        panel.offsetHeight;
+        requestAnimationFrame(function () {
+          panel.classList.add('is-open');
+          updateMobileNavMetrics();
+        });
+        openBtn.setAttribute('aria-expanded', 'true');
+        panel.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        syncMenuButtonIcon(true);
+      } else {
+        if (panel.classList.contains('hidden')) return;
+        panel.classList.remove('is-open');
+        openBtn.setAttribute('aria-expanded', 'false');
+        panel.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        syncMenuButtonIcon(false);
+        function sealClosed() {
+          window.clearTimeout(closeTimer);
+          if (sheet) sheet.removeEventListener('transitionend', sheetTransitionEnd);
+          panel.classList.add('hidden');
+        }
+        if (sheet) {
+          sheet.addEventListener('transitionend', sheetTransitionEnd);
+          closeTimer = window.setTimeout(sealClosed, 350);
+        } else {
+          sealClosed();
+        }
+      }
+    }
+
+    function toggleMenu() {
+      if (!panel || panel.classList.contains('hidden') || !panel.classList.contains('is-open')) setMenuOpen(true);
+      else setMenuOpen(false);
+    }
+
+    if (openBtn) {
+      openBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        toggleMenu();
+      });
+    }
+    panel && panel.querySelectorAll('a[href]').forEach(function (link) {
+      link.addEventListener('click', function () { setMenuOpen(false); });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && panel && !panel.classList.contains('hidden')) setMenuOpen(false);
+    });
+    window.addEventListener('resize', function () {
+      if (panel && !panel.classList.contains('hidden')) updateMobileNavMetrics();
+    });
+    window.addEventListener('orientationchange', function () {
+      window.setTimeout(updateMobileNavMetrics, 200);
+    });
+  });
+</script>
+</body>
+</html>

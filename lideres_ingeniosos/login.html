@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Líderes Ingeniosos · Acceso</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body { 
+      background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 50%, #a855f7 100%); 
+      min-height: 100vh;
+    }
+    #loginError { transition: all .3s ease; }
+    .hidden { display: none !important; }
+    .input-dark {
+      background: #1a1a2e;
+      border: 1px solid #2d2d44;
+      color: #fff;
+    }
+    .input-dark:focus {
+      outline: none;
+      border-color: #8b5cf6;
+    }
+    .input-dark::placeholder {
+      color: #6b7280;
+    }
+    /* Animación de flotación lenta */
+    @keyframes bounce-slow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    .animate-bounce-slow {
+      animation: bounce-slow 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+  <!-- Card Container - 35% altura con borde blanco -->
+  <div class="w-full max-w-4xl bg-white rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col lg:flex-row max-h-[35vh] lg:max-h-[550px] border-[10px] border-white">
+    
+    <!-- Left Side: Image -->
+    <div class="lg:w-1/2 relative overflow-hidden rounded-[2rem]">
+      <!-- Background: lunar_02 -->
+      <img src="img/lunar_02.jpg" 
+        alt="Fondo espacial" 
+        class="w-full h-full object-cover rounded-l-[2rem]">
+      <!-- Overlay gradient -->
+      <div class="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent"></div>
+      
+      <!-- Floating character: juego_01 - más arriba -->
+      <div class="absolute right-10 lg:right-20 top-8 lg:top-6 animate-bounce-slow">
+        <img src="img/juego_01.png" 
+          alt="Personaje" 
+          class="w-[140px] lg:w-[280px] drop-shadow-2xl">
+      </div>
+      
+      
+    </div>
+
+    <!-- Right Side: Form -->
+    <div class="lg:w-1/2 bg-white p-6 lg:p-8 flex flex-col justify-center">
+      <!-- Header -->
+
+      <!-- Logo centrado -->
+      <div class="flex justify-center mb-4">
+        <img src="img/logo.svg" alt="Logo" class="h-28 w-auto">
+      </div>
+      <div class="mb-4 text-center">
+        <h1 class="text-gray-900 text-2xl font-semibold mb-1">Bienvenido de vuelta</h1>
+        <p class="text-gray-500 text-lg">Ingresa tus datos para continuar</p>
+      </div>
+
+      <!-- Form -->
+      <div class="space-y-2">
+        <!-- Username Input -->
+        <div class="relative">
+          <i class="ti ti-user absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+          <input type="text" id="username" placeholder="Usuario"
+            class="w-full bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-3 py-3 text-gray-900 text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors">
+        </div>
+
+        <!-- Password Input -->
+        <div class="relative">
+          <i class="ti ti-lock absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+          <input type="password" id="password" placeholder="Contraseña"
+            class="w-full bg-gray-50 border border-gray-200 rounded-lg pl-10 pr-3 py-3 text-gray-900 text-sm focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors">
+        </div>
+
+        <!-- Error message -->
+        <div id="loginError" class="hidden bg-red-50 border border-red-200 text-red-600 text-xs px-3 py-2 rounded-lg text-center">
+          <i class="ti ti-alert-circle mr-1"></i> <span id="loginErrorMsg"></span>
+        </div>
+
+        <!-- Login button -->
+        <button id="loginBtn"
+          class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2 mt-4">
+          <span>Ingresar</span>
+          <i class="ti ti-arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="mt-4 pt-3 border-t border-gray-100">
+        <p class="text-gray-400 text-xs text-center">
+          Contraseña: <span class="text-purple-600 font-medium">123</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 18 usuarios válidos (no visibles, solo para validación)
+    const validUsers = [
+      { id: 1, name: 'Ana', color: 'from-pink-500 to-rose-400' },
+      { id: 2, name: 'Benjamín', color: 'from-blue-500 to-cyan-400' },
+      { id: 3, name: 'Carla', color: 'from-purple-500 to-violet-400' },
+      { id: 4, name: 'Diego', color: 'from-green-500 to-emerald-400' },
+      { id: 5, name: 'Elena', color: 'from-orange-500 to-amber-400' },
+      { id: 6, name: 'Felipe', color: 'from-indigo-500 to-blue-400' },
+      { id: 7, name: 'Gabriela', color: 'from-teal-500 to-cyan-400' },
+      { id: 8, name: 'Hugo', color: 'from-red-500 to-rose-400' },
+      { id: 9, name: 'Isabella', color: 'from-fuchsia-500 to-pink-400' },
+      { id: 10, name: 'Juan', color: 'from-yellow-500 to-orange-400' },
+      { id: 11, name: 'Sarah', color: 'from-purple-600 to-violet-500' },
+      { id: 12, name: 'Andres', color: 'from-green-600 to-emerald-500' },
+      { id: 13, name: 'Andriuw', color: 'from-cyan-500 to-blue-400' },
+      { id: 14, name: 'Fabi', color: 'from-pink-400 to-rose-300' },
+      { id: 15, name: 'Samanta', color: 'from-amber-500 to-yellow-400' },
+      { id: 16, name: 'Milan', color: 'from-slate-500 to-gray-400' },
+      { id: 17, name: 'Avi', color: 'from-lime-500 to-green-400' },
+      { id: 18, name: 'Sara', color: 'from-violet-500 to-purple-400' },
+      { id: 19, name: 'Sebastian', color: 'from-red-400 to-orange-300' }
+    ];
+
+    function handleLogin() {
+      const username = document.getElementById('username').value.trim();
+      const pwd = document.getElementById('password').value.trim();
+      const errBox = document.getElementById('loginError');
+      const errMsg = document.getElementById('loginErrorMsg');
+      
+      errBox.classList.add('hidden');
+
+      if (!username) {
+        errMsg.innerText = 'Ingresa tu nombre';
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      if (!pwd) {
+        errMsg.innerText = 'Ingresa la contraseña';
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      // Buscar usuario (insensible a mayúsculas/minúsculas)
+      const user = validUsers.find(u => u.name.toLowerCase() === username.toLowerCase());
+
+      if (!user) {
+        errMsg.innerText = 'Nombre no encontrado';
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      if (pwd !== '123') {
+        errMsg.innerText = 'Contraseña incorrecta';
+        errBox.classList.remove('hidden');
+        document.getElementById('password').value = '';
+        return;
+      }
+
+      // Login exitoso
+      sessionStorage.setItem('li_user', user.name);
+      sessionStorage.setItem('li_user_id', user.id);
+      sessionStorage.setItem('li_user_color', user.color);
+      
+      initUserProgress(user.id, user.name);
+      window.location.href = 'app.html';
+    }
+
+    function initUserProgress(userId, userName) {
+      const progressKey = `li_progress_${userId}`;
+      const existing = localStorage.getItem(progressKey);
+      
+      if (!existing) {
+        const initialProgress = {
+          userId: userId,
+          userName: userName,
+          points: 0,
+          level: 1,
+          title: 'Explorador Financiero',
+          streak: 0,
+          joinDate: new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
+          modules: [
+            { id: 1, emoji: '💰', title: '¿Qué es el dinero?', desc: 'Aprende el origen y función del dinero en la sociedad.', progress: 0, completed: false },
+            { id: 2, emoji: '🐷', title: 'Cómo ahorrar', desc: 'Estrategias prácticas para guardar dinero desde pequeño.', progress: 0, completed: false },
+            { id: 3, emoji: '🛒', title: 'Necesidades vs Deseos', desc: 'Aprende a distinguir lo que necesitas de lo que quieres.', progress: 0, completed: false },
+            { id: 4, emoji: '📊', title: 'Presupuesto personal', desc: 'Crea y gestiona tu primer presupuesto mensual.', progress: 0, completed: false },
+            { id: 5, emoji: '🏦', title: 'El banco y yo', desc: 'Entiende cómo funcionan los bancos y las cuentas.', progress: 0, completed: false },
+            { id: 6, emoji: '🤝', title: 'Liderazgo y equipo', desc: 'Desarrolla habilidades de liderazgo y trabajo en equipo.', progress: 0, completed: false }
+          ],
+          challenges: [
+            { id: 1, title: 'La Alcancía Express', color: 'pink', completed: false, help: 'COMODÍN: Pide una caja de cereal o un bote de yogurt vacío.' },
+            { id: 2, title: 'Los Establos', color: 'blue', completed: false, help: 'COMODÍN: Dibuja cuadrados uno dentro de otro como una muñeca rusa.' },
+            { id: 3, title: 'Memoria', color: 'emerald', completed: false, help: 'COMODÍN: ¡Toma una foto rápida con tu mente!' },
+            { id: 4, title: 'Movimiento Genial', color: 'orange', completed: false, help: 'COMODÍN: ¿Y si el número que formas es el 11?' },
+            { id: 5, title: '¿Cuántos huevos?', color: 'yellow', completed: false, help: 'COMODÍN: ¿Desde cuándo los GALLOS ponen huevos? 😉' },
+            { id: 6, title: 'Unión Imposible', color: 'purple', completed: false, help: 'COMODÍN: La clave es pensar fuera de la caja.' }
+          ],
+          achievements: [],
+          lastActivity: null
+        };
+        localStorage.setItem(progressKey, JSON.stringify(initialProgress));
+      }
+    }
+
+    // Event listeners
+    document.getElementById('loginBtn').addEventListener('click', handleLogin);
+    document.getElementById('username').addEventListener('keypress', e => {
+      if (e.key === 'Enter') document.getElementById('password').focus();
+    });
+    document.getElementById('password').addEventListener('keypress', e => {
+      if (e.key === 'Enter') handleLogin();
+    });
+
+    // Ya logueado?
+    if (sessionStorage.getItem('li_user')) {
+      window.location.href = 'app.html';
+    }
+  </script>
+</body>
+</html>

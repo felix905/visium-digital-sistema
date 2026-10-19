@@ -1,0 +1,453 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misión Líderes Ingeniosos - Consola Central</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Montserrat:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #0f172a;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .title-font { font-family: 'Luckiest Guy', cursive; }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+        }
+
+        /* Word Tag States */
+        .word-tag {
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .word-tag.selected {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .word-tag.hit {
+            background: #10b981 !important;
+            border-color: #059669 !important;
+            color: white !important;
+            animation: celebrate 0.5s ease-out;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+
+        .word-tag.drawn-not-selected {
+            opacity: 0.3;
+            text-decoration: line-through;
+            pointer-events: none;
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15) rotate(3deg); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out infinite; }
+
+        .letter-slot {
+            display: inline-flex;
+            width: 3rem;
+            height: 3.5rem;
+            background: #1e293b;
+            border: 2px solid #3b82f6;
+            border-radius: 0.75rem;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin: 0.25rem;
+            text-transform: uppercase;
+        }
+
+        .hint-box {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px dashed rgba(251, 191, 36, 0.5);
+            color: #fbbf24;
+        }
+
+        /* Ambient background glow */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, #1e3a8a, transparent),
+                        radial-gradient(circle at 0% 100%, #111827, transparent);
+            z-index: -1;
+        }
+
+        .btn-disabled {
+            filter: grayscale(1);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+  <link rel="stylesheet" href="../styles/btn.css">
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+    <div class="bg-glow"></div>
+
+    <div class="max-w-6xl mx-auto space-y-8">
+        <!-- HEADER -->
+        <header class="text-center">
+            <h1 class="title-font text-5xl md:text-6xl text-blue-400 drop-shadow-[0_5px_15px_rgba(59,130,246,0.3)] mb-2 tracking-wider uppercase">Misión Ingeniosa</h1>
+            <div class="flex flex-wrap justify-center gap-4">
+                <span class="bg-blue-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">Reto de Palabras</span>
+                <span class="bg-purple-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">Agilidad Mental</span>
+                <span class="bg-emerald-600 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">Liderazgo Activo</span>
+            </div>
+        </header>
+
+        <!-- FILA SUPERIOR: BINGO Y PALABRAS LOCAS -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- SECCIÓN 1: BINGO DE TÓMBOLA -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="glass-panel p-6 shadow-2xl border-blue-500/30">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h2 class="title-font text-3xl text-blue-400 flex items-center gap-3">
+                                <span class="text-4xl">🎰</span> BINGO INGENIOSO
+                            </h2>
+                            <p id="instruction-text" class="text-[11px] text-amber-400 font-black mt-1 uppercase animate-pulse">
+                                Paso 1: ¡Toca 4 palabras para armar tu cartón!
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p id="counter" class="text-4xl font-black text-white leading-none">0/4</p>
+                            <p class="text-[10px] text-blue-400 font-bold uppercase">Seleccionadas</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-black/40 rounded-3xl border-2 border-slate-700 p-8 mb-6 text-center relative overflow-hidden">
+                        <div id="display-word" class="text-5xl md:text-7xl title-font text-white min-h-[1.5em] flex items-center justify-center italic opacity-30">ESPERANDO...</div>
+                        <div id="display-cat" class="text-blue-500 font-black tracking-[0.3em] uppercase text-xs mt-4 opacity-70">Prepara tu cartón abajo</div>
+                    </div>
+
+                    <button onclick="spinTombola()" id="btn-spin" disabled class="btn-3d btn-blue btn-full btn-lg mb-8 btn-disabled">
+                        ¡GIRAR TÓMBOLA! 🎲
+                    </button>
+
+                    <div id="word-grid" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: PALABRAS LOCAS -->
+            <div class="glass-panel p-6 border-purple-500/30 min-h-[500px] flex flex-col">
+                <h2 class="title-font text-2xl text-purple-400 mb-2 flex items-center gap-2">
+                    <span>🤪</span> PALABRAS LOCAS
+                </h2>
+                <p class="text-[20px] text-slate-400 mb-6 font-bold uppercase italic">¡Ordena y adivina la palabra!</p>
+                
+                <div id="scrambled-game" class="flex-1 flex flex-col text-center">
+                    <div id="scrambled-container" class="flex flex-wrap justify-center mb-6">
+                        <p class="text-slate-500 italic">Haz clic en Nueva Palabra</p>
+                    </div>
+
+                    <div id="hint-display" class="hidden w-full p-3 rounded-xl hint-box mb-6 text-[10px] font-bold uppercase transition-all">
+                        <span class="opacity-70 mr-1">PISTA:</span> <span id="hint-content"></span>
+                    </div>
+
+                    <div class="w-full space-y-3">
+                        <input type="text" id="guess-input" placeholder="Respuesta..." class="w-full bg-slate-800 border-2 border-slate-700 p-4 rounded-2xl focus:border-purple-500 outline-none font-bold text-center text-xl uppercase">
+                        
+                        <button onclick="checkGuess()" class="btn-3d btn-violet btn-full">
+                            Comprobar ✅
+                        </button>
+
+                        <div class="flex gap-2">
+                            <button onclick="showHint()" id="btn-hint" class="btn-3d btn-gray btn-sm flex-1">
+                                💡 Pista
+                            </button>
+                            <button onclick="newScrambledWord()" class="btn-3d btn-gray btn-sm flex-1">
+                                Siguiente ➔
+                            </button>
+                        </div>
+                    </div>                <div id="scrambled-feedback" class="mt-4 h-10 text-center font-black uppercase text-sm"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: LABORATORIO DE LIDERAZGO -->
+        <div class="glass-panel p-8 border-emerald-500/30 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 text-[15rem] opacity-5 pointer-events-none select-none">🏆</div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 border-b border-emerald-500/20 pb-6">
+                <div>
+                    <h2 class="title-font text-4xl text-emerald-400 flex items-center gap-3">
+                        <span class="text-5xl">🚀</span> LABORATORIO DE LIDERAZGO
+                    </h2>
+                    <p class="text-slate-400 font-bold uppercase tracking-widest text-sm mt-2">Misión: Construyendo mi propósito de vida</p>
+                </div>
+                <div class="bg-orange-500/20 border border-orange-500/40 p-4 rounded-2xl max-w-sm">
+                    <p class="text-[10px] font-black text-orange-400 uppercase leading-tight text-center">💡 Un buen líder sabe hacia dónde camina y siempre ayuda a su equipo a llegar allí.</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="space-y-8">
+                    <div class="group">
+                        <div class="flex items-center gap-4 mb-3">
+                            <div class="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 font-black text-xl border border-emerald-500/30">1</div>
+                            <h3 class="font-black text-emerald-400 text-2xl uppercase tracking-tighter">¿Cuál es mi MISIÓN?</h3>
+                        </div>
+                        <div class="bg-emerald-500/5 p-6 rounded-3xl border border-emerald-500/20">
+                            <p class="text-sm text-slate-300">Es lo que haces <b class="text-emerald-400">HOY</b>. Tu labor diaria y cómo ayudas.</p>
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div class="flex items-center gap-4 mb-3">
+                            <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center text-blue-400 font-black text-xl border border-blue-500/30">2</div>
+                            <h3 class="font-black text-blue-400 text-2xl uppercase tracking-tighter">¿Cuál es mi VISIÓN?</h3>
+                        </div>
+                        <div class="bg-blue-500/5 p-6 rounded-3xl border border-blue-500/20">
+                            <p class="text-sm text-slate-300">Es donde estarás <b class="text-blue-400">MAÑANA</b>. Tu meta en 10 años.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/50 p-8 rounded-[2.5rem] border-2 border-slate-700 shadow-inner space-y-8">
+                    <div class="space-y-6">
+                        <textarea id="input-mision" class="w-full bg-slate-800 border-2 border-slate-700 rounded-2xl p-4 text-sm focus:border-emerald-500 outline-none placeholder:text-slate-600" placeholder="MI MISIÓN (Hoy)..." rows="3"></textarea>
+                        <textarea id="input-vision" class="w-full bg-slate-800 border-2 border-slate-700 rounded-2xl p-4 text-sm focus:border-blue-500 outline-none placeholder:text-slate-600" placeholder="MI VISIÓN (Futuro)..." rows="3"></textarea>
+                        <button onclick="saveBitacora()" class="btn-3d btn-green btn-full btn-lg">
+                            💾 Sellar mi Compromiso
+                        </button>
+                        <p id="save-status" class="text-center text-[10px] text-slate-500 font-bold h-4 italic"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center pb-12 opacity-30 text-[10px] font-bold uppercase tracking-[0.4em]">
+            Consola de Comando Ingeniosa • v3.1 • Fase Selección
+        </footer>
+    </div>
+
+    <script>
+        const wordBank = [
+            {t: "Hormiga", c: "H", p: "Pequeño insecto muy trabajador."}, 
+            {t: "Hielo", c: "H", p: "Agua congelada muy fría."}, 
+            {t: "Huevo", c: "H", p: "Lo pone la gallina."}, 
+            {t: "Helado", c: "H", p: "Postre frío de muchos sabores."},
+            {t: "Cielo", c: "C", p: "Donde están las nubes y el sol."}, 
+            {t: "Cebra", c: "C", p: "Animal con rayas blancas y negras."}, 
+            {t: "Silla", c: "S", p: "Mueble para sentarse."}, 
+            {t: "Sapo", c: "S", p: "Animal que salta y dice 'croac'."},
+            {t: "Cuna", c: "C", p: "Cama para bebés."}, 
+            {t: "Sopa", c: "S", p: "Comida líquida y caliente."}, 
+            {t: "Cero", c: "C", p: "Número que no tiene valor solo."}, 
+            {t: "Saco", c: "S", p: "Prenda de vestir o bolsa grande."},
+            {t: "Zulia", c: "VEN", p: "Estado donde está el Lago de Maracaibo."}, 
+            {t: "Mérida", c: "VEN", p: "Estado con nieve y montañas altas."}, 
+            {t: "Lara", c: "VEN", p: "Capital musical de Venezuela."}, 
+            {t: "Bolívar", c: "VEN", p: "Estado más grande de Venezuela."},
+            {t: "Falcón", c: "VEN", p: "Donde están los Médanos de Coro."}, 
+            {t: "Táchira", c: "VEN", p: "Estado andino, frontera con Colombia."}, 
+            {t: "Apure", c: "VEN", p: "Estado de los llanos venezolanos."}, 
+            {t: "Caracas", c: "VEN", p: "Ciudad capital de Venezuela."}
+        ];
+
+        // Game State
+        let selectedWords = [];
+        let drawnWords = [];
+        let gameActive = false;
+        let currentWordObj = null;
+
+        // BINGO: Phase 1 - Grid & Selection
+        function initWordGrid() {
+            const grid = document.getElementById('word-grid');
+            grid.innerHTML = '';
+            wordBank.forEach(word => {
+                const div = document.createElement('div');
+                div.id = `tag-${word.t}`;
+                div.className = "word-tag px-3 py-4 rounded-2xl text-[11px] font-black text-slate-400 text-center";
+                div.innerHTML = `<span class="opacity-50 text-[8px] block mb-1">${word.c}</span>${word.t.toUpperCase()}`;
+                div.onclick = () => toggleWordSelection(word.t);
+                grid.appendChild(div);
+            });
+        }
+
+        function toggleWordSelection(wordTitle) {
+            if (gameActive) return; // Cant change during spin phase
+
+            const index = selectedWords.indexOf(wordTitle);
+            const element = document.getElementById(`tag-${wordTitle}`);
+
+            if (index > -1) {
+                selectedWords.splice(index, 1);
+                element.classList.remove('selected');
+            } else {
+                if (selectedWords.length < 4) {
+                    selectedWords.push(wordTitle);
+                    element.classList.add('selected');
+                }
+            }
+
+            updateSelectionUI();
+        }
+
+        function updateSelectionUI() {
+            const counter = document.getElementById('counter');
+            const btn = document.getElementById('btn-spin');
+            const inst = document.getElementById('instruction-text');
+            
+            counter.innerText = `${selectedWords.length}/4`;
+
+            if (selectedWords.length === 4) {
+                btn.disabled = false;
+                btn.classList.remove('btn-disabled');
+                btn.classList.add('hover:bg-blue-500', 'active:translate-y-1', 'active:shadow-none');
+                inst.innerText = "¡Paso 2: Gira la tómbola y busca tus palabras!";
+                inst.className = "text-[11px] text-emerald-400 font-black mt-1 uppercase";
+            } else {
+                btn.disabled = true;
+                btn.classList.add('btn-disabled');
+                btn.classList.remove('hover:bg-blue-500', 'active:translate-y-1', 'active:shadow-none');
+                inst.innerText = "Paso 1: ¡Toca 4 palabras para armar tu cartón!";
+                inst.className = "text-[11px] text-amber-400 font-black mt-1 uppercase animate-pulse";
+            }
+        }
+
+        // BINGO: Phase 2 - Spin
+        function spinTombola() {
+            gameActive = true;
+            const btn = document.getElementById('btn-spin');
+            const display = document.getElementById('display-word');
+            const cat = document.getElementById('display-cat');
+            
+            const available = wordBank.filter(w => !drawnWords.includes(w.t));
+            if (available.length === 0) return alert("¡Misión Cumplida! Todas las palabras han salido.");
+
+            btn.disabled = true;
+            display.classList.remove('italic', 'opacity-30');
+            display.classList.add('animate-shake');
+            cat.innerText = "MEZCLANDO...";
+            
+            let count = 0;
+            const interval = setInterval(() => {
+                display.innerText = available[Math.floor(Math.random() * available.length)].t.toUpperCase();
+                count++;
+                if (count > 25) {
+                    clearInterval(interval);
+                    const final = available[Math.floor(Math.random() * available.length)];
+                    drawnWords.push(final.t);
+                    
+                    display.innerText = final.t.toUpperCase();
+                    display.classList.remove('animate-shake');
+                    cat.innerText = `CATEGORÍA: ${final.c}`;
+                    btn.disabled = false;
+
+                    const tag = document.getElementById(`tag-${final.t}`);
+                    if (selectedWords.includes(final.t)) {
+                        tag.classList.add('hit');
+                    } else {
+                        tag.classList.add('drawn-not-selected');
+                    }
+                    
+                    checkWin();
+                }
+            }, 50);
+        }
+
+        function checkWin() {
+            const hits = selectedWords.filter(w => drawnWords.includes(w));
+            if (hits.length === 4) {
+                document.getElementById('instruction-text').innerText = "¡BINGO COMPLETADO! ¡ERES UN GRAN LÍDER! 🏆";
+                document.getElementById('instruction-text').className = "text-sm text-yellow-400 font-black mt-1 uppercase animate-bounce";
+            }
+        }
+
+        // SCRAMBLED Logic
+        function newScrambledWord() {
+            currentWordObj = wordBank[Math.floor(Math.random() * wordBank.length)];
+            const wordStr = currentWordObj.t.toUpperCase();
+            let scrambled = wordStr;
+            while (scrambled === wordStr) {
+                scrambled = wordStr.split('').sort(() => Math.random() - 0.5).join('');
+            }
+            const container = document.getElementById('scrambled-container');
+            container.innerHTML = '';
+            scrambled.split('').forEach(letra => {
+                const slot = document.createElement('div');
+                slot.className = "letter-slot shadow-lg border-2 border-purple-500/50";
+                slot.innerText = letra;
+                container.appendChild(slot);
+            });
+            document.getElementById('guess-input').value = "";
+            document.getElementById('scrambled-feedback').innerText = "";
+            document.getElementById('hint-display').classList.add('hidden');
+            document.getElementById('btn-hint').disabled = false;
+        }
+
+        function showHint() {
+            if (!currentWordObj) return;
+            document.getElementById('hint-content').innerText = currentWordObj.p;
+            document.getElementById('hint-display').classList.remove('hidden');
+            document.getElementById('btn-hint').disabled = true;
+        }
+
+        function checkGuess() {
+            if (!currentWordObj) return;
+            const guess = document.getElementById('guess-input').value.toUpperCase().trim();
+            const feedback = document.getElementById('scrambled-feedback');
+            if (guess === currentWordObj.t.toUpperCase()) {
+                feedback.innerText = "¡EXCELENTE LÍDER! 🌟";
+                feedback.className = "mt-4 h-10 text-center font-black uppercase text-sm text-green-400";
+                setTimeout(newScrambledWord, 1500);
+            } else {
+                feedback.innerText = "¡INTÉNTALO OTRA VEZ! ❌";
+                feedback.className = "mt-4 h-10 text-center font-black uppercase text-sm text-red-500 animate-pulse";
+            }
+        }
+
+        // LEADERSHIP Logic
+        function saveBitacora() {
+            const m = document.getElementById('input-mision').value;
+            const v = document.getElementById('input-vision').value;
+            const status = document.getElementById('save-status');
+            
+            if(!m || !v) {
+                status.innerText = "⚠️ DOCUMENTO INCOMPLETO";
+                status.className = "text-center text-[10px] text-red-400 font-bold h-4 uppercase";
+                return;
+            }
+            
+            status.innerText = "✨ ¡COMPROMISO SELLADO, LÍDER! ✨";
+            status.className = "text-center text-[10px] text-emerald-400 font-bold h-4 uppercase animate-bounce";
+            
+            setTimeout(() => { status.innerText = ""; }, 4000);
+        }
+
+        window.onload = () => {
+            initWordGrid();
+            newScrambledWord();
+        };
+    </script>
+</body>
+</html>
+

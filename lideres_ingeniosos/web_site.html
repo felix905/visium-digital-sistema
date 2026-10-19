@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Líderes Ingeniosos | Educación financiera que transforma el futuro</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Sans Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Tabler Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    body {
+      font-family: 'Google Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    /* Container unificado */
+    .container {
+      max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    @media (min-width: 640px) {
+      .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
+    }
+    /* Menú móvil */
+    .mobile-menu-btn {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      .mobile-menu-btn {
+        display: flex;
+      }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 1rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .nav-links.active {
+        display: flex;
+      }
+      .nav-links a, .nav-links button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    /* Scroll Reveal Animation */
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .scroll-reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Stagger animation for children */
+    .scroll-reveal.visible > * {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+    .scroll-reveal.visible > *:nth-child(1) { animation-delay: 0.1s; }
+    .scroll-reveal.visible > *:nth-child(2) { animation-delay: 0.2s; }
+    .scroll-reveal.visible > *:nth-child(3) { animation-delay: 0.3s; }
+    .scroll-reveal.visible > *:nth-child(4) { animation-delay: 0.4s; }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /* Hover effects for cards */
+    .hover-lift {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-lift:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    /* Gradient text animation */
+    .gradient-text {
+      background: linear-gradient(135deg, #0D9488 0%, #7C3AED 50%, #F59E0B 100%);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 5s ease infinite;
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    /* Pulse animation for CTA */
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    /* FAQ accordion */
+    .faq-item {
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .faq-question {
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .faq-question:hover {
+      background-color: #f9fafb;
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    .faq-answer.open {
+      max-height: 500px;
+      padding-top: 1rem;
+    }
+  </style>
+</head>
+<body class="bg-white text-slate-900 overflow-x-hidden">
+
+  <!-- NAVBAR -->
+  <nav class="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200" data-purpose="navigation-bar">
+    <div class="container flex justify-between items-center py-4 relative">
+      <!-- Logo y ubicación -->
+      <div class="flex items-center gap-8">
+        <div class="text-2xl font-bold tracking-tighter text-teal-900 flex items-center gap-2">
+          <img src="img/logo.svg" class="w-[150px] md:w-[190px]" alt="Líderes Ingeniosos">
+        </div>
+        <div class="hidden lg:flex flex-col text-xs">
+          <span class="text-slate-400">Modalidad</span>
+          <button class="flex items-center font-semibold text-slate-700 hover:text-teal-600 transition-colors">
+            Online + Presencial
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Botón menú móvil -->
+      <button class="mobile-menu-btn lg:hidden flex flex-col gap-1.5 p-2" onclick="toggleMobileMenu()" aria-label="Menú">
+        <span class="w-6 h-0.5 bg-slate-700 transition-all"></span>
+        <span class="w-6 h-0.5 bg-slate-700 transition-all"></span>
+        <span class="w-6 h-0.5 bg-slate-700 transition-all"></span>
+      </button>
+      
+      <!-- Navigation Links -->
+      <div id="navLinks" class="nav-links lg:flex items-center gap-6 text-md font-medium">
+        <a class="text-slate-600 hover:text-teal-600 transition-colors flex items-center py-2 lg:py-0" href="#programas">
+          Programas
+        </a>
+        <a class="text-slate-600 hover:text-teal-600 transition-colors flex items-center py-2 lg:py-0" href="#metodologia">
+          Metodología
+        </a>
+        <a class="text-slate-600 hover:text-teal-600 transition-colors flex items-center py-2 lg:py-0" href="#contacto">
+          Contacto
+        </a>
+        <button onclick="openModal()" class="bg-teal-700 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-teal-800 transition shadow-lg hover:shadow-teal-500/30">Solicita info</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="pt-40 pb-12 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="bg-[#BF8FE9] opacity-90 rounded-2xl overflow-visible w-full relative hover-lift">
+         <div class="absolute bottom-0 right-60 opacity-30 pointer-events-none w-[600px] md ">
+        <img src="" alt="" class="w-full h-auto">
+      </div>
+        <div class="grid md:grid-cols-2 gap-8 items-center pt-12 px-6 md:px-12 relative z-10">
+          <div class="z-10 max-w-2xl">
+            <h1 class="text-5xl font-medium leading-[1.0] text-white mb-6">
+              Educación financiera & <span class="gradient-text">liderazgo</span> para niños y adolescentes
+            </h1>
+            <p class="text-2xl text-gray-100 font-medium mb-6">Educación financiera, liderazgo y pensamiento <br>crítico para niños y adolescentes en un mundo digital.</p>
+           
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+              <button onclick="openModalWithType('colegio')" class="bg-slate-900 text-white px-8 py-4 rounded-full font-bold text-lg flex items-center gap-3 hover:bg-slate-800 transition-all active:scale-95 pulse-animation">
+                Para Colegios
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              </button>
+              <button onclick="openModalWithType('padre')" class="bg-amber-500 text-white px-8 py-4 rounded-full font-bold text-lg flex items-center gap-3 hover:bg-amber-600 transition-all active:scale-95">
+                Para Padres
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              </button>
+            </div>
+            <div class="flex gap-4 text-slate-400 text-2xl mt-4">
+              <i class="ti ti-coin"></i> <i class="ti ti-chart-line"></i> <i class="ti ti-brain"></i> <i class="ti ti-rocket"></i>
+            </div>
+          </div>
+          <div class="relative flex justify-end items-center overflow-visible">
+            <img alt="Niños aprendiendo finanzas" 
+                 class="hidden md:block w-full h-auto object-contain" 
+                 style="max-height: none;" 
+                 src="img/03.png" class="w-[850px]">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem Section -->
+  <section class="py-20 bg-white">
+    <div class="container">
+      <div class="text-left mb-12">
+        <div class="inline-block px-6 py-2 bg-amber-100 text-amber-700 font-bold rounded-full mb-4">
+          <i class="ti ti-alert-triangle text-sm inline mr-2"></i>
+          DATOS QUE IMPORTAN
+        </div>
+        <h2 class="text-4xl md:text-5xl font-medium mb-4 text-gray-900">El mundo cambió.<br>La educación también debería.</h2>
+        <p class="text-xl text-gray-600 max-w-3xl">Hoy los niños crecen rodeados de tecnología, dinero digital y decisiones complejas. Nosotros los preparamos para entenderlo, usarlo y liderarlo con criterio.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8 mb-8">
+        <div class="bg-yellow-100 rounded-2xl p-12 hover-lift">
+          <div class="text-8xl font-medium text-gray-900 mb-4 stat-number">72%</div>
+          <div class="text-2xl font-bold text-gray-800 mb-2">jóvenes sin presupuesto básico</div>
+          <div class="text-sm text-gray-700">Fuente: OCDE 2024</div>
+          <div class="mt-8 bg-white rounded-2xl p-4"><p class="text-gray-700">Solo 1 de cada 3 jóvenes logra identificar una inversión segura o crear un presupuesto funcional antes de los 18 años.</p></div>
+        </div>
+        <div class="space-y-4">
+          <div class="bg-pink-100 rounded-2xl p-6 hover-lift">
+            <div class="flex gap-4 items-start">
+              <i class="ti ti-alert-circle text-pink-700 text-3xl"></i>
+              <div><h3 class="font-bold text-xl text-gray-900 mb-2">Brecha curricular peligrosa</h3><p class="text-gray-700">El 82% de colegios no incluye finanzas en su malla, dejando a los jóvenes desprotegidos ante el crédito fácil.</p></div>
+            </div>
+          </div>
+          <div class="bg-amber-100 rounded-2xl p-6 hover-lift">
+            <div class="flex gap-4 items-start">
+              <i class="ti ti-device-mobile text-amber-700 text-3xl"></i>
+              <div><h3 class="font-bold text-xl text-gray-900 mb-2">Consumo digital sin criterio</h3><p class="text-gray-700">Microtransacciones, suscripciones ocultas y compras impulsivas en apps: gastan sin entender el valor real.</p></div>
+            </div>
+          </div>
+          <div class="bg-purple-100 rounded-2xl p-6 hover-lift">
+            <div class="flex gap-4 items-start">
+              <i class="ti ti-credit-card-off text-purple-700 text-3xl"></i>
+              <div><h3 class="font-bold text-xl text-gray-900 mb-2">Endeudamiento temprano</h3><p class="text-gray-700">1 de cada 3 jóvenes entre 18-25 años ya tiene deudas que arrastran por falta de planificación.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-green-100 rounded-2xl p-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="flex items-center gap-4">
+            <i class="ti ti-check-circle text-green-600 text-4xl"></i>
+            <div><h3 class="text-2xl font-bold text-gray-900 mb-2">Líderes Ingeniosos cierra esta brecha</h3><p class="text-gray-700">Mediante simuladores financieros, proyectos reales y educación experiencial.</p></div>
+          </div>
+          <button onclick="openModal()" class="px-8 py-4 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-full transition-colors">Conoce cómo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Propuesta de valor: No es solo educación financiera -->
+  <section class="py-20 bg-white">
+    <div class="container text-center">
+      <h2 class="text-4xl md:text-5xl font-medium mb-4 text-gray-900">No es solo educación financiera</h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">Formamos líderes capaces de tomar decisiones inteligentes, éticas y seguras en la vida real.</p>
+    </div>
+  </section>
+
+  <!-- Los Pilares (4 cards) - Rediseñada -->
+  <section class="py-20 bg-white">
+    <div class="container">
+      <div class="relative bg-[#BF8FE9] rounded-[3rem] overflow-hidden p-8 md:p-12">
+        <!-- Imagen de fondo -->
+        <div class="absolute inset-0 opacity-20">
+          <img src="img/bg.svg" alt="" class="w-full h-full object-cover">
+        </div>
+        
+        <!-- Contenido -->
+        <div class="relative z-10">
+          <!-- Stats superiores -->
+          <div class="flex flex-wrap justify-center gap-8 md:gap-16 mb-12">
+            <div class="text-center">
+              <div class="text-5xl md:text-6xl font-bold text-white mb-2 stat-number">500+</div>
+              <div class="text-white/80 text-lg">Familias</div>
+            </div>
+            <div class="text-center">
+              <div class="text-5xl md:text-6xl font-bold text-white mb-2 stat-number">30+</div>
+              <div class="text-white/80 text-lg">Colegios</div>
+            </div>
+            <div class="text-center">
+              <div class="text-5xl md:text-6xl font-bold text-white mb-2 stat-number">5,000+</div>
+              <div class="text-white/80 text-lg">Estudiantes</div>
+            </div>
+            <div class="text-center">
+              <div class="text-5xl md:text-6xl font-bold text-white mb-2 stat-number">98%</div>
+              <div class="text-white/80 text-lg flex items-center gap-1 justify-center">
+                <i class="ti ti-check"></i> Satisfacción
+              </div>
+            </div>
+          </div>
+          
+          <!-- Subtítulo -->
+          <p class="text-center text-white/90 text-xl mb-12">Padres y colegios confían en nuestra metodología</p>
+          
+          <!-- 4 Pilares en fila horizontal -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <!-- Pilar 1: Liderazgo -->
+            <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 text-center hover-lift">
+              <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <i class="ti ti-crown text-blue-600 text-xl"></i>
+              </div>
+              <h3 class="font-bold text-gray-900 mb-2">Liderazgo y Valores</h3>
+              <p class="text-gray-600 text-sm">Decisiones con propósito y trabajo en equipo.</p>
+            </div>
+            
+            <!-- Pilar 2: Finanzas -->
+            <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 text-center hover-lift">
+              <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <i class="ti ti-wallet text-green-600 text-xl"></i>
+              </div>
+              <h3 class="font-bold text-gray-900 mb-2">Finanzas Digitales</h3>
+              <p class="text-gray-600 text-sm">Ahorro, inversión y uso inteligente del dinero.</p>
+            </div>
+            
+            <!-- Pilar 3: Ciencia -->
+            <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 text-center hover-lift">
+              <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <i class="ti ti-flask text-purple-600 text-xl"></i>
+              </div>
+              <h3 class="font-bold text-gray-900 mb-2">Ciencia Aplicada</h3>
+              <p class="text-gray-600 text-sm">Experimentos que conectan lógica y dinero.</p>
+            </div>
+            
+            <!-- Pilar 4: Gamificación -->
+            <div class="bg-white/95 backdrop-blur-sm rounded-2xl p-6 text-center hover-lift">
+              <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <i class="ti ti-device-gamepad text-amber-600 text-xl"></i>
+              </div>
+              <h3 class="font-bold text-gray-900 mb-2">Consola Interactiva</h3>
+              <p class="text-gray-600 text-sm">Aprendizaje gamificado en matemáticas.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Áreas de dominio (lo que aprende) - Rediseñada -->
+  <section class="py-20 bg-white">
+    <div class="container">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl md:text-5xl font-medium mb-4 text-gray-900">Lo que tu hijo realmente va a aprender</h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">Habilidades prácticas para el mundo real</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <!-- Izquierda: Cards de habilidades -->
+        <div class="grid grid-cols-2 gap-6">
+          <div class="bg-yellow-100 rounded-2xl p-6 hover-lift">
+            <div class="flex flex-col gap-4">
+              <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+                <i class="ti ti-coin text-yellow-600 text-2xl"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-gray-900 mb-1">Manejo del dinero</h3>
+                <p class="text-gray-700 text-sm">Presupuesto, ahorro e inversión con propósito.</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-pink-100 rounded-2xl p-6 hover-lift">
+            <div class="flex flex-col gap-4">
+              <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+                <i class="ti ti-shield-check text-pink-600 text-2xl"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-gray-900 mb-1">Protección digital</h3>
+                <p class="text-gray-700 text-sm">Ciberseguridad, estafas y huella financiera.</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-purple-100 rounded-2xl p-6 hover-lift">
+            <div class="flex flex-col gap-4">
+              <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+                <i class="ti ti-brain text-purple-600 text-2xl"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-gray-900 mb-1">Pensamiento estratégico</h3>
+                <p class="text-gray-700 text-sm">Evaluar riesgos y tomar decisiones inteligentes.</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-green-100 rounded-2xl p-6 hover-lift">
+            <div class="flex flex-col gap-4">
+              <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+                <i class="ti ti-users text-green-600 text-2xl"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-gray-900 mb-1">Liderazgo y equipo</h3>
+                <p class="text-gray-700 text-sm">Expresar ideas y liderar proyectos.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Derecha: Imagen -->
+        <div class="flex justify-center items-center">
+          <img src="img/02.png" alt="Niños aprendiendo habilidades" class="w-full max-w-md h-auto object-contain">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Metodología: Aprender haciendo -->
+  <section id="metodologia" class="py-20 bg-white">
+    <div class="container">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl md:text-5xl font-medium mb-4 text-gray-900">Aprender haciendo, no memorizando</h2>
+        <p class="text-xl text-gray-600">Metodología activa que engancha, reta y transforma</p>
+      </div>
+      <div class="grid md:grid-cols-4 gap-8">
+        <div class="bg-amber-100 rounded-2xl p-6 text-center cursor-pointer hover-lift"><div class="bg-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-700 font-black text-xl">1</div><h3 class="font-bold text-lg mb-1 text-gray-900">Analizan situaciones reales</h3><p class="text-sm text-gray-700">Casos de emprendimiento, ahorro y finanzas cotidianas</p></div>
+        <div class="bg-pink-100 rounded-2xl p-6 text-center cursor-pointer hover-lift"><div class="bg-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-pink-700 font-black text-xl">2</div><h3 class="font-bold text-lg mb-1 text-gray-900">Proponen soluciones en equipo</h3><p class="text-sm text-gray-700">Debaten, diseñan y presentan ideas con impacto</p></div>
+        <div class="bg-purple-100 rounded-2xl p-6 text-center cursor-pointer hover-lift"><div class="bg-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-purple-700 font-black text-xl">3</div><h3 class="font-bold text-lg mb-1 text-gray-900">Experimentan y validan ideas</h3><p class="text-sm text-gray-700">Prueban presupuestos, inversiones simuladas</p></div>
+        <div class="bg-green-100 rounded-2xl p-6 text-center cursor-pointer hover-lift"><div class="bg-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-green-700 font-black text-xl">4</div><h3 class="font-bold text-lg mb-1 text-gray-900">Refuerzan con herramientas digitales</h3><p class="text-sm text-gray-700">App, consola y gamificación interactiva</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Programas (renombrado y adaptado a Kids, Ingeniosos, Global) -->
+  <section id="programas" class="py-20 bg-white">
+    <div class="container">
+      <div class="text-left mb-12">
+        <h2 class="text-4xl md:text-5xl font-medium mb-4 text-gray-900">Programas que se adaptan a cada edad</h2>
+        <p class="text-xl text-gray-600">Rutas progresivas, desde los primeros hábitos hasta liderazgo financiero global</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-green-100 rounded-2xl p-8 cursor-pointer hover-lift"><i class="ti ti-puzzle text-green-700 text-5xl mb-6 block"></i><div class="inline-block px-4 py-2 bg-white rounded-full text-sm font-bold text-gray-900 mb-4">6 – 9 años</div><h3 class="text-2xl font-medium text-gray-900 mb-4">Líderes Kids</h3><p class="text-gray-700">Valores, curiosidad científica y primeros hábitos financieros. Ahorro lúdico, necesidades vs deseos, primeros proyectos.</p><button onclick="openModalWithType('padre')" class="mt-6 text-green-700 font-bold flex items-center gap-1 px-4 py-2 rounded-full hover:bg-green-200">Conocer más <i class="ti ti-arrow-right"></i></button></div>
+        <div class="bg-purple-100 rounded-2xl p-8 cursor-pointer hover-lift"><i class="ti ti-chart-line text-purple-700 text-5xl mb-6 block"></i><div class="inline-block px-4 py-2 bg-white rounded-full text-sm font-bold text-gray-900 mb-4">9+ años</div><h3 class="text-2xl font-medium text-gray-900 mb-4">Líderes Ingeniosos</h3><p class="text-gray-700">Finanzas digitales, liderazgo activo y proyectos reales. Inversión consciente, emprendimiento, tarjetas inteligentes.</p><button onclick="openModalWithType('padre')" class="mt-6 text-purple-700 font-bold flex items-center gap-1 px-4 py-2 rounded-full hover:bg-purple-200">Quiero esto <i class="ti ti-arrow-right"></i></button></div>
+        <div class="bg-amber-100 rounded-2xl p-8 cursor-pointer hover-lift"><i class="ti ti-world text-amber-700 text-5xl mb-6 block"></i><div class="inline-block px-4 py-2 bg-white rounded-full text-sm font-bold text-gray-900 mb-4">Online global</div><h3 class="text-2xl font-medium text-gray-900 mb-4">Líderes Global</h3><p class="text-gray-700">Clases online interactivas desde cualquier parte del mundo. Horarios flexibles, mentorías personalizadas, networking.</p><button onclick="openModalWithType('padre')" class="mt-6 text-amber-700 font-bold flex items-center gap-1 px-4 py-2 rounded-full hover:bg-amber-200">Inscribir ahora <i class="ti ti-arrow-right"></i></button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Diferencial (venta fuerte) -->
+  <section class="py-20 bg-teal-800 text-white">
+    <div class="container text-center">
+      <i class="ti ti-brain text-amber-300 text-6xl mb-5 block"></i>
+      <h2 class="text-4xl md:text-5xl font-medium mb-6">No enseñamos teoría. Creamos criterio.</h2>
+      <p class="text-xl max-w-3xl mx-auto">Los niños no solo aprenden qué hacer con el dinero. Aprenden a pensar, decidir y actuar con responsabilidad.</p>
+    </div>
+  </section>
+
+  <!-- Modalidades corregidas -->
+  <section id="modalidades" class="py-20 bg-white">
+    <div class="container">
+      <div class="text-center mb-12">
+        <span class="inline-block px-4 py-2 bg-teal-100 text-teal-700 font-bold rounded-full mb-4 text-sm">
+          <i class="ti ti-users text-sm inline mr-1"></i>
+          MODALIDADES
+        </span>
+        <h2 class="text-4xl md:text-5xl font-medium mb-4 text-gray-900">Diseñado para ti</h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">Adaptamos el programa según tus necesidades</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-2xl p-10 shadow-sm border border-gray-100 hover-lift">
+          <div class="w-16 h-16 bg-teal-100 rounded-2xl flex items-center justify-center mb-6">
+            <i class="ti ti-school text-teal-700 text-3xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">Para Colegios</h3>
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-start gap-3">
+              <i class="ti ti-check text-teal-600 text-lg mt-0.5"></i>
+              <span class="text-gray-700">Implementación curricular o extracurricular</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <i class="ti ti-check text-teal-600 text-lg mt-0.5"></i>
+              <span class="text-gray-700">Capacitación docente completa</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <i class="ti ti-check text-teal-600 text-lg mt-0.5"></i>
+              <span class="text-gray-700">Plataforma gamificada incluida</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <i class="ti ti-check text-teal-600 text-lg mt-0.5"></i>
+              <span class="text-gray-700">Certificación oficial</span>
+            </li>
+          </ul>
+          <button onclick="openModalWithType('colegio')" class="w-full py-3 bg-teal-600 text-white rounded-full font-semibold hover:bg-teal-700 transition">Solicitar para colegio</button>
+        </div>
+        
+        <div class="bg-white rounded-2xl p-10 shadow-sm border border-gray-100 hover-lift">
+          <div class="w-16 h-16 bg-pink-100 rounded-2xl flex items-center justify-center mb-6">
+            <i class="ti ti-users text-pink-700 text-3xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">Para Familias</h3>
+          <ul class="space-y-3 mb-8">
+            <li class="flex items-start gap-3">
+              <i class="ti ti-check text-pink-600 text-lg mt-0.5"></i>
+              <span class="text-gray-700">Clases online en vivo</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <i class="ti ti-check text-pink-600 text-lg mt-0.5"></i>
+              <span class="text-gray-700">App interactiva para niños</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <i class="ti ti-check text-pink-600 text-lg mt-0.5"></i>
+              <span class="text-gray-700">Kits de actividades en casa</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <i class="ti ti-check text-pink-600 text-lg mt-0.5"></i>
+              <span class="text-gray-700">Seguimiento personalizado</span>
+            </li>
+          </ul>
+          <button onclick="openModalWithType('padre')" class="w-full py-3 bg-pink-500 text-white rounded-full font-semibold hover:bg-pink-600 transition">Solicitar para familia</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonios -->
+  <section class="py-20 bg-white">
+    <div class="container">
+      <div class="text-center mb-12">
+        <span class="inline-block px-4 py-2 bg-amber-100 text-amber-700 font-bold rounded-full mb-4 text-sm">
+          <i class="ti ti-heart text-sm inline mr-1"></i>
+          TESTIMONIOS
+        </span>
+        <h2 class="text-4xl md:text-5xl font-medium text-gray-900">Confían en nosotros</h2>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <div class="bg-white rounded-2xl p-8 shadow-sm hover-lift">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white font-bold text-xl">CR</div>
+            <div>
+              <p class="font-bold text-gray-900">Carolina R.</p>
+              <p class="text-sm text-gray-500">Madre de familia</p>
+            </div>
+            <div class="ml-auto flex gap-0.5">
+              <i class="ti ti-star-filled text-amber-400"></i>
+              <i class="ti ti-star-filled text-amber-400"></i>
+              <i class="ti ti-star-filled text-amber-400"></i>
+              <i class="ti ti-star-filled text-amber-400"></i>
+              <i class="ti ti-star-filled text-amber-400"></i>
+            </div>
+          </div>
+          <i class="ti ti-quote text-amber-400 text-3xl mb-4 block"></i>
+          <p class="text-gray-700 text-lg leading-relaxed">"Mi hija de 10 años ahora ahorra el 30% de su mesada y ha creado su primer emprendimiento. El cambio es asombroso."</p>
+        </div>
+        <div class="bg-white rounded-2xl p-8 shadow-sm hover-lift">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center text-white font-bold text-xl">LA</div>
+            <div>
+              <p class="font-bold text-gray-900">Colegio Los Alerces</p>
+              <p class="text-sm text-gray-500">Director Académico</p>
+            </div>
+            <div class="ml-auto flex gap-0.5">
+              <i class="ti ti-star-filled text-amber-400"></i>
+              <i class="ti ti-star-filled text-amber-400"></i>
+              <i class="ti ti-star-filled text-amber-400"></i>
+              <i class="ti ti-star-filled text-amber-400"></i>
+              <i class="ti ti-star-filled text-amber-400"></i>
+            </div>
+          </div>
+          <i class="ti ti-quote text-amber-400 text-3xl mb-4 block"></i>
+          <p class="text-gray-700 text-lg leading-relaxed">"Implementamos el programa en 7° básico. Los alumnos terminaron con proyectos de negocio viables. Excelente herramienta."</p>
+        </div>
+      </div>
+      
+      <!-- Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-xl p-6 text-center shadow-sm hover-lift">
+          <div class="text-4xl font-bold text-teal-600 mb-1 stat-number">+500</div>
+          <div class="text-sm text-gray-600">Familias</div>
+        </div>
+        <div class="bg-white rounded-xl p-6 text-center shadow-sm hover-lift">
+          <div class="text-4xl font-bold text-purple-600 mb-1 stat-number">30+</div>
+          <div class="text-sm text-gray-600">Colegios</div>
+        </div>
+        <div class="bg-white rounded-xl p-6 text-center shadow-sm hover-lift">
+          <div class="text-4xl font-bold text-amber-500 mb-1 stat-number">98%</div>
+          <div class="text-sm text-gray-600">Satisfacción</div>
+        </div>
+        <div class="bg-white rounded-xl p-6 text-center shadow-sm hover-lift">
+          <div class="text-4xl font-bold text-pink-500 mb-1 stat-number">4.9</div>
+          <div class="text-sm text-gray-600">★ Rating</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA final con nuevo copy y botón único -->
+  <section id="contacto" class="py-20 bg-white">
+    <div class="container">
+      <div class="bg-yellow-100 rounded-[3rem] p-12 md:p-16 text-left text-gray-900 border-2 border-yellow-200 hover-lift">
+        <h2 class="text-4xl md:text-5xl font-medium mb-6">Prepárale para el mundo real, no para el pasado</h2>
+        <p class="text-xl mb-10 text-gray-600">Solicita información y descubre cómo puede comenzar.</p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <button onclick="openModal()" class="px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full flex items-center gap-2 pulse-animation"><i class="ti ti-message-circle-2"></i> Quiero más información</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ / Preguntas Frecuentes -->
+  <section class="py-20 bg-white">
+    <div class="container">
+      <div class="text-center mb-12">
+        <span class="inline-block px-4 py-2 bg-teal-100 text-teal-700 font-bold rounded-full mb-4 text-sm">
+          <i class="ti ti-help text-sm inline mr-1"></i>
+          FAQ
+        </span>
+        <h2 class="text-4xl md:text-5xl font-medium mb-4 text-gray-900">Preguntas Frecuentes</h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">Todo lo que necesitas saber sobre nuestros programas</p>
+      </div>
+      <div class="max-w-3xl mx-auto space-y-4">
+        <div class="faq-item bg-white rounded-2xl p-6 shadow-sm">
+          <div class="faq-question flex justify-between items-center" onclick="toggleFaq(this)">
+            <h3 class="font-bold text-lg text-gray-900">¿Para qué edades son los programas?</h3>
+            <i class="ti ti-chevron-down text-gray-500 transition-transform"></i>
+          </div>
+          <div class="faq-answer text-gray-700">
+            <p>Tenemos programas para todas las edades: Líderes Kids (6-9 años), Líderes Ingeniosos (9+ años) y Líderes Global (online global para todas las edades). Cada programa se adapta al nivel de desarrollo y comprensión de los estudiantes.</p>
+          </div>
+        </div>
+        <div class="faq-item bg-white rounded-2xl p-6 shadow-sm">
+          <div class="faq-question flex justify-between items-center" onclick="toggleFaq(this)">
+            <h3 class="font-bold text-lg text-gray-900">¿Cómo funciona la modalidad online?</h3>
+            <i class="ti ti-chevron-down text-gray-500 transition-transform"></i>
+          </div>
+          <div class="faq-answer text-gray-700">
+            <p>Las clases online son en vivo, interactivas y en grupos pequeños. Incluimos acceso a nuestra plataforma gamificada, materiales digitales y seguimiento personalizado. Los horarios son flexibles y se adaptan a diferentes zonas horarias.</p>
+          </div>
+        </div>
+        <div class="faq-item bg-white rounded-2xl p-6 shadow-sm">
+          <div class="faq-question flex justify-between items-center" onclick="toggleFaq(this)">
+            <h3 class="font-bold text-lg text-gray-900">¿Los colegios pueden implementar el programa?</h3>
+            <i class="ti ti-chevron-down text-gray-500 transition-transform"></i>
+          </div>
+          <div class="faq-answer text-gray-700">
+            <p>Sí, ofrecemos implementación curricular o extracurricular para colegios. Incluimos capacitación docente completa, plataforma gamificada para todos los alumnos, materiales didácticos y certificación oficial para la institución.</p>
+          </div>
+        </div>
+        <div class="faq-item bg-white rounded-2xl p-6 shadow-sm">
+          <div class="faq-question flex justify-between items-center" onclick="toggleFaq(this)">
+            <h3 class="font-bold text-lg text-gray-900">¿Qué incluye el programa para familias?</h3>
+            <i class="ti ti-chevron-down text-gray-500 transition-transform"></i>
+          </div>
+          <div class="faq-answer text-gray-700">
+            <p>Incluye clases online en vivo, acceso a nuestra app interactiva para niños, kits de actividades para hacer en casa, seguimiento personalizado del progreso, y reportes detallados para los padres sobre el desarrollo de habilidades financieras y de liderazgo.</p>
+          </div>
+        </div>
+        <div class="faq-item bg-white rounded-2xl p-6 shadow-sm">
+          <div class="faq-question flex justify-between items-center" onclick="toggleFaq(this)">
+            <h3 class="font-bold text-lg text-gray-900">¿Cómo puedo comenzar?</h3>
+            <i class="ti ti-chevron-down text-gray-500 transition-transform"></i>
+          </div>
+          <div class="faq-answer text-gray-700">
+            <p>Es muy sencillo: completa el formulario de contacto indicando si eres colegio o familia, y te contactaremos para programar una sesión informativa gratuita donde te explicaremos todos los detalles y te ayudaremos a elegir la mejor opción para tus necesidades.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-white text-gray-700 py-16 border-t border-gray-200">
+    <div class="container grid md:grid-cols-4 gap-12 mb-12">
+      <div>
+        <div class="flex items-center gap-2 mb-4">
+          <img src="img/logo.svg" alt="Líderes Ingeniosos" class="w-10 h-10">
+          <span class="text-2xl font-medium text-gray-900">Líderes Ingeniosos</span>
+        </div>
+        <p class="text-gray-600 mb-4">Educación financiera que empodera a la próxima generación de líderes.</p>
+        <div class="flex gap-3">
+          <a href="#" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-teal-100 transition-colors">
+            <i class="ti ti-brand-instagram text-gray-600"></i>
+          </a>
+          <a href="#" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-teal-100 transition-colors">
+            <i class="ti ti-brand-linkedin text-gray-600"></i>
+          </a>
+          <a href="#" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-teal-100 transition-colors">
+            <i class="ti ti-brand-youtube text-gray-600"></i>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-gray-900 font-bold text-lg mb-4">Programas</h4>
+        <ul class="space-y-2">
+          <li><a href="#programas" class="text-gray-600 hover:text-teal-600 transition-colors">Líderes Kids</a></li>
+          <li><a href="#programas" class="text-gray-600 hover:text-teal-600 transition-colors">Líderes Ingeniosos</a></li>
+          <li><a href="#programas" class="text-gray-600 hover:text-teal-600 transition-colors">Líderes Global</a></li>
+          <li><a href="#modalidades" class="text-gray-600 hover:text-teal-600 transition-colors">Para Colegios</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-gray-900 font-bold text-lg mb-4">Contacto</h4>
+        <div class="space-y-3">
+          <p class="flex items-center gap-2">
+            <i class="ti ti-mail text-gray-500"></i>
+            <a href="mailto:hola@lideresingeniosos.com" class="text-gray-600 hover:text-teal-600 transition-colors">hola@lideresingeniosos.com</a>
+          </p>
+          <p class="flex items-center gap-2">
+            <i class="ti ti-phone text-gray-500"></i>
+            <a href="tel:+582125557890" class="text-gray-600 hover:text-teal-600 transition-colors">+58 212 555 7890</a>
+          </p>
+          <p class="flex items-center gap-2">
+            <i class="ti ti-map-pin text-gray-500"></i>
+            <span class="text-gray-600">Caracas, Venezuela</span>
+          </p>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-gray-900 font-bold text-lg mb-4">Comunidad</h4>
+        <a href="https://wa.me/56912345678?text=Hola%20Líderes%20Ingeniosos%2C%20quiero%20más%20información" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-colors">
+          <i class="ti ti-brand-whatsapp"></i> Escríbenos
+        </a>
+      </div>
+    </div>
+    <div class="border-t border-gray-200 pt-8 text-center text-gray-600 container">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <p>© 2025 Líderes Ingeniosos – Transformando hábitos financieros</p>
+        <div class="flex gap-6 text-sm">
+          <a href="#" class="hover:text-teal-600 transition-colors">Privacidad</a>
+          <a href="#" class="hover:text-teal-600 transition-colors">Términos</a>
+          <a href="#" class="hover:text-teal-600 transition-colors">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal de contacto (mismo estilo, mejorado para conversión) -->
+  <div id="contactModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-8 max-w-md w-full relative">
+      <button onclick="closeModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-600 text-3xl">×</button>
+      <h3 class="text-3xl font-medium text-gray-900 mb-2">¡Transforma su futuro!</h3>
+      <p class="text-gray-600 mb-6">Cuéntanos quién eres y recibe toda la información.</p>
+      <form onsubmit="handleSubmit(event)" class="space-y-4">
+        <input type="text" id="nombre" placeholder="Nombre completo" class="w-full px-6 py-3 border-2 border-gray-200 rounded-full focus:border-teal-500 focus:outline-none" required>
+        <input type="email" id="email" placeholder="Correo electrónico" class="w-full px-6 py-3 border-2 border-gray-200 rounded-full focus:border-teal-500 focus:outline-none" required>
+        <input type="tel" id="telefono" placeholder="Teléfono / WhatsApp" class="w-full px-6 py-3 border-2 border-gray-200 rounded-full focus:border-teal-500 focus:outline-none">
+        <select id="tipo" class="w-full px-6 py-3 border-2 border-gray-200 rounded-full focus:border-teal-500 focus:outline-none" required>
+          <option value="">Selecciona tu perfil</option>
+          <option value="colegio">Institución / Colegio</option>
+          <option value="padre">Padre / Madre / Tutor</option>
+        </select>
+        <textarea id="mensaje" placeholder="¿Cómo te gustaría participar?" rows="3" class="w-full px-6 py-3 border-2 border-gray-200 rounded-2xl focus:border-teal-500 focus:outline-none"></textarea>
+        <button type="submit" class="w-full px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full flex items-center justify-center gap-2"><i class="ti ti-send"></i> Solicitar información</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Menú móvil toggle
+    function toggleMobileMenu() {
+      const navLinks = document.getElementById('navLinks');
+      navLinks.classList.toggle('active');
+    }
+    
+    // Cerrar menú al hacer clic en un link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('navLinks').classList.remove('active');
+      });
+    });
+    
+    // Scroll Reveal Animation
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          // Animar contadores si hay
+          if (entry.target.querySelector('.stat-number')) {
+            animateCounter(entry.target.querySelector('.stat-number'));
+          }
+        }
+      });
+    }, observerOptions);
+    
+    // Observar elementos con scroll-reveal
+    document.querySelectorAll('section').forEach(section => {
+      section.classList.add('scroll-reveal');
+      observer.observe(section);
+    });
+    
+    // Animación de contador
+    function animateCounter(element) {
+      const target = parseInt(element.textContent.replace(/\D/g, ''));
+      const duration = 2000;
+      const step = target / (duration / 16);
+      let current = 0;
+      
+      const timer = setInterval(() => {
+        current += step;
+        if (current >= target) {
+          current = target;
+          clearInterval(timer);
+        }
+        element.textContent = '+' + Math.floor(current);
+      }, 16);
+    }
+    
+    // Botón volver arriba
+    const backToTopBtn = document.createElement('button');
+    backToTopBtn.innerHTML = '<i class="ti ti-arrow-up"></i>';
+    backToTopBtn.className = 'fixed bottom-8 right-8 w-12 h-12 bg-teal-600 text-white rounded-full shadow-lg hover:bg-teal-700 transition-all opacity-0 pointer-events-none z-40 flex items-center justify-center';
+    backToTopBtn.id = 'backToTop';
+    document.body.appendChild(backToTopBtn);
+    
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 500) {
+        backToTopBtn.classList.remove('opacity-0', 'pointer-events-none');
+        backToTopBtn.classList.add('opacity-100', 'pointer-events-auto');
+      } else {
+        backToTopBtn.classList.add('opacity-0', 'pointer-events-none');
+        backToTopBtn.classList.remove('opacity-100', 'pointer-events-auto');
+      }
+    });
+    
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    // Navbar scroll effect
+    let lastScroll = 0;
+    const navbar = document.querySelector('nav');
+    
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.scrollY;
+      
+      if (currentScroll > 100) {
+        navbar.classList.add('shadow-md');
+      } else {
+        navbar.classList.remove('shadow-md');
+      }
+      
+      lastScroll = currentScroll;
+    });
+    
+    // Funciones de modal (adaptadas para soportar pre-selección de perfil)
+    function openModal() {
+      const modal = document.getElementById('contactModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      // reset select
+      const tipoSelect = document.getElementById('tipo');
+      if(tipoSelect) tipoSelect.value = '';
+    }
+    function openModalWithType(tipo) {
+      openModal();
+      if(tipo && (tipo === 'colegio' || tipo === 'padre')) {
+        const tipoSelect = document.getElementById('tipo');
+        if(tipoSelect) tipoSelect.value = tipo;
+      }
+    }
+    function closeModal() {
+      const modal = document.getElementById('contactModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+    function handleSubmit(event) {
+      event.preventDefault();
+      const nombre = document.getElementById('nombre').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const tipo = document.getElementById('tipo').value;
+      if (!nombre || !email || !tipo) {
+        alert('Completa los campos obligatorios.');
+        return;
+      }
+      alert(`¡Gracias ${nombre}! Recibirás toda la información en ${email}. ¡Bienvenido a la comunidad Líderes Ingeniosos!`);
+      event.target.reset();
+      closeModal();
+    }
+    document.getElementById('contactModal')?.addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+    
+    // FAQ Accordion function
+    function toggleFaq(element) {
+      const answer = element.nextElementSibling;
+      const icon = element.querySelector('i');
+      
+      // Close all other FAQs
+      document.querySelectorAll('.faq-answer').forEach(item => {
+        if (item !== answer) {
+          item.classList.remove('open');
+          item.previousElementSibling.querySelector('i').style.transform = 'rotate(0deg)';
+        }
+      });
+      
+      // Toggle current FAQ
+      answer.classList.toggle('open');
+      icon.style.transform = answer.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+  </script>
+</body>
+</html>

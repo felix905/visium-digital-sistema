@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Stop del Conocimiento: Edición Mundialista ⚽🏆</title>
+    <!-- Tailwind CSS para el estilizado responsivo de vanguardia -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts para tipografía moderna y deportiva -->
+    <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome para íconos temáticos de fútbol y banderas -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tone.js para efectos de sonido retro de alta fidelidad -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, #071e12 0%, #020805 100%);
+        }
+        .header-font {
+            font-family: 'Cabinet Grotesk', sans-serif;
+        }
+        /* Efecto de césped de fútbol de fondo de alta definición */
+        .soccer-pitch {
+            background-color: #0d311b;
+            background-image:
+                radial-gradient(circle at 50% 50%, transparent 140px, rgba(255,255,255,0.04) 141px, rgba(255,255,255,0.04) 143px, transparent 144px),
+                linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+        }
+        /* Animaciones para las burbujas de palabras */
+        @keyframes subtle-float {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-4px) scale(1.02); }
+        }
+        .word-bubble {
+            animation: subtle-float 5s ease-in-out infinite;
+        }
+        .word-bubble:nth-child(even) {
+            animation-delay: 2s;
+        }
+        .word-bubble:nth-child(3n) {
+            animation-delay: 1s;
+        }
+        .smooth-transition {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Ocultar barra de scroll pero mantener funcionalidad */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex flex-col justify-between selection:bg-yellow-400 selection:text-black">
+
+    <header class="border-b border-green-900/60 bg-black/60 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-yellow-500 to-amber-300 p-2.5 rounded-xl shadow-lg shadow-yellow-500/20">
+                    <i class="fa-solid fa-trophy text-black text-2xl animate-bounce"></i>
+                </div>
+                <div>
+                    <h1 class="header-font text-2xl md:text-3xl tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-200 to-green-400">
+                        EL STOP DEL CONOCIMIENTO
+                    </h1>
+                    <p class="text-xs text-green-400 font-semibold tracking-wider uppercase">Fútbol Profesional vs Gramática Rigurosa</p>
+                </div>
+            </div>
+           
+            <div class="flex items-center gap-3">
+                <!-- Tablero de Puntuaciones Globales -->
+                <div class="flex gap-2">
+                    <div class="bg-green-950/80 border border-green-500/30 px-3 py-1.5 rounded-lg text-center">
+                        <span class="block text-[10px] text-green-400 uppercase font-bold">Puntos Stop</span>
+                        <span id="stopScore" class="text-xl font-bold text-yellow-400">0</span>
+                    </div>
+                    <div class="bg-emerald-950/80 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-center">
+                        <span class="block text-[10px] text-emerald-300 uppercase font-bold">Puntos Sabio 🧠</span>
+                        <span id="knowledgeScore" class="text-xl font-bold text-cyan-400">0</span>
+                    </div>
+                </div>
+
+                <!-- Botón de Reglas -->
+                <button onclick="toggleModal('rules-modal', true)" class="bg-green-800 hover:bg-green-700 text-white font-medium text-sm px-4 py-2.5 rounded-xl transition duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info"></i> Reglamento
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6">
+       
+        <!-- COLUMNA IZQUIERDA: Control de Ronda & Tablero de Palabras Ampliado (5 Cols en LG) -->
+        <section class="lg:col-span-5 flex flex-col gap-6">
+           
+            <!-- Panel de Selección de Letra / Ruleta -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full filter blur-3xl pointer-events-none"></div>
+                <h3 class="text-sm font-bold text-green-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-dharmachakra animate-spin text-yellow-400"></i> Generador de Rondas Mundialistas
+                </h3>
+               
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                    <!-- Botón para girar / elegir letra -->
+                    <button id="spinBtn" onclick="spinLetterWheel()" class="w-full sm:w-auto flex-grow bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-black font-extrabold px-6 py-4 rounded-2xl shadow-lg shadow-yellow-500/20 active:scale-95 transition-all text-center flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-random text-lg"></i>
+                        <span>¡ELEGIR LETRA AL AZAR!</span>
+                    </button>
+                   
+                    <!-- Pantalla Gigante de Letra Activa -->
+                    <div class="flex items-center gap-2 bg-black/40 border border-slate-800 px-5 py-3 rounded-2xl w-full sm:w-auto justify-center min-w-[120px]">
+                        <span class="text-xs font-semibold text-slate-400 uppercase">Letra:</span>
+                        <span id="currentLetterDisplay" class="text-4xl font-extrabold text-yellow-400 uppercase tracking-wider">-</span>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-400 mt-2 text-center sm:text-left">
+                    Solo podrás rellenar las casillas con palabras que comiencen exactamente con la letra de la ronda. ¡Atención con las trampas ortográficas en el tablero!
+                </p>
+            </div>
+
+            <div class="bg-slate-950/90 border-2 border-green-900/60 rounded-3xl flex-grow flex flex-col overflow-hidden shadow-2xl min-h-[480px]">
+                <div class="bg-gradient-to-r from-green-950 via-emerald-950 to-slate-950 px-5 py-4 border-b border-green-900/60">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-futbol text-green-400 animate-spin"></i>
+                            <h2 class="font-bold text-sm tracking-widest text-green-300 uppercase">Tablero de Confusión</h2>
+                        </div>
+                        <span id="wordCounter" class="text-xs bg-green-900/60 text-green-300 px-2.5 py-0.5 rounded-full font-mono">0 Palabras</span>
+                    </div>
+                   
+                    <!-- Filtros Rápidos del Tablero para Navegabilidad Óptima -->
+                    <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                        <button onclick="filterBoard('ALL')" id="filter-all" class="filter-btn shrink-0 text-[11px] font-bold px-3 py-1 rounded-full bg-green-800 text-white transition">TODAS</button>
+                        <button onclick="filterBoard('A')" id="filter-a" class="filter-btn shrink-0 text-[11px] font-bold px-3 py-1 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition">LETRA A</button>
+                        <button onclick="filterBoard('B')" id="filter-b" class="filter-btn shrink-0 text-[11px] font-bold px-3 py-1 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition">LETRA B</button>
+                        <button onclick="filterBoard('C')" id="filter-c" class="filter-btn shrink-0 text-[11px] font-bold px-3 py-1 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition">LETRA C</button>
+                        <button onclick="filterBoard('F')" id="filter-f" class="filter-btn shrink-0 text-[11px] font-bold px-3 py-1 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition">LETRA F</button>
+                        <button onclick="filterBoard('P')" id="filter-p" class="filter-btn shrink-0 text-[11px] font-bold px-3 py-1 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition">LETRA P</button>
+                    </div>
+                </div>
+
+                <!-- Contenedor con efecto césped para las burbujas de palabras -->
+                <div id="wordBoard" class="soccer-pitch p-4 flex-grow overflow-y-auto max-h-[500px] flex flex-wrap gap-2 justify-center items-center content-start relative">
+                    <!-- Las palabras dinámicas se inyectarán aquí desde JS -->
+                </div>
+               
+                <div class="p-3 bg-black/60 border-t border-green-900/40 text-center text-xs text-slate-300 flex justify-center items-center gap-2">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-yellow-400 animate-ping"></span>
+                    <span>¿Ves la correcta y la incorrecta juntas? ¡Usa el VAR para ganar puntos de sabio!</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="lg:col-span-7 flex flex-col gap-6">
+           
+            <!-- Formulario de la Plantilla de Stop -->
+            <div class="bg-slate-900/95 border border-slate-800 rounded-3xl p-6 shadow-2xl relative">
+                <div class="absolute top-0 right-0 w-48 h-48 bg-yellow-500/5 rounded-full filter blur-3xl pointer-events-none"></div>
+               
+                <div class="flex justify-between items-center mb-5 border-b border-slate-800 pb-3">
+                    <h2 class="header-font text-xl text-yellow-400 tracking-wide flex items-center gap-2">
+                        <i class="fa-regular fa-clipboard"></i> PLANTILLA DEL STOP MUNDIALISTA
+                    </h2>
+                    <span class="text-xs text-slate-400 italic">Completa la nómina oficial</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   
+                    <!-- PAÍS (Nombre del País mundialista) -->
+                    <div class="bg-slate-950/60 p-3 rounded-2xl border border-slate-800 flex flex-col gap-1.5 hover:border-slate-700 transition">
+                        <label class="text-xs font-bold text-green-400 uppercase tracking-wider flex justify-between">
+                            <span>🌎 País Mundialista</span>
+                            <span class="text-[10px] text-slate-500">Valor: 100 pts</span>
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="text" id="input-pais" placeholder="Busca en el tablero o escribe..." class="bg-black/50 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white w-full focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <button onclick="fillFromSelected('pais')" class="bg-green-800 hover:bg-green-700 px-3 rounded-xl text-xs font-bold shrink-0 transition" title="Colocar palabra seleccionada">Poner</button>
+                        </div>
+                    </div>
+
+                    <!-- APELLIDO O APODO -->
+                    <div class="bg-slate-950/60 p-3 rounded-2xl border border-slate-800 flex flex-col gap-1.5 hover:border-slate-700 transition">
+                        <label class="text-xs font-bold text-green-400 uppercase tracking-wider flex justify-between">
+                            <span>👟 Apellido / Apodo</span>
+                            <span class="text-[10px] text-slate-500">Valor: 100 pts</span>
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="text" id="input-apodo" placeholder="Ej: Pelé, Agüero, Cavani..." class="bg-black/50 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white w-full focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <button onclick="fillFromSelected('apodo')" class="bg-green-800 hover:bg-green-700 px-3 rounded-xl text-xs font-bold shrink-0 transition" title="Colocar palabra seleccionada">Poner</button>
+                        </div>
+                    </div>
+
+                    <!-- COLOR -->
+                    <div class="bg-slate-950/60 p-3 rounded-2xl border border-slate-800 flex flex-col gap-1.5 hover:border-slate-700 transition">
+                        <label class="text-xs font-bold text-green-400 uppercase tracking-wider flex justify-between">
+                            <span>🎨 Color Característico</span>
+                            <span class="text-[10px] text-slate-500">Valor: 100 pts</span>
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="text" id="input-color" placeholder="Ej: Celeste, Blanco, Fucsia..." class="bg-black/50 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white w-full focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <button onclick="fillFromSelected('color')" class="bg-green-800 hover:bg-green-700 px-3 rounded-xl text-xs font-bold shrink-0 transition" title="Colocar palabra seleccionada">Poner</button>
+                        </div>
+                    </div>
+
+                    <!-- ANIMALES / MASCOTAS -->
+                    <div class="bg-slate-950/60 p-3 rounded-2xl border border-slate-800 flex flex-col gap-1.5 hover:border-slate-700 transition font-sans">
+                        <label class="text-xs font-bold text-green-400 uppercase tracking-wider flex justify-between">
+                            <span>🦁 Mascota Oficial (Animal)</span>
+                            <span class="text-[10px] text-slate-500">Valor: 100 pts</span>
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="text" id="input-mascota" placeholder="Ej: Fuleco, Footix, Pulpo Paul..." class="bg-black/50 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white w-full focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <button onclick="fillFromSelected('mascota')" class="bg-green-800 hover:bg-green-700 px-3 rounded-xl text-xs font-bold shrink-0 transition" title="Colocar palabra seleccionada">Poner</button>
+                        </div>
+                    </div>
+
+                    <!-- COMIDA TÍPICA -->
+                    <div class="bg-slate-950/60 p-3 rounded-2xl border border-slate-800 flex flex-col gap-1.5 hover:border-slate-700 transition">
+                        <label class="text-xs font-bold text-green-400 uppercase tracking-wider flex justify-between">
+                            <span>🍲 Comida de Sede</span>
+                            <span class="text-[10px] text-slate-500">Valor: 100 pts</span>
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="text" id="input-comida" placeholder="Ej: Asado, Baguette, Ceviche..." class="bg-black/50 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white w-full focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <button onclick="fillFromSelected('comida')" class="bg-green-800 hover:bg-green-700 px-3 rounded-xl text-xs font-bold shrink-0 transition" title="Colocar palabra seleccionada">Poner</button>
+                        </div>
+                    </div>
+
+                    <!-- Botón para Cantar STOP -->
+                    <div class="bg-gradient-to-br from-green-950 to-slate-950 p-3 rounded-2xl border-2 border-dashed border-green-800/80 flex flex-col justify-center items-center">
+                        <span class="text-xs font-bold text-yellow-400 uppercase tracking-wider mb-1">¿Completaste la nómina?</span>
+                        <button onclick="checkStopTemplate()" class="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-extrabold text-xs px-6 py-2.5 rounded-xl shadow-lg shadow-red-600/20 active:scale-95 transition-all uppercase tracking-widest">
+                            🚨 ¡STOP!
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="bg-slate-900/95 border border-slate-800 rounded-3xl p-6 shadow-2xl relative">
+                <div class="absolute inset-0 bg-blue-500/5 rounded-3xl filter blur-2xl pointer-events-none"></div>
+               
+                <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+                    <h2 class="header-font text-xl text-cyan-400 tracking-wide flex items-center gap-2">
+                        <i class="fa-solid fa-desktop text-cyan-400 animate-pulse"></i> EL ÁRBITRO DEL VAR (DESAFÍOS GRAMATICALES)
+                    </h2>
+                    <span class="text-xs text-cyan-300 font-mono bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/40">Modo Sabio</span>
+                </div>
+
+                <!-- Palabra Actualmente Seleccionada -->
+                <div class="mb-5 bg-black/50 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <span class="text-[10px] text-slate-400 uppercase font-bold block">Palabra bajo revisión del VAR:</span>
+                        <span id="selectedWordDisplay" class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-300 tracking-wide">Haz clic en una palabra del tablero...</span>
+                    </div>
+                    <div id="wordAnalysisIndicator" class="hidden bg-cyan-950 text-cyan-300 text-xs px-3 py-1.5 rounded-lg border border-cyan-800 animate-pulse">
+                        Lista para Análisis
+                    </div>
+                </div>
+
+                <!-- Retos a Resolver -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                   
+                    <!-- Desafío 1: Palabra mal escrita -->
+                    <button onclick="claimBonus('mal_escrita')" class="group text-left bg-slate-950/60 hover:bg-slate-950 border border-slate-800 hover:border-cyan-500/50 p-3 rounded-2xl smooth-transition flex items-start gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-red-950 text-red-400 group-hover:bg-red-900 shrink-0">
+                            <i class="fa-solid fa-spell-check"></i>
+                        </span>
+                        <div>
+                            <span class="font-bold text-xs block text-slate-200 group-hover:text-cyan-400">Punto de Escritura Errónea</span>
+                            <p class="text-[10px] text-slate-400">Reclama si la palabra tiene un error de ortografía.</p>
+                        </div>
+                    </button>
+
+                    <!-- Desafío 2: Palabra mal acentuada -->
+                    <button onclick="claimBonus('mal_acentuada')" class="group text-left bg-slate-950/60 hover:bg-slate-950 border border-slate-800 hover:border-cyan-500/50 p-3 rounded-2xl smooth-transition flex items-start gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-950 text-amber-400 group-hover:bg-amber-900 shrink-0">
+                            <i class="fa-solid fa-quote-right"></i>
+                        </span>
+                        <div>
+                            <span class="font-bold text-xs block text-slate-200 group-hover:text-cyan-400">Punto de Acentuación Errónea</span>
+                            <p class="text-[10px] text-slate-400">Reclama si carece de tilde o está mal colocada.</p>
+                        </div>
+                    </button>
+
+                    <!-- Desafío 3: Hiato -->
+                    <button onclick="claimBonus('hiato')" class="group text-left bg-slate-950/60 hover:bg-slate-950 border border-slate-800 hover:border-cyan-500/50 p-3 rounded-2xl smooth-transition flex items-start gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-950 text-emerald-400 group-hover:bg-emerald-900 shrink-0">
+                            <i class="fa-solid fa-arrows-left-right"></i>
+                        </span>
+                        <div>
+                            <span class="font-bold text-xs block text-slate-200 group-hover:text-cyan-400">Punto de Hiato</span>
+                            <p class="text-[10px] text-slate-400">Reclama si separa dos vocales en sílabas distintas (vocal abierta+abierta o cerrada tónica).</p>
+                        </div>
+                    </button>
+
+                    <!-- Desafío 4: Diptongo (Requiere 2 acumulados) -->
+                    <button onclick="claimBonus('diptongo')" class="group text-left bg-slate-950/60 hover:bg-slate-950 border border-slate-800 hover:border-cyan-500/50 p-3 rounded-2xl smooth-transition flex items-start gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-950 text-indigo-400 group-hover:bg-indigo-900 shrink-0">
+                            <i class="fa-solid fa-link"></i>
+                        </span>
+                        <div>
+                            <span class="font-bold text-xs block text-slate-200 group-hover:text-cyan-400">Punto de Diptongo (Acumular 2)</span>
+                            <p class="text-[10px] text-slate-400">Acumula 2 palabras con unión de vocales en la misma sílaba.</p>
+                        </div>
+                    </button>
+
+                    <!-- Desafío 5: Triptongo (Requiere 3 acumulados) -->
+                    <button onclick="claimBonus('triptongo')" class="group text-left bg-slate-950/60 hover:bg-slate-950 border border-slate-800 hover:border-cyan-500/50 p-3 rounded-2xl smooth-transition flex items-start gap-3 sm:col-span-2">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-950 text-purple-400 group-hover:bg-purple-900 shrink-0">
+                            <i class="fa-solid fa-people-group"></i>
+                        </span>
+                        <div>
+                            <span class="font-bold text-xs block text-slate-200 group-hover:text-cyan-400">Punto de Triptongo Extraordinario (Acumular 3)</span>
+                            <p class="text-[10px] text-slate-400">Acumula 3 palabras con triptongo (vocal cerrada + abierta + cerrada) en la misma sílaba.</p>
+                        </div>
+                    </button>
+
+                </div>
+
+                <!-- Barra de Estado de Acumuladores del Conocimiento -->
+                <div class="mt-4 bg-black/60 border border-slate-800 rounded-xl p-3 flex flex-wrap justify-around items-center gap-3">
+                    <div class="text-[10px] text-slate-400">
+                        Diptongos Acumulados: <span id="diptongoCount" class="font-extrabold text-indigo-400">0 / 2</span>
+                    </div>
+                    <div class="h-4 w-[1px] bg-slate-800 hidden sm:block"></div>
+                    <div class="text-[10px] text-slate-400">
+                        Triptongos Acumulados: <span id="triptongoCount" class="font-extrabold text-purple-400">0 / 3</span>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <div id="toastNotification" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 bg-slate-900 border-2 border-green-500 text-white px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-4 z-50 max-w-sm">
+        <div id="toastIcon" class="bg-green-500 text-slate-950 p-2 rounded-xl shrink-0">
+            <i class="fa-solid fa-check text-lg"></i>
+        </div>
+        <div class="flex-grow">
+            <h4 id="toastTitle" class="font-bold text-sm text-yellow-400">Notificación</h4>
+            <div id="toastBody" class="text-xs text-slate-300 mt-0.5 max-h-32 overflow-y-auto">Mensaje de prueba para el jugador.</div>
+        </div>
+        <button onclick="hideToast()" class="text-slate-500 hover:text-white shrink-0 self-start">
+            <i class="fa-solid fa-times"></i>
+        </button>
+    </div>
+
+    <div id="rules-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex justify-center items-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col">
+            <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+                <h3 class="header-font text-2xl text-yellow-400 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question"></i> REGLAMENTO DEL CONOCIMIENTO MUNDIALISTA
+                </h3>
+                <button onclick="toggleModal('rules-modal', false)" class="text-slate-400 hover:text-white text-xl">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+           
+            <div class="p-6 space-y-4 text-sm text-slate-300">
+                <p>¡Bienvenido a la competencia académica de fútbol más emocionante! El tablero de juego ahora incluye **trampas y palabras idénticas** (algunas bien escritas y otras con errores gramaticales o faltas de acentuación). Tu misión es discernir cuáles usar para tu plantilla de Stop y cuáles reportar en el VAR.</p>
+               
+                <div class="space-y-4">
+                    <h4 class="font-bold text-white text-base border-b border-slate-800 pb-1 flex items-center gap-2">
+                        <i class="fa-regular fa-clipboard text-green-400"></i> 1. Rellenar la Plantilla de Stop
+                    </h4>
+                    <p class="pl-4">Gira la ruleta para activar una letra. Rellena las 5 categorías correspondientes. **¡Cuidado!** Si utilizas una palabra mal escrita en tu plantilla de Stop, el VAR la anulará de inmediato y perderás esos puntos.</p>
+                   
+                    <h4 class="font-bold text-white text-base border-b border-slate-800 pb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-desktop text-cyan-400"></i> 2. La Mesa de Arbitraje del VAR (Puntos de Conocimiento)
+                    </h4>
+                    <p class="pl-4">Para ganar **Puntos de Sabio**, selecciona cualquier palabra sospechosa en el Tablero de Confusión y presiona los botones de análisis:</p>
+                   
+                    <ul class="list-disc pl-8 space-y-2.5 text-slate-300">
+                        <li><strong class="text-red-400">Escritura Errónea:</strong> Identifica errores ortográficos serios. Ej: <code class="bg-black/40 px-1 py-0.5 rounded text-red-300">Fransia</code> (incorrecto) frente a la versión correcta <code class="bg-black/40 px-1 py-0.5 rounded text-emerald-300">Francia</code>.</li>
+                        <li><strong class="text-amber-400">Acentuación Errónea:</strong> Reporta palabras sin su tilde obligatoria. Ej: <code class="bg-black/40 px-1 py-0.5 rounded text-red-300">Pele</code> (incorrecto) vs <code class="bg-black/40 px-1 py-0.5 rounded text-emerald-300">Pelé</code>; <code class="bg-black/40 px-1 py-0.5 rounded text-red-300">Belgica</code> vs <code class="bg-black/40 px-1 py-0.5 rounded text-emerald-300">Bélgica</code>.</li>
+                        <li><strong class="text-emerald-400">Palabra con Hiato:</strong> Reporta la división de vocales fuertes en sílabas contiguas. Ej: <code class="bg-black/40 px-1 py-0.5 rounded text-cyan-300">Pa-ís</code>, <code class="bg-black/40 px-1 py-0.5 rounded text-cyan-300">Pa-e-lla</code>, <code class="bg-black/40 px-1 py-0.5 rounded text-cyan-300">Fi-de-o</code>, <code class="bg-black/40 px-1 py-0.5 rounded text-cyan-300">Fai-ná</code>.</li>
+                        <li><strong class="text-indigo-400">Diptongos Acumulativos:</strong> Junta dos palabras con diptongos (Ej: <code class="bg-black/40 px-1 py-0.5 rounded text-cyan-300">Croa-cia</code>, <code class="bg-black/40 px-1 py-0.5 rounded text-cyan-300">Ecua-dor</code>, <code class="bg-black/40 px-1 py-0.5 rounded text-cyan-300">Fuc-sia</code>).</li>
+                        <li><strong class="text-purple-400">Triptongos Legendarios:</strong> El reto supremo. Reúne 3 palabras con triptongo (Ej: <code class="bg-black/40 px-1 py-0.5 rounded text-cyan-300">U-ru-guay</code>, <code class="bg-black/40 px-1 py-0.5 rounded text-cyan-300">Pa-ra-guay</code>, <code class="bg-black/40 px-1 py-0.5 rounded text-cyan-300">Cam-biáis</code>).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-slate-800 flex justify-end">
+                <button onclick="toggleModal('rules-modal', false)" class="bg-gradient-to-r from-green-700 to-emerald-700 hover:from-green-600 hover:to-emerald-600 px-6 py-2 rounded-xl text-sm font-bold">
+                    ¡Entendido, a la cancha!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie de Página -->
+    <footer class="bg-black/80 border-t border-green-950 text-center py-4 text-xs text-slate-500">
+        <p>© 2026 El Stop del Conocimiento Mundialista. Diseñado para potenciar el dominio del idioma español jugando.</p>
+    </footer>
+
+    <script>
+        /* =========================================
+           CONFIGURACIÓN DEL MOTOR DE AUDIO (TONE.JS)
+           ========================================= */
+        let synth = null;
+
+        function initSynth() {
+            if (!synth) {
+                synth = new Tone.Synth().toDestination();
+                synth.volume.value = -12;
+            }
+        }
+
+        function playSuccessSound() {
+            try {
+                initSynth();
+                const now = Tone.now();
+                synth.triggerAttackRelease("E5", "16n", now);
+                synth.triggerAttackRelease("G5", "16n", now + 0.08);
+                synth.triggerAttackRelease("C6", "8n", now + 0.16);
+            } catch(e){}
+        }
+
+        function playErrorSound() {
+            try {
+                initSynth();
+                const now = Tone.now();
+                synth.triggerAttackRelease("G3", "8n", now);
+                synth.triggerAttackRelease("F#3", "8n", now + 0.10);
+            } catch(e){}
+        }
+
+        function playTickSound() {
+            try {
+                initSynth();
+                synth.triggerAttackRelease("B4", "32n");
+            } catch(e){}
+        }
+
+        function playFanfareSound() {
+            try {
+                initSynth();
+                const now = Tone.now();
+                const notes = ["C4", "E4", "G4", "C5", "E5", "G5", "C6"];
+                notes.forEach((note, index) => {
+                    synth.triggerAttackRelease(note, "16n", now + index * 0.06);
+                });
+            } catch(e){}
+        }
+
+        /* =========================================
+           BASE DE DATOS AMPLIADA (CON TRAMPAS Y CONFUSIONES)
+           ========================================= */
+        const wordsDatabase = [
+            // ================= LETRA A =================
+            { id: 101, word: "Alemania", category: "pais", letter: "A", grammar: "diptongo", isCorrect: true, correction: "", description: "País con diptongo 'ia' en su última sílaba." },
+            { id: 102, word: "Alemanía", category: "pais", letter: "A", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Alemania", description: "Alemania es una palabra llana terminada en vocal y no lleva tilde en la 'i'." },
+            { id: 103, word: "Agüero", category: "apodo", letter: "A", grammar: "diptongo", isCorrect: true, correction: "", description: "Histórico goleador argentino con diéresis obligatoria y diptongo 'güe'." },
+            { id: 104, word: "Aguero", category: "apodo", letter: "A", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Agüero", description: "Falta la diéresis sobre la 'u' para que suene correctamente en español." },
+            { id: 105, word: "Amarillo", category: "color", letter: "A", grammar: "ninguno", isCorrect: true, correction: "", description: "Color tradicional de camisetas como la de Brasil o Colombia." },
+            { id: 106, word: "Amariyo", category: "color", letter: "A", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Amarillo", description: "Amarillo se escribe con doble 'l' (elle), no con 'y'." },
+            { id: 107, word: "Azul", category: "color", letter: "A", grammar: "ninguno", isCorrect: true, correction: "", description: "Color de la segunda equipación de múltiples selecciones campeonas." },
+            { id: 108, word: "Asul", category: "color", letter: "A", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Azul", description: "La ortografía correcta del color es con 'z', no con 's'." },
+            { id: 109, word: "Ato", category: "mascota", letter: "A", grammar: "ninguno", isCorrect: true, correction: "", description: "Mascota oficial extraterrestre del Mundial Corea-Japón 2002." },
+            { id: 110, word: "Asado", category: "comida", letter: "A", grammar: "ninguno", isCorrect: true, correction: "", description: "Comida típica de países del Cono Sur, como Uruguay y Argentina." },
+            { id: 111, word: "Hazado", category: "comida", letter: "A", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Asado", description: "Asado proviene de asar y se escribe sin 'h' y con 's'." },
+
+            // ================= LETRA B =================
+            { id: 201, word: "Bélgica", category: "pais", letter: "B", grammar: "ninguno", isCorrect: true, correction: "", description: "País europeo, palabra esdrújula que lleva tilde en la 'E'." },
+            { id: 202, word: "Belgica", category: "pais", letter: "B", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Bélgica", description: "Bélgica es una palabra esdrújula y por ley todas llevan tilde en la antepenúltima sílaba." },
+            { id: 203, word: "Brasil", category: "pais", letter: "B", grammar: "ninguno", isCorrect: true, correction: "", description: "Pentacampeón mundial. Se escribe con 'S'." },
+            { id: 204, word: "Brazíl", category: "pais", letter: "B", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Brasil", description: "En español se escribe con 's' y no lleva tilde por ser palabra aguda terminada en L." },
+            { id: 205, word: "Buffon", category: "apodo", letter: "B", grammar: "ninguno", isCorrect: true, correction: "", description: "Arquero legendario italiano campeón del mundo en 2006." },
+            { id: 206, word: "Bufon", category: "apodo", letter: "B", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Buffon", description: "El apellido del guardameta italiano Gianluigi se escribe con doble 'f'." },
+            { id: 207, word: "Blanco", category: "color", letter: "B", grammar: "ninguno", isCorrect: true, correction: "", description: "Color de la indumentaria de Real Madrid o de la selección alemana." },
+            { id: 208, word: "Blancco", category: "color", letter: "B", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Blanco", description: "Se escribe con una sola 'c'." },
+            { id: 209, word: "Besta", category: "mascota", letter: "B", grammar: "ninguno", isCorrect: true, correction: "", description: "Criatura de energía que fue una de las mascotas de Corea-Japón 2002." },
+            { id: 210, word: "Baguette", category: "comida", letter: "B", grammar: "ninguno", isCorrect: true, correction: "", description: "Pan clásico de Francia (Sede de 1938 y 1998)." },
+            { id: 211, word: "Baguet", category: "comida", letter: "B", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Baguette", description: "La ortografía en francés conservada en español requiere el sufijo '-tte'." },
+
+            // ================= LETRA C =================
+            { id: 301, word: "Catar", category: "pais", letter: "C", grammar: "ninguno", isCorrect: true, correction: "", description: "País árabe sede del Mundial de fútbol 2022." },
+            { id: 302, word: "Katar", category: "pais", letter: "C", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Catar", description: "La grafía oficial y recomendada por la RAE es Catar." },
+            { id: 303, word: "Cavani", category: "apodo", letter: "C", grammar: "ninguno", isCorrect: true, correction: "", description: "Histórico goleador uruguayo apodado 'El Matador'." },
+            { id: 304, word: "Cabani", category: "apodo", letter: "C", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Cavani", description: "El apellido del uruguayo Edinson Cavani es con 'v', no con 'b'." },
+            { id: 305, word: "Celeste", category: "color", letter: "C", grammar: "ninguno", isCorrect: true, correction: "", description: "Apodo y color tradicional de la selección uruguaya." },
+            { id: 306, word: "Seleste", category: "color", letter: "C", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Celeste", description: "Celeste proviene del latín 'caelestis' y se escribe con 'C'." },
+            { id: 307, word: "Ciao", category: "mascota", letter: "C", grammar: "diptongo", isCorrect: true, correction: "", description: "Mascota oficial del Mundial Italia 1990 con diptongo 'ia'." },
+            { id: 308, word: "Churrasco", category: "comida", letter: "C", grammar: "ninguno", isCorrect: true, correction: "", description: "Corte de carne sumamente consumido en las sedes sudamericanas." },
+            { id: 309, word: "Churrascco", category: "comida", letter: "C", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Churrasco", description: "Contiene una sola 'c' antes del fonema 'o'." },
+
+            // ================= LETRA F =================
+            { id: 401, word: "Francia", category: "pais", letter: "F", grammar: "diptongo", isCorrect: true, correction: "", description: "País bicampeón mundial con diptongo 'ia' final." },
+            { id: 402, word: "Fransia", category: "pais", letter: "F", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Francia", description: "La grafía oficial del país europeo es con 'C', no con 'S'." },
+            { id: 403, word: "Fideo", category: "apodo", letter: "F", grammar: "hiato", isCorrect: true, correction: "", description: "Apodo icónico de Ángel Di María. Tiene hiato en 'e-o' (dos vocales abiertas)." },
+            { id: 404, word: "Fidéo", category: "apodo", letter: "F", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Fideo", description: "Fideo es palabra llana terminada en vocal y no debe llevar tilde." },
+            { id: 405, word: "Fucsia", category: "color", letter: "F", grammar: "diptongo", isCorrect: true, correction: "", description: "Color exótico usado a menudo en equipaciones de porteros." },
+            { id: 406, word: "Fuscia", category: "color", letter: "F", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Fucsia", description: "Se escribe con 'cs' en el centro de la palabra, no 'sc'." },
+            { id: 407, word: "Fuleco", category: "mascota", letter: "F", grammar: "ninguno", isCorrect: true, correction: "", description: "Mascota oficial (armadillo) de la Copa del Mundo de Brasil 2014." },
+            { id: 408, word: "Phuleco", category: "mascota", letter: "F", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Fuleco", description: "Se escribe con 'F' inicial en español, no con el dígrafo inglés 'Ph'." },
+            { id: 409, word: "Footix", category: "mascota", letter: "F", grammar: "ninguno", isCorrect: true, correction: "", description: "Mascota mítica (gallo) de la Copa del Mundo de Francia 1998." },
+            { id: 410, word: "Futix", category: "mascota", letter: "F", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Footix", description: "La ortografía original del personaje francés de 1998 es 'Footix' con doble 'o'." },
+            { id: 411, word: "Fainá", category: "comida", letter: "F", grammar: "hiato", isCorrect: true, correction: "", description: "Comida típica italiana consumida fervientemente en Uruguay y Argentina. Contiene hiato 'a-í'." },
+            { id: 412, word: "Faina", category: "comida", letter: "F", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Fainá", description: "Debe llevar tilde en la 'a' para marcar la pronunciación aguda correcta." },
+
+            // ================= LETRA P =================
+            { id: 501, word: "Polonia", category: "pais", letter: "P", grammar: "diptongo", isCorrect: true, correction: "", description: "País europeo del gran goleador Lewandowski, posee diptongo 'ia'." },
+            { id: 502, word: "Polonía", category: "pais", letter: "P", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Polonia", description: "Es palabra llana terminada en vocal, no lleva tilde en la 'i'." },
+            { id: 503, word: "Pelé", category: "apodo", letter: "P", grammar: "ninguno", isCorrect: true, correction: "", description: "Apodo del 'Rey del fútbol' brasileño. Palabra aguda terminada en vocal." },
+            { id: 504, word: "Pele", category: "apodo", letter: "P", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Pelé", description: "Palabra aguda que requiere acento gráfico por terminar en vocal." },
+            { id: 505, word: "Piqué", category: "apodo", letter: "P", grammar: "ninguno", isCorrect: true, correction: "", description: "Defensa central campeón mundial con España en 2010. Aguda terminada en vocal." },
+            { id: 506, word: "Pique", category: "apodo", letter: "P", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Piqué", description: "Sin tilde suena como el verbo 'pique', el apellido requiere acento en la 'é'." },
+            { id: 507, word: "Púrpura", category: "color", letter: "P", grammar: "ninguno", isCorrect: true, correction: "", description: "Color de gran estatus, palabra esdrújula que siempre lleva tilde." },
+            { id: 508, word: "Purpura", category: "color", letter: "P", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Púrpura", description: "Requiere tilde obligatoria en la primera 'u' por ser esdrújula." },
+            { id: 509, word: "Pulpo Paul", category: "mascota", letter: "P", grammar: "diptongo", isCorrect: true, correction: "", description: "Animal vidente que predijo los resultados de Sudáfrica 2010. Diptongo 'au'." },
+            { id: 510, word: "Paella", category: "comida", letter: "P", grammar: "hiato", isCorrect: true, correction: "", description: "Comida de España (Sede de 1982). El grupo 'a-e' forma un hiato de vocales fuertes." },
+            { id: 511, word: "Paela", category: "comida", letter: "P", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Paella", description: "Se escribe con doble 'l' (elle)." },
+
+            // ================= TRIPTONGOS Y CASOS ESPECIALES MULTILETRAS =================
+            { id: 601, word: "Uruguay", category: "pais", letter: "U", grammar: "triptongo", isCorrect: true, correction: "", description: "Primer campeón mundial, posee triptongo fonético 'uay'." },
+            { id: 602, word: "Paraguay", category: "pais", letter: "P", grammar: "triptongo", isCorrect: true, correction: "", description: "País sudamericano con triptongo en su última sílaba." },
+            { id: 603, word: "Cambiáis", category: "apodo", letter: "C", grammar: "triptongo", isCorrect: true, correction: "", description: "Término lingüístico con triptongo en 'iái' y tilde en la vocal abierta." },
+
+            // ================= 20 NUEVAS PALABRAS (DESAFÍOS AMPLIADOS) =================
+            { id: 701, word: "Bielsa", category: "apodo", letter: "B", grammar: "diptongo", isCorrect: true, correction: "", description: "Apodo del técnico 'Loco' Bielsa con diptongo 'ie' en su primera sílaba." },
+            { id: 702, word: "Vielsa", category: "apodo", letter: "B", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Bielsa", description: "El apellido del entrenador Marcelo Bielsa se escribe con 'B' y no con 'V'." },
+            { id: 703, word: "Feijoada", category: "comida", letter: "F", grammar: "hiato", isCorrect: true, correction: "", description: "Plato icónico de Brasil (Sede 1950 y 2014) con hiato 'o-a' y diptongo 'ei'." },
+            { id: 704, word: "Feyjoada", category: "comida", letter: "F", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Feijoada", description: "Se escribe con 'i' latina, no con 'y' griega." },
+            { id: 705, word: "Croacia", category: "pais", letter: "C", grammar: "diptongo", isCorrect: true, correction: "", description: "País europeo subcampeón mundial con diptongo 'ia' y hiato 'o-a'." },
+            { id: 706, word: "Croasia", category: "pais", letter: "C", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Croacia", description: "El nombre del país balcánico se escribe con 'C', no con 'S'." },
+            { id: 707, word: "Cafú", category: "apodo", letter: "C", grammar: "ninguno", isCorrect: true, correction: "", description: "Legendario lateral brasileño. Palabra aguda que lleva tilde por terminar en vocal." },
+            { id: 708, word: "Cafu", category: "apodo", letter: "C", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Cafú", description: "Al ser una palabra aguda terminada en vocal, requiere tilde obligatoria en la 'u'." },
+            { id: 709, word: "Falcao", category: "apodo", letter: "F", grammar: "hiato", isCorrect: true, correction: "", description: "El 'Tigre' Falcao, goleador histórico de Colombia. El grupo 'a-o' forma un hiato." },
+            { id: 710, word: "Falcaó", category: "apodo", letter: "F", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Falcao", description: "Falcao es palabra llana terminada en vocal, por lo tanto no lleva tilde." },
+            { id: 711, word: "Pékerman", category: "apodo", letter: "P", grammar: "ninguno", isCorrect: true, correction: "", description: "Prestigioso director técnico mundialista. Palabra esdrújula que siempre lleva tilde." },
+            { id: 712, word: "Pekerman", category: "apodo", letter: "P", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Pékerman", description: "Al ser esdrújula, requiere tilde obligatoria en la primera sílaba 'Pé'." },
+            { id: 713, word: "Forlán", category: "apodo", letter: "F", grammar: "ninguno", isCorrect: true, correction: "", description: "Mejor jugador del Mundial 2010. Palabra aguda terminada en 'n' que lleva tilde." },
+            { id: 714, word: "Forlan", category: "apodo", letter: "F", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Forlán", description: "Requiere tilde obligatoria en la 'á' por ser palabra aguda terminada en la consonante 'n'." },
+            { id: 715, word: "Ajiaco", category: "comida", letter: "A", grammar: "diptongo", isCorrect: true, correction: "", description: "Sopa tradicional de Colombia (Sedes mundialistas). Contiene diptongo 'ia'." },
+            { id: 716, word: "Ajiacco", category: "comida", letter: "A", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Ajiaco", description: "Se escribe con una sola 'c' antes de la vocal 'o'." },
+            { id: 717, word: "Paraguai", category: "pais", letter: "P", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Paraguay", description: "En español se escribe con 'y' al final de sílaba para representar el triptongo." },
+            { id: 718, word: "Uruguaí", category: "pais", letter: "U", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Uruguay", description: "El nombre del país sudamericano se escribe sin tilde gráfica en su triptongo final." },
+            { id: 719, word: "Cambiais", category: "apodo", letter: "C", grammar: "ninguno", isCorrect: false, errorType: "mal_acentuada", correction: "Cambiáis", description: "Falta colocar la tilde sobre la vocal abierta 'a' de su triptongo." },
+            { id: 720, word: "Vaguette", category: "comida", letter: "B", grammar: "ninguno", isCorrect: false, errorType: "mal_escrita", correction: "Baguette", description: "El pan francés se escribe con 'B' de Baguette, no con 'V'." }
+        ];
+
+        /* =========================================
+           VARIABLES DE ESTADO DEL JUEGO
+           ========================================= */
+        let stopPoints = 0;
+        let knowledgePoints = 0;
+        let selectedLetter = "-";
+        let selectedWord = null;
+        let activeFilter = "ALL";
+
+        // Acumuladores de desafíos gramaticales del VAR
+        let identifiedDiptongos = [];
+        let identifiedTriptongos = [];
+        let successfullyEvaluatedWords = new Set(); // Evitar cobros dobles
+
+        /* =========================================
+           FLUJO DE INICIO Y RENDERIZADO
+           ========================================= */
+        window.onload = function() {
+            renderWordBoard();
+        };
+
+        function renderWordBoard() {
+            const board = document.getElementById("wordBoard");
+            board.innerHTML = "";
+
+            // Filtrar elementos según el botón activo
+            let filteredList = [...wordsDatabase];
+            if (activeFilter !== "ALL") {
+                filteredList = wordsDatabase.filter(item => item.letter === activeFilter);
+            }
+
+            // Barajar para desordenar y sembrar confusión
+            const shuffledWords = filteredList.sort(() => Math.random() - 0.5);
+            document.getElementById("wordCounter").innerText = `${filteredList.length} Palabras`;
+
+            shuffledWords.forEach(wordObj => {
+                const bubble = document.createElement("button");
+                bubble.innerText = wordObj.word;
+                bubble.id = `word-card-${wordObj.id}`;
+               
+                // Clases visuales base
+                let borderClass = "border-slate-800";
+                let textClass = "text-slate-200";
+                let bgClass = "bg-slate-900/95";
+
+                // Si la letra coincide con la letra seleccionada activa, se le da un brillo sutil
+                if (selectedLetter !== "-" && wordObj.letter === selectedLetter) {
+                    borderClass = "border-yellow-600/60";
+                    bgClass = "bg-slate-900/100";
+                }
+
+                bubble.className = `word-bubble ${bgClass} ${textClass} ${borderClass} border hover:border-yellow-400 hover:text-yellow-400 px-4 py-2 rounded-2xl text-xs md:text-sm font-semibold tracking-wide shadow-md active:scale-95 transition-all cursor-pointer select-none smooth-transition m-1`;
+               
+                // Acción al hacer clic
+                bubble.onclick = () => selectWord(wordObj);
+
+                board.appendChild(bubble);
+            });
+        }
+
+        function filterBoard(letter) {
+            activeFilter = letter;
+           
+            // Actualizar botones de filtro activos en la UI
+            document.querySelectorAll(".filter-btn").forEach(btn => {
+                btn.className = "filter-btn shrink-0 text-[11px] font-bold px-3 py-1 rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+            });
+
+            const activeBtnId = `filter-${letter.toLowerCase()}`;
+            const activeBtn = document.getElementById(activeBtnId);
+            if (activeBtn) {
+                activeBtn.className = "filter-btn shrink-0 text-[11px] font-bold px-3 py-1 rounded-full bg-green-800 text-white transition";
+            }
+
+            renderWordBoard();
+            playTickSound();
+        }
+
+        /* =========================================
+           SELECCIÓN Y REVISIÓN DE PALABRAS
+           ========================================= */
+        function selectWord(wordObj) {
+            selectedWord = wordObj;
+            playTickSound();
+
+            // Limpiar bordes de selección previos
+            document.querySelectorAll(".word-bubble").forEach(btn => {
+                btn.classList.remove("ring-4", "ring-cyan-500/50", "border-cyan-400", "bg-cyan-950/40");
+            });
+
+            const activeBtn = document.getElementById(`word-card-${wordObj.id}`);
+            if (activeBtn) {
+                activeBtn.classList.add("ring-4", "ring-cyan-500/50", "border-cyan-400", "bg-cyan-950/40");
+            }
+
+            // Actualizar visualizador del VAR
+            document.getElementById("selectedWordDisplay").innerText = wordObj.word;
+            document.getElementById("wordAnalysisIndicator").classList.remove("hidden");
+        }
+
+        /* =========================================
+           RULETA DE LETRAS (MECÁNICA DEL STOP)
+           ========================================= */
+        function spinLetterWheel() {
+            const validLetters = ["A", "B", "C", "F", "P"];
+            let counter = 0;
+            const interval = setInterval(() => {
+                const tempLetter = validLetters[Math.floor(Math.random() * validLetters.length)];
+                document.getElementById("currentLetterDisplay").innerText = tempLetter;
+                playTickSound();
+                counter++;
+                if (counter > 15) {
+                    clearInterval(interval);
+                    selectedLetter = validLetters[Math.floor(Math.random() * validLetters.length)];
+                    document.getElementById("currentLetterDisplay").innerText = selectedLetter;
+                    playFanfareSound();
+                   
+                    // Filtrar tablero automáticamente para facilitar visibilidad de la letra jugada
+                    filterBoard(selectedLetter);
+
+                    showToast(
+                        "🏆 ¡INICIA LA RONDA!",
+                        `Letra seleccionada: **${selectedLetter}**. Encuentra País, Apellido, Color, Mascota y Comida que comiencen con esa letra. ¡Ojo con las trampas del VAR!`,
+                        "success"
+                    );
+                }
+            }, 70);
+        }
+
+        /* =========================================
+           LOGICA DE LA PLANTILLA DEL STOP
+           ========================================= */
+        function fillFromSelected(categoryKey) {
+            if (!selectedWord) {
+                showToast("⚠️ ¡Un momento!", "Selecciona primero una palabra del tablero de confusión.", "error");
+                playErrorSound();
+                return;
+            }
+
+            if (selectedLetter === "-") {
+                showToast("⚠️ Falta Girar", "Gira la ruleta de rondas para conocer la letra activa primero.", "error");
+                playErrorSound();
+                return;
+            }
+
+            // Validar si la inicial es correcta
+            const firstChar = selectedWord.word.charAt(0).toUpperCase();
+            if (firstChar !== selectedLetter) {
+                showToast(
+                    "❌ Inicial Incorrecta",
+                    `La palabra "${selectedWord.word}" comienza con "${firstChar}". Debe iniciar con la letra "${selectedLetter}" de esta ronda.`,
+                    "error"
+                );
+                playErrorSound();
+                return;
+            }
+
+            const inputElement = document.getElementById(`input-${categoryKey}`);
+            if (inputElement) {
+                inputElement.value = selectedWord.word;
+                playSuccessSound();
+                showToast("⚽ Plantilla Actualizada", `Pusiste "${selectedWord.word}" en la casilla de ${categoryKey.toUpperCase()}`, "success");
+            }
+        }
+
+        function checkStopTemplate() {
+            if (selectedLetter === "-") {
+                showToast("⚠️ Ronda inactiva", "Determina la letra de juego girando la ruleta primero.", "error");
+                playErrorSound();
+                return;
+            }
+
+            const fields = [
+                { id: "input-pais", category: "pais", name: "País" },
+                { id: "input-apodo", category: "apodo", name: "Apellido/Apodo" },
+                { id: "input-color", category: "color", name: "Color" },
+                { id: "input-mascota", category: "mascota", name: "Mascota (Animal)" },
+                { id: "input-comida", category: "comida", name: "Comida" }
+            ];
+
+            let roundPoints = 0;
+            let successList = [];
+            let errorList = [];
+
+            fields.forEach(field => {
+                const val = document.getElementById(field.id).value.trim();
+               
+                if (val === "") {
+                    errorList.push(`⚽ **${field.name}**: Campo vacío`);
+                    return;
+                }
+
+                // Buscar coincidencia exacta en la base de datos
+                const match = wordsDatabase.find(w => w.word.toLowerCase() === val.toLowerCase());
+
+                if (match) {
+                    // Validar inicial
+                    if (match.word.charAt(0).toUpperCase() !== selectedLetter) {
+                        errorList.push(`❌ **${field.name}**: "${val}" no inicia con la letra activa ${selectedLetter}.`);
+                        return;
+                    }
+
+                    // Validar categoría correcta
+                    if (match.category !== field.category) {
+                        errorList.push(`❌ **${field.name}**: "${val}" no pertenece a este grupo.`);
+                        return;
+                    }
+
+                    // ¡Trampa de Ortografía detectada!
+                    if (!match.isCorrect) {
+                        errorList.push(`🔴 **El VAR Anuló el Gol en ${field.name}**: "${val}" está mal escrita en el tablero. Debiste reportarla en el VAR, no ponerla en tu planilla.`);
+                        return;
+                    }
+
+                    roundPoints += 100;
+                    successList.push(`✅ **${field.name}**: +100 pts por "${match.word}"`);
+                } else {
+                    errorList.push(`❌ **${field.name}**: "${val}" no es una palabra válida del tablero.`);
+                }
+            });
+
+            if (roundPoints > 0) {
+                stopPoints += roundPoints;
+                document.getElementById("stopScore").innerText = stopPoints;
+                playFanfareSound();
+               
+                let details = successList.join("<br>") + (errorList.length > 0 ? "<br><br><strong>Revisión del VAR:</strong><br>" + errorList.join("<br>") : "");
+                showToast("🎉 ¡GOOOL! STOP VALIDADO", `Suma total de la ronda: <strong>${roundPoints} puntos</strong>.<br>${details}`, "success");
+
+                // Limpiar plantilla
+                fields.forEach(f => document.getElementById(f.id).value = "");
+                selectedLetter = "-";
+                document.getElementById("currentLetterDisplay").innerText = "-";
+                filterBoard("ALL"); // Resetear tablero
+            } else {
+                playErrorSound();
+                showToast("❌ GOL ANULADO", `Ningún acierto válido en esta ronda.<br>${errorList.join("<br>")}`, "error");
+            }
+        }
+
+        /* =========================================
+           SABIO DEL VAR (ANÁLISIS GRAMATICAL)
+           ========================================= */
+        function claimBonus(challengeType) {
+            if (!selectedWord) {
+                showToast("⚠️ ¡Falta Palabra!", "Por favor selecciona primero una palabra en el tablero.", "error");
+                playErrorSound();
+                return;
+            }
+
+            const claimKey = `${selectedWord.id}-${challengeType}`;
+            if (successfullyEvaluatedWords.has(claimKey)) {
+                showToast("⚠️ Doble Cobro Prohibido", "Ya has cobrado los puntos de conocimiento por esta palabra.", "error");
+                playErrorSound();
+                return;
+            }
+
+            switch(challengeType) {
+                case "mal_escrita":
+                    if (!selectedWord.isCorrect && selectedWord.errorType === "mal_escrita") {
+                        addKnowledgePoints(150, `✅ ¡Excelente decisión arbitral! **"${selectedWord.word}"** posee un error de ortografía serio. La forma correcta es **"${selectedWord.correction}"**.<br>_${selectedWord.description}_`);
+                        successfullyEvaluatedWords.add(claimKey);
+                    } else {
+                        deductKnowledgePoints(50, `❌ ¡Simulación! **"${selectedWord.word}"** está escrita perfectamente o su error es únicamente de acentuación.`);
+                    }
+                    break;
+
+                case "mal_acentuada":
+                    if (!selectedWord.isCorrect && selectedWord.errorType === "mal_acentuada") {
+                        addKnowledgePoints(150, `✅ ¡Ojo de halcón! A **"${selectedWord.word}"** le hace falta o posee mal una tilde. Su acentuación correcta es **"${selectedWord.correction}"**.<br>_${selectedWord.description}_`);
+                        successfullyEvaluatedWords.add(claimKey);
+                    } else {
+                        deductKnowledgePoints(50, `❌ ¡Falta arbitral! **"${selectedWord.word}"** no tiene ningún error de acento.`);
+                    }
+                    break;
+
+                case "hiato":
+                    if (selectedWord.grammar === "hiato" && selectedWord.isCorrect) {
+                        addKnowledgePoints(100, `🧠 ¡Perfecto! La palabra **"${selectedWord.word}"** contiene un hiato (separación silábica de vocales).<br>_${selectedWord.description}_`);
+                        successfullyEvaluatedWords.add(claimKey);
+                    } else {
+                        deductKnowledgePoints(50, `❌ Tarjeta Amarilla: **"${selectedWord.word}"** no tiene hiato o es una palabra mal escrita.`);
+                    }
+                    break;
+
+                case "diptongo":
+                    if (selectedWord.grammar === "diptongo" && selectedWord.isCorrect) {
+                        if (!identifiedDiptongos.includes(selectedWord.word)) {
+                            identifiedDiptongos.push(selectedWord.word);
+                            document.getElementById("diptongoCount").innerText = `${identifiedDiptongos.length} / 2`;
+                           
+                            if (identifiedDiptongos.length === 2) {
+                                addKnowledgePoints(200, `🏆 ¡DESAFÍO DIPTONGO COMPLETADO! Encontraste 2 palabras correctas con diptongo: **${identifiedDiptongos.join(" y ")}**.`);
+                                identifiedDiptongos = [];
+                                document.getElementById("diptongoCount").innerText = `0 / 2`;
+                            } else {
+                                playSuccessSound();
+                                showToast("🧩 Diptongo Registrado", `¡Buen inicio! Llevas 1 de 2. Encuentra otro diptongo válido en el tablero para cobrar los 200 puntos.`, "success");
+                            }
+                            successfullyEvaluatedWords.add(claimKey);
+                        } else {
+                            showToast("⚠️ Duplicada", "Ya reportaste este diptongo en este desafío.", "error");
+                        }
+                    } else {
+                        deductKnowledgePoints(50, `❌ ¡Fuera de Juego! **"${selectedWord.word}"** no es un diptongo válido o tiene errores.`);
+                    }
+                    break;
+
+                case "triptongo":
+                    if (selectedWord.grammar === "triptongo" && selectedWord.isCorrect) {
+                        if (!identifiedTriptongos.includes(selectedWord.word)) {
+                            identifiedTriptongos.push(selectedWord.word);
+                            document.getElementById("triptongoCount").innerText = `${identifiedTriptongos.length} / 3`;
+
+                            if (identifiedTriptongos.length === 3) {
+                                addKnowledgePoints(350, `⭐ ¡GENIO MUNDIALISTA! Identificaste los 3 triptongos de la Copa: **${identifiedTriptongos.join(", ")}**.`);
+                                identifiedTriptongos = [];
+                                document.getElementById("triptongoCount").innerText = `0 / 3`;
+                            } else {
+                                playSuccessSound();
+                                showToast("🧩 Triptongo Registrado", `¡Fabuloso! Llevas ${identifiedTriptongos.length} de 3. Encuentra los restantes para el gran premio.`, "success");
+                            }
+                            successfullyEvaluatedWords.add(claimKey);
+                        } else {
+                            showToast("⚠️ Duplicada", "Ya tienes registrada esta palabra para el triptongo.", "error");
+                        }
+                    } else {
+                        deductKnowledgePoints(100, `❌ ¡Pena Máxima! **"${selectedWord.word}"** no posee estructura de triptongo válido.`);
+                    }
+                    break;
+            }
+        }
+
+        function addKnowledgePoints(pts, message) {
+            knowledgePoints += pts;
+            document.getElementById("knowledgeScore").innerText = knowledgePoints;
+            playFanfareSound();
+            showToast("🧠 ¡SABIO GRAMATICAL!", message, "success");
+        }
+
+        function deductKnowledgePoints(pts, message) {
+            knowledgePoints = Math.max(0, knowledgePoints - pts);
+            document.getElementById("knowledgeScore").innerText = knowledgePoints;
+            playErrorSound();
+            showToast("❌ PENALIZACIÓN", `${message} Perdiste ${pts} pts de sabio.`, "error");
+        }
+
+        /* =========================================
+           SISTEMA DE INTERFAZ Y MODALES
+           ========================================= */
+        function toggleModal(modalId, show) {
+            const modal = document.getElementById(modalId);
+            if (show) {
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+            } else {
+                modal.classList.remove("flex");
+                modal.classList.add("hidden");
+            }
+        }
+
+        function showToast(title, body, type = "success") {
+            const toast = document.getElementById("toastNotification");
+            const toastTitle = document.getElementById("toastTitle");
+            const toastBody = document.getElementById("toastBody");
+            const toastIcon = document.getElementById("toastIcon");
+
+            toastTitle.innerHTML = title;
+            toastBody.innerHTML = body;
+
+            if (type === "success") {
+                toast.className = "fixed bottom-6 right-6 transform scale-100 bg-slate-900 border-2 border-emerald-500 text-white px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-4 z-50 max-w-sm";
+                toastIcon.className = "bg-emerald-500 text-slate-950 p-2.5 rounded-xl shrink-0";
+                toastIcon.innerHTML = `<i class="fa-solid fa-check text-lg"></i>`;
+            } else {
+                toast.className = "fixed bottom-6 right-6 transform scale-100 bg-slate-900 border-2 border-red-500 text-white px-6 py-4 rounded-2xl shadow-2xl transition-all duration-300 flex items-center gap-4 z-50 max-w-sm";
+                toastIcon.className = "bg-red-500 text-slate-950 p-2.5 rounded-xl shrink-0";
+                toastIcon.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-lg"></i>`;
+            }
+
+            toast.classList.remove("translate-y-20", "opacity-0");
+        }
+
+        function hideToast() {
+            const toast = document.getElementById("toastNotification");
+            toast.classList.add("translate-y-20", "opacity-0");
+        }
+    </script>
+</body>
+</html>

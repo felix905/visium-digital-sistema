@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Líderes Ingeniosos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    * { font-family: 'Inter', sans-serif; }
+    .user-card { transition: all 0.3s ease; cursor: pointer; }
+    .user-card:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    .level-badge {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .tab-btn { transition: all 0.2s; }
+    .tab-btn.active { background: #7c3aed; color: white; }
+    .game-toggle { transition: all 0.2s; }
+    .game-toggle.enabled { background: #10b981; }
+    .game-toggle.disabled { background: #ef4444; }
+    .game-toggle:disabled { opacity: 0.5; cursor: not-allowed; }
+    #login-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+    .hidden { display: none !important; }
+    .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Login Overlay -->
+<div id="login-overlay">
+  <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+    <div class="text-center mb-6">
+      <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-shield-alt text-2xl text-purple-600"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900">Acceso Admin</h2>
+      <p class="text-gray-500 text-sm">Ingresa tus credenciales de administrador</p>
+    </div>
+    
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase">Usuario</label>
+        <input type="text" id="admin-username" placeholder="Nombre de usuario" 
+          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase">Contraseña</label>
+        <input type="password" id="admin-password" placeholder="Contraseña" 
+          class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
+      </div>
+      
+      <button onclick="checkAdminLogin()" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition">
+        <i class="fas fa-lock mr-2"></i>Acceder
+      </button>
+    </div>
+    
+    <p id="login-error" class="text-red-500 text-sm text-center mt-3 hidden">Usuario o contraseña incorrectos</p>
+    <a href="login.html" class="block text-center text-purple-600 text-sm mt-4 hover:underline">← Volver al login</a>
+  </div>
+</div>
+
+<!-- Main Admin Panel -->
+<div id="admin-panel" class="hidden min-h-screen">
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 px-6 py-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+          <i class="fas fa-crown text-white text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-gray-900">Panel de Administración</h1>
+          <p class="text-sm text-gray-500">Líderes Ingeniosos - Sistema Multi-Usuario</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="refreshData()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold transition">
+          <i class="fas fa-sync-alt mr-2"></i>Actualizar
+        </button>
+        <a href="login.html" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-semibold transition">
+          <i class="fas fa-sign-out-alt mr-2"></i>Salir
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats Overview -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 p-6">
+    <div class="stat-card rounded-2xl p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-purple-200 text-sm font-medium">Total Usuarios</p>
+          <p class="text-3xl font-bold" id="stat-total-users">10</p>
+        </div>
+        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+          <i class="fas fa-users text-xl"></i>
+        </div>
+      </div>
+    </div>
+    <div class="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-blue-200 text-sm font-medium">Puntos Totales</p>
+          <p class="text-3xl font-bold" id="stat-total-points">0</p>
+        </div>
+        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+          <i class="fas fa-star text-xl"></i>
+        </div>
+      </div>
+    </div>
+    <div class="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-green-200 text-sm font-medium">Módulos Comp.</p>
+          <p class="text-3xl font-bold" id="stat-total-modules">0</p>
+        </div>
+        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+          <i class="fas fa-book text-xl"></i>
+        </div>
+      </div>
+    </div>
+    <div class="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-orange-200 text-sm font-medium">Retos Logrados</p>
+          <p class="text-3xl font-bold" id="stat-total-challenges">0</p>
+        </div>
+        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+          <i class="fas fa-trophy text-xl"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="px-6 pb-4">
+    <div class="flex gap-2 bg-gray-100 p-1 rounded-xl w-fit">
+      <button onclick="switchTab('users')" id="tab-users" class="tab-btn active px-4 py-2 rounded-lg text-sm font-semibold">
+        <i class="fas fa-users mr-2"></i>Usuarios
+      </button>
+      <button onclick="switchTab('games')" id="tab-games" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-gray-600">
+        <i class="fas fa-gamepad mr-2"></i>Control por Usuario
+      </button>
+      <button onclick="switchTab('global-games')" id="tab-global-games" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-gray-600">
+        <i class="fas fa-globe mr-2"></i>Control Global
+      </button>
+      <button onclick="switchTab('stats')" id="tab-stats" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-gray-600">
+        <i class="fas fa-chart-bar mr-2"></i>Estadísticas
+      </button>
+    </div>
+  </div>
+
+  <!-- Users Tab -->
+  <div id="panel-users" class="px-6 pb-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-bold text-gray-900">Progreso de Usuarios</h2>
+      <select id="sort-users" onchange="renderUsers()" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+        <option value="points">Ordenar por puntos</option>
+        <option value="level">Ordenar por nivel</option>
+        <option value="name">Ordenar por nombre</option>
+        <option value="progress">Ordenar por progreso</option>
+      </select>
+    </div>
+    <div id="users-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    </div>
+  </div>
+
+  <!-- Games Control Tab (Per User) -->
+  <div id="panel-games" class="px-6 pb-6 hidden">
+    <h2 class="text-lg font-bold text-gray-900 mb-4">Control de Acceso por Usuario</h2>
+    <div class="bg-white rounded-2xl p-6 border border-gray-200 mb-6">
+      <label class="block text-sm font-semibold text-gray-700 mb-2">Seleccionar Usuario</label>
+      <select id="games-user-selector" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-base">
+        <option value="">Cargando usuarios...</option>
+      </select>
+    </div>
+    <div id="user-games-list">
+      <p class="text-gray-500 text-center py-8">Selecciona un usuario para ver/controlar sus juegos</p>
+    </div>
+  </div>
+
+  <!-- Global Games Control Tab -->
+  <div id="panel-global-games" class="px-6 pb-6 hidden">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h2 class="text-lg font-bold text-gray-900">Control Global de Juegos</h2>
+        <p class="text-sm text-gray-500">Activa o desactiva juegos para <strong>todos los usuarios</strong> simultáneamente</p>
+      </div>
+      <div class="flex items-center gap-2 bg-yellow-50 px-4 py-2 rounded-xl border border-yellow-200">
+        <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+        <span class="text-sm text-yellow-700 font-medium">Los cambios aplican a todos los usuarios</span>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-2xl p-6 border border-gray-200">
+        <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <i class="fas fa-bolt text-yellow-500"></i>
+          Acciones Rápidas
+        </h3>
+        <div class="space-y-3">
+          <button onclick="enableAllGamesGlobal()" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold transition flex items-center justify-center gap-2">
+            <i class="fas fa-unlock"></i> Desbloquear Todos
+          </button>
+          <button onclick="disableAllGamesGlobal()" class="w-full py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold transition flex items-center justify-center gap-2">
+            <i class="fas fa-lock"></i> Bloquear Todos
+          </button>
+          <button onclick="resetGlobalGames()" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition flex items-center justify-center gap-2">
+            <i class="fas fa-undo"></i> Restaurar Defaults
+          </button>
+        </div>
+        <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+          <h4 class="text-sm font-bold text-blue-900 mb-2">¿Cómo funciona?</h4>
+          <ul class="text-xs text-blue-700 space-y-1">
+            <li>• Los juegos <strong>bloqueados globalmente</strong> no están disponibles para nadie</li>
+            <li>• Los juegos <strong>desbloqueados globalmente</strong> siguen las reglas individuales por usuario</li>
+            <li>• El bloqueo global tiene prioridad sobre el control por usuario</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Games List -->
+      <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-gray-200">
+        <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <i class="fas fa-gamepad text-purple-500"></i>
+          Estado de Juegos
+        </h3>
+        <div id="global-games-list" class="space-y-3">
+          <p class="text-gray-500 text-center py-8">Cargando configuración global...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Tab -->
+  <div id="panel-stats" class="px-6 pb-6 hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white rounded-2xl p-6 border border-gray-200">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Progreso por Módulo (Global)</h3>
+        <div id="global-modules-stats" class="space-y-3">
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl p-6 border border-gray-200">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Top Usuarios</h3>
+        <div id="top-users-list" class="space-y-3">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- User Detail Modal -->
+<div id="user-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div id="modal-avatar" class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">U</div>
+        <div>
+          <h3 id="modal-user-name" class="text-xl font-bold text-gray-900">Usuario</h3>
+          <span id="modal-user-level" class="level-badge">Nivel 1</span>
+        </div>
+      </div>
+      <button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+    </div>
+    <div class="p-6">
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="text-center p-4 bg-purple-50 rounded-xl">
+          <div id="modal-points" class="text-2xl font-bold text-purple-600">0</div>
+          <div class="text-xs text-gray-500">Puntos</div>
+        </div>
+        <div class="text-center p-4 bg-green-50 rounded-xl">
+          <div id="modal-modules" class="text-2xl font-bold text-green-600">0</div>
+          <div class="text-xs text-gray-500">Módulos</div>
+        </div>
+        <div class="text-center p-4 bg-orange-50 rounded-xl">
+          <div id="modal-challenges" class="text-2xl font-bold text-orange-600">0</div>
+          <div class="text-xs text-gray-500">Retos</div>
+        </div>
+      </div>
+      <h4 class="font-bold text-gray-900 mb-3">Progreso por Módulo</h4>
+      <div id="modal-modules-list" class="space-y-2 mb-6">
+      </div>
+      <h4 class="font-bold text-gray-900 mb-3">Estado de Retos</h4>
+      <div id="modal-challenges-list" class="flex flex-wrap gap-2">
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ADMIN_CODE = "admin123";
+  
+  // ===== CONFIGURACIÓN FIREBASE =====
+  const firebaseConfig = {
+    apiKey: "AIzaSyDummyKeyForDemo",
+    authDomain: "lideres-ingeniosos.firebaseapp.com",
+    databaseURL: "https://lideres-ingeniosos-default-rtdb.firebaseio.com",
+    projectId: "lideres-ingeniosos",
+    storageBucket: "lideres-ingeniosos.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:abcdef123456"
+  };
+  
+  // Inicializar Firebase
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  
+  // 12 usuarios predefinidos (igual que login.html)
+  const predefinedUsers = [
+    { id: 1, name: 'Ana', color: '#ec4899' },
+    { id: 2, name: 'Benjamín', color: '#3b82f6' },
+    { id: 3, name: 'Carla', color: '#8b5cf6' },
+    { id: 4, name: 'Diego', color: '#10b981' },
+    { id: 5, name: 'Elena', color: '#f59e0b' },
+    { id: 6, name: 'Felipe', color: '#6366f1' },
+    { id: 7, name: 'Gabriela', color: '#06b6d4' },
+    { id: 8, name: 'Hugo', color: '#ef4444' },
+    { id: 9, name: 'Isabella', color: '#d946ef' },
+    { id: 10, name: 'Juan', color: '#f97316' },
+    { id: 11, name: 'Sarah', color: '#a855f7' },
+    { id: 12, name: 'Andres', color: '#22c55e' }
+  ];
+
+  let allUsersData = [];
+  let currentTab = 'users';
+  let selectedUserForGames = null;
+
+  // Cargar datos de todos los usuarios
+  function loadAllUsersData() {
+    allUsersData = [];
+    predefinedUsers.forEach(user => {
+      const key = `li_progress_${user.id}`;
+      const data = localStorage.getItem(key);
+      if (data) {
+        const userData = JSON.parse(data);
+        allUsersData.push({ ...user, ...userData, hasData: true });
+      } else {
+        allUsersData.push({ ...user, hasData: false, points: 0, level: 1, modules: [], challenges: [] });
+      }
+    });
+    
+    updateStats();
+    renderUsers();
+    renderUserGamesSelector();
+    renderStats();
+    
+    // Inicializar listeners de Firebase para bloqueos
+    initGamesConfigListener();
+    initGlobalGamesListener();
+  }
+
+  // Credenciales de admin
+  const ADMIN_USERNAME = "admin";
+  const ADMIN_PASSWORD = "admin123";
+
+  function checkAdminLogin() {
+    const username = document.getElementById('admin-username').value.trim();
+    const password = document.getElementById('admin-password').value.trim();
+    
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      document.getElementById('login-overlay').classList.add('hidden');
+      document.getElementById('admin-panel').classList.remove('hidden');
+      loadAllUsersData();
+    } else {
+      document.getElementById('login-error').classList.remove('hidden');
+    }
+  }
+
+  function updateStats() {
+    const totalPoints = allUsersData.reduce((sum, u) => sum + (u.points || 0), 0);
+    const totalModules = allUsersData.reduce((sum, u) => sum + (u.modules ? u.modules.filter(m => m.completed).length : 0), 0);
+    const totalChallenges = allUsersData.reduce((sum, u) => sum + (u.challenges ? u.challenges.filter(c => c.completed).length : 0), 0);
+    document.getElementById('stat-total-points').innerText = totalPoints;
+    document.getElementById('stat-total-modules').innerText = totalModules;
+    document.getElementById('stat-total-challenges').innerText = totalChallenges;
+  }
+
+  function renderUsers() {
+    const sortBy = document.getElementById('sort-users').value;
+    const grid = document.getElementById('users-grid');
+    grid.innerHTML = '';
+
+    let sortedUsers = [...allUsersData];
+    if (sortBy === 'points') sortedUsers.sort((a, b) => (b.points || 0) - (a.points || 0));
+    else if (sortBy === 'level') sortedUsers.sort((a, b) => (b.level || 1) - (a.level || 1));
+    else if (sortBy === 'name') sortedUsers.sort((a, b) => a.name.localeCompare(b.name));
+    else if (sortBy === 'progress') {
+      sortedUsers.sort((a, b) => {
+        const progA = a.modules ? a.modules.reduce((sum, m) => sum + m.progress, 0) / (a.modules.length || 1) : 0;
+        const progB = b.modules ? b.modules.reduce((sum, m) => sum + m.progress, 0) / (b.modules.length || 1) : 0;
+        return progB - progA;
+      });
+    }
+
+    sortedUsers.forEach((user) => {
+      const progress = user.modules && user.modules.length > 0 
+        ? Math.round(user.modules.reduce((sum, m) => sum + m.progress, 0) / user.modules.length)
+        : 0;
+      const modulesCompleted = user.modules ? user.modules.filter(m => m.completed).length : 0;
+      const challengesCompleted = user.challenges ? user.challenges.filter(c => c.completed).length : 0;
+      
+      const card = document.createElement('div');
+      card.className = 'user-card bg-white rounded-2xl p-5 border border-gray-200';
+      card.onclick = () => showUserDetail(user);
+      card.innerHTML = `
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg" style="background: ${user.color}">
+            ${user.name.charAt(0)}
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900">${user.name}</h3>
+            <span class="level-badge text-xs">Nivel ${user.level || 1}</span>
+          </div>
+          ${!user.hasData ? '<span class="ml-auto text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">Sin iniciar</span>' : ''}
+        </div>
+        <div class="space-y-3">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">Progreso</span>
+            <span class="font-bold ${progress === 100 ? 'text-green-600' : 'text-blue-600'}">${progress}%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="${progress === 100 ? 'bg-green-500' : 'bg-blue-500'} h-2 rounded-full transition-all" style="width:${progress}%"></div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="bg-purple-50 rounded-lg p-2">
+              <div class="text-lg font-bold text-purple-600">${user.points || 0}</div>
+              <div class="text-[10px] text-gray-500">pts</div>
+            </div>
+            <div class="bg-green-50 rounded-lg p-2">
+              <div class="text-lg font-bold text-green-600">${modulesCompleted}</div>
+              <div class="text-[10px] text-gray-500">mods</div>
+            </div>
+            <div class="bg-orange-50 rounded-lg p-2">
+              <div class="text-lg font-bold text-orange-600">${challengesCompleted}</div>
+              <div class="text-[10px] text-gray-500">retos</div>
+            </div>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function showUserDetail(user) {
+    document.getElementById('user-modal').classList.remove('hidden');
+    document.getElementById('modal-avatar').innerText = user.name.charAt(0);
+    document.getElementById('modal-avatar').style.background = user.color;
+    document.getElementById('modal-user-name').innerText = user.name;
+    document.getElementById('modal-user-level').innerText = `Nivel ${user.level || 1}`;
+    document.getElementById('modal-points').innerText = user.points || 0;
+    document.getElementById('modal-modules').innerText = user.modules ? user.modules.filter(m => m.completed).length : 0;
+    document.getElementById('modal-challenges').innerText = user.challenges ? user.challenges.filter(c => c.completed).length : 0;
+
+    const modulesList = document.getElementById('modal-modules-list');
+    modulesList.innerHTML = '';
+    if (user.modules && user.modules.length > 0) {
+      user.modules.forEach(m => {
+        const scoreText = m.score !== undefined ? `${m.score}/${m.totalQuestions || 3}` : '';
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+        div.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="text-xl">${m.emoji || '📚'}</span>
+            <span class="text-sm font-medium">${m.title}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-24 bg-gray-200 rounded-full h-2">
+              <div class="${m.progress === 100 ? 'bg-green-500' : 'bg-blue-500'} h-2 rounded-full" style="width:${m.progress || 0}%"></div>
+            </div>
+            <span class="text-sm font-bold ${m.progress === 100 ? 'text-green-600' : 'text-blue-600'}">${m.progress || 0}%</span>
+            ${scoreText ? `<span class="text-xs ${m.score === m.totalQuestions ? 'text-green-600 font-bold' : 'text-gray-500'}">${scoreText} ✓</span>` : ''}
+          </div>
+        `;
+        modulesList.appendChild(div);
+      });
+    } else {
+      modulesList.innerHTML = '<p class="text-gray-500 text-sm">El usuario aún no ha iniciado ningún módulo.</p>';
+    }
+
+    const challengesList = document.getElementById('modal-challenges-list');
+    challengesList.innerHTML = '';
+    if (user.challenges && user.challenges.length > 0) {
+      user.challenges.forEach((c, i) => {
+        const span = document.createElement('span');
+        span.className = `px-3 py-1 rounded-full text-xs font-bold ${c.completed ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`;
+        span.innerText = `Reto ${i + 1}: ${c.completed ? '✅' : '⏳'}`;
+        challengesList.appendChild(span);
+      });
+    } else {
+      challengesList.innerHTML = '<p class="text-gray-500 text-sm">No hay retos completados aún.</p>';
+    }
+  }
+
+  function closeUserModal() {
+    document.getElementById('user-modal').classList.add('hidden');
+  }
+
+  function renderUserGamesSelector() {
+    const selector = document.getElementById('games-user-selector');
+    if (!selector) return;
+    
+    selector.innerHTML = '<option value="">Selecciona un usuario...</option>' + 
+      allUsersData.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
+    
+    selector.onchange = (e) => {
+      selectedUserForGames = e.target.value ? parseInt(e.target.value) : null;
+      renderUserGamesControl();
+    };
+  }
+
+  function renderUserGamesControl() {
+    const container = document.getElementById('user-games-list');
+    if (!container) return;
+    
+    if (!selectedUserForGames) {
+      container.innerHTML = '<p class="text-gray-500 text-center py-8">Selecciona un usuario para ver/controlar sus juegos</p>';
+      return;
+    }
+    
+    const user = allUsersData.find(u => u.id === selectedUserForGames);
+    const games = [
+      { id: "game_lideres_studio", name: "Líderes Ingeniosos Studio", emoji: "🚀" },
+      { id: "game_exploradores", name: "Exploradores de Venezuela", emoji: "🗺️" },
+      { id: "game_mision_ingeniosa", name: "Misión Ingeniosa", emoji: "🎰" },
+      { id: "game_super_mundo", name: "Super Mundo Ingenioso", emoji: "🍄" },
+      { id: "game_club_lideres", name: "Club de Líderes", emoji: "🚀" },
+      { id: "game_clasificacion", name: "Clasificación de Palabras", emoji: "🎯" },
+      { id: "game_ruleta", name: "Ruleta del Conocimiento", emoji: "🎡" },
+      { id: "game_tinta_invisible", name: "Tinta Invisible", emoji: "🧪" },
+      { id: "game_retos_familiares", name: "Retos Familiares", emoji: "🏆" }
+    ];
+
+    container.innerHTML = `
+      <div class="mb-4 pb-4 border-b border-gray-200">
+        <h3 class="font-bold text-lg text-gray-900">${user.name}</h3>
+        <p class="text-sm text-gray-500">Activar/desactivar juegos para este usuario</p>
+      </div>
+      <div class="space-y-3">
+    `;
+    
+    games.forEach(game => {
+      const isEnabled = isGameEnabledForUser(game.id, user.id);
+      const isGloballyDisabled = globalGamesConfig[game.id] === false;
+      const div = document.createElement('div');
+      div.className = 'bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-between';
+      div.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-2xl">${game.emoji}</div>
+          <div>
+            <span class="font-semibold text-gray-900 block">${game.name}</span>
+            ${isGloballyDisabled ? '<span class="text-xs text-red-500 font-medium">🔒 Bloqueado globalmente</span>' : ''}
+          </div>
+        </div>
+        <button onclick="toggleUserGame('${game.id}', ${user.id})" 
+          class="game-toggle ${isEnabled ? 'enabled' : 'disabled'} px-4 py-2 rounded-lg text-white font-semibold text-sm transition"
+          ${isGloballyDisabled ? 'disabled title="Desbloquea primero en Control Global"' : ''}>
+          ${isEnabled ? '✅ Activado' : '❌ Desactivado'}
+        </button>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  // ===== FUNCIONES FIREBASE PARA BLOQUEO DE JUEGOS =====
+  let gamesConfigCache = {};
+  
+  // Escuchar cambios en tiempo real desde Firebase
+  function initGamesConfigListener() {
+    database.ref('games_config').on('value', (snapshot) => {
+      gamesConfigCache = snapshot.val() || {};
+      renderUserGamesControl();
+    });
+  }
+  
+  function isGameEnabledForUser(gameId, userId) {
+    // Primero verificar bloqueo global (tiene prioridad)
+    if (globalGamesConfig[gameId] === false) {
+      return false; // Bloqueado globalmente
+    }
+    
+    // Luego verificar configuración individual del usuario
+    if (!gamesConfigCache[userId]) return true;
+    return gamesConfigCache[userId][gameId] !== false;
+  }
+
+  function toggleUserGame(gameId, userId) {
+    console.log('toggleUserGame llamado:', { gameId, userId });
+    const currentValue = isGameEnabledForUser(gameId, userId);
+    const newValue = !currentValue; // Toggle: si estaba activado, ahora desactivado (false)
+    
+    console.log('Cambiando estado:', { gameId, userId, from: currentValue, to: newValue });
+    
+    // Guardar en Firebase
+    const updates = {};
+    updates[`games_config/${userId}/${gameId}`] = newValue;
+    database.ref().update(updates)
+      .then(() => {
+        console.log('✅ Juego actualizado en Firebase:', gameId, newValue ? 'activado' : 'bloqueado');
+        showNotification(`Juego ${newValue ? 'activado' : 'desactivado'} para el usuario`);
+        renderUserGamesControl(); // Refrescar la lista inmediatamente
+      })
+      .catch((error) => {
+        console.error('❌ Error al guardar en Firebase:', error);
+        alert('Error al guardar cambios. Verifica tu conexión a internet.');
+      });
+  }
+
+  // ===== FUNCIONES PARA CONTROL GLOBAL DE JUEGOS =====
+  let globalGamesConfig = {};
+  
+  // Escuchar cambios en la configuración global
+  function initGlobalGamesListener() {
+    database.ref('games_config_global').on('value', (snapshot) => {
+      globalGamesConfig = snapshot.val() || {};
+      // Si estamos en la tab global, actualizar la vista
+      if (currentTab === 'global-games') {
+        renderGlobalGamesList();
+      }
+    });
+  }
+  
+  function isGameEnabledGlobally(gameId) {
+    // Por defecto, todos los juegos están activados globalmente
+    return globalGamesConfig[gameId] !== false;
+  }
+  
+  function renderGlobalGamesList() {
+    const container = document.getElementById('global-games-list');
+    if (!container) return;
+    
+    const games = [
+      { id: "game_lideres_studio", name: "Líderes Ingeniosos Studio", emoji: "🚀" },
+      { id: "game_exploradores", name: "Exploradores de Venezuela", emoji: "🗺️" },
+      { id: "game_mision_ingeniosa", name: "Misión Ingeniosa", emoji: "🎰" },
+      { id: "game_super_mundo", name: "Super Mundo Ingenioso", emoji: "🍄" },
+      { id: "game_club_lideres", name: "Club de Líderes", emoji: "🚀" },
+      { id: "game_clasificacion", name: "Clasificación de Palabras", emoji: "🎯" },
+      { id: "game_ruleta", name: "Ruleta del Conocimiento", emoji: "🎡" },
+      { id: "game_tinta_invisible", name: "Tinta Invisible", emoji: "🧪" },
+      { id: "game_retos_familiares", name: "Retos Familiares", emoji: "🏆" }
+    ];
+    
+    container.innerHTML = games.map(game => {
+      const isEnabled = isGameEnabledGlobally(game.id);
+      return `
+        <div class="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-2xl">${game.emoji}</div>
+            <span class="font-semibold text-gray-900">${game.name}</span>
+          </div>
+          <button onclick="toggleGlobalGame('${game.id}')" 
+            class="game-toggle ${isEnabled ? 'enabled' : 'disabled'} px-4 py-2 rounded-lg text-white font-semibold text-sm transition">
+            ${isEnabled ? '✅ Activado' : '❌ Desactivado'}
+          </button>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  function toggleGlobalGame(gameId) {
+    const currentValue = isGameEnabledGlobally(gameId);
+    const newValue = !currentValue;
+    
+    database.ref(`games_config_global/${gameId}`).set(newValue)
+      .then(() => {
+        console.log('Juego global actualizado:', gameId, newValue ? 'activado' : 'bloqueado');
+        showNotification(`Juego ${newValue ? 'activado' : 'bloqueado'} globalmente`);
+        renderGlobalGamesList();
+        // Si estamos en la tab de usuario, refrescar también
+        const selectedUser = document.getElementById('games-user-selector').value;
+        if (selectedUser) {
+          renderUserGamesControl();
+        }
+      })
+      .catch((error) => {
+        console.error('Error al guardar configuración global:', error);
+        alert('Error al guardar cambios. Verifica tu conexión a internet.');
+      });
+  }
+  
+  function enableAllGamesGlobal() {
+    if (!confirm('¿Estás seguro de desbloquear TODOS los juegos para todos los usuarios?')) return;
+    
+    const games = [
+      "game_lideres_studio", "game_exploradores", "game_mision_ingeniosa",
+      "game_club_lideres", "game_clasificacion", "game_ruleta",
+      "game_tinta_invisible", "game_retos_familiares", "game_super_mundo"
+    ];
+    
+    const updates = {};
+    games.forEach(id => updates[id] = true);
+    
+    database.ref('games_config_global').update(updates)
+      .then(() => {
+        showNotification('Todos los juegos han sido desbloqueados globalmente');
+        renderGlobalGamesList();
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        alert('Error al actualizar. Verifica tu conexión.');
+      });
+  }
+  
+  function disableAllGamesGlobal() {
+    if (!confirm('¿Estás seguro de bloquear TODOS los juegos para todos los usuarios?')) return;
+    
+    const games = [
+      "game_lideres_studio", "game_exploradores", "game_mision_ingeniosa",
+      "game_club_lideres", "game_clasificacion", "game_ruleta",
+      "game_tinta_invisible", "game_retos_familiares", "game_super_mundo"
+    ];
+    
+    const updates = {};
+    games.forEach(id => updates[id] = false);
+    
+    database.ref('games_config_global').update(updates)
+      .then(() => {
+        showNotification('Todos los juegos han sido bloqueados globalmente');
+        renderGlobalGamesList();
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        alert('Error al actualizar. Verifica tu conexión.');
+      });
+  }
+  
+  function resetGlobalGames() {
+    if (!confirm('¿Restaurar configuración por defecto? Todos los juegos estarán disponibles.')) return;
+    
+    database.ref('games_config_global').remove()
+      .then(() => {
+        showNotification('Configuración global restaurada');
+        renderGlobalGamesList();
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        alert('Error al restaurar. Verifica tu conexión.');
+      });
+  }
+
+  // Función global para control de juegos (legacy - ahora por usuario)
+  function renderGamesControl() {
+    renderUserGamesSelector();
+    renderUserGamesControl();
+  }
+
+  function toggleGame(gameId) {
+    // Esta función ya no se usa - reemplazada por toggleUserGame
+    console.log('Use toggleUserGame instead');
+  }
+
+  function renderStats() {
+    const globalModules = {};
+    allUsersData.forEach(user => {
+      if (user.modules) {
+        user.modules.forEach(m => {
+          if (!globalModules[m.title]) {
+            globalModules[m.title] = { total: 0, completed: 0, emoji: m.emoji };
+          }
+          globalModules[m.title].total++;
+          if (m.completed) globalModules[m.title].completed++;
+        });
+      }
+    });
+
+    const modulesList = document.getElementById('global-modules-stats');
+    modulesList.innerHTML = '';
+    Object.entries(globalModules).forEach(([title, data]) => {
+      const percent = Math.round((data.completed / data.total) * 100);
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-sm font-medium">${data.emoji} ${title}</span>
+          <span class="text-sm font-bold ${percent === 100 ? 'text-green-600' : 'text-blue-600'}">${data.completed}/${data.total}</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="${percent === 100 ? 'bg-green-500' : 'bg-blue-500'} h-2 rounded-full" style="width:${percent}%"></div>
+        </div>
+      `;
+      modulesList.appendChild(div);
+    });
+
+    const topUsers = [...allUsersData].sort((a, b) => (b.points || 0) - (a.points || 0)).slice(0, 5);
+    const topList = document.getElementById('top-users-list');
+    topList.innerHTML = '';
+    topUsers.forEach((user, i) => {
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-3 p-3 bg-gray-50 rounded-xl';
+      div.innerHTML = `
+        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${i < 3 ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-200 text-gray-600'}">${i + 1}</div>
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style="background: ${user.color}">${user.name.charAt(0)}</div>
+        <div class="flex-1">
+          <div class="font-semibold text-sm">${user.name}</div>
+          <div class="text-xs text-gray-500">Nivel ${user.level || 1}</div>
+        </div>
+        <div class="text-right">
+          <div class="font-bold text-purple-600">${user.points || 0}</div>
+          <div class="text-xs text-gray-500">puntos</div>
+        </div>
+      `;
+      topList.appendChild(div);
+    });
+  }
+
+  function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'text-white'));
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-gray-600'));
+    document.getElementById(`tab-${tab}`).classList.add('active', 'text-white');
+    document.getElementById(`tab-${tab}`).classList.remove('text-gray-600');
+    ['users', 'games', 'global-games', 'stats'].forEach(t => {
+      document.getElementById(`panel-${t}`).classList.add('hidden');
+    });
+    document.getElementById(`panel-${tab}`).classList.remove('hidden');
+    
+    // Renderizar lista de juegos globales cuando se abre esa tab
+    if (tab === 'global-games') {
+      renderGlobalGamesList();
+    }
+  }
+
+  function refreshData() {
+    loadAllUsersData();
+    showNotification('Datos actualizados');
+  }
+
+  function showNotification(msg) {
+    const notif = document.createElement('div');
+    notif.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50';
+    notif.innerText = msg;
+    document.body.appendChild(notif);
+    setTimeout(() => notif.remove(), 2000);
+  }
+
+  document.getElementById('user-modal').addEventListener('click', e => {
+    if (e.target.id === 'user-modal') closeUserModal();
+  });
+
+  document.getElementById('admin-password').addEventListener('keypress', e => {
+    if (e.key === 'Enter') checkAdminLogin();
+  });
+</script>
+</body>
+</html>

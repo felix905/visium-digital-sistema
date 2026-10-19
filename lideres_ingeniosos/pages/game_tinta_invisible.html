@@ -1,0 +1,477 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Líderes Ingeniosos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .bg-gradient-soft { background: linear-gradient(135deg, #f6f8fb 0%, #e9effd 100%); }
+        .market-item { transition: all 0.2s; cursor: pointer; border-radius: 1rem; border: 2px solid transparent; }
+        .market-item:hover { transform: translateY(-3px); border-color: #fbd38d; }
+        .market-item.selected { border-color: #ed8936; background-color: #fffaf0; }
+        .prop-input { width: 55px; height: 35px; border: 2px solid #cbd5e1; border-radius: 8px; text-align: center; font-weight: bold; color: #4f46e5; outline: none; }
+        .prop-input:focus { border-color: #6366f1; }
+        #drawing-canvas { border: 2px solid #f472b6; cursor: crosshair; touch-action: none; background: white; border-radius: 1rem; }
+        .timer-badge { animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .recipe-card { border-left: 5px solid #10b981; }
+    </style>
+  <link rel="stylesheet" href="../styles/btn.css">
+</head>
+<body class="bg-gradient-soft min-h-screen font-sans text-gray-800 p-4">
+
+    <div class="max-w-5xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-blue-700 mb-2">🚀 Club de Líderes Ingeniosos</h1>
+            <p class="text-lg text-gray-600 italic">"¡Ciencia, Valores y Finanzas en Acción!"</p>
+        </header>
+
+        <div class="flex flex-wrap justify-center gap-3 mb-8">
+            <button onclick="showTab('laboratorio')" id="btn-laboratorio" class="px-6 py-2 rounded-full font-bold transition-all bg-green-600 text-white shadow-lg">🧪 Laboratorio: Tinta Invisible</button>
+            <button onclick="showTab('sara')" id="btn-sara" class="px-6 py-2 rounded-full font-bold transition-all bg-white text-pink-600 border-2 border-pink-600">El Desafío de Sara</button>
+            <button onclick="showTab('andres')" id="btn-andres" class="px-6 py-2 rounded-full font-bold transition-all bg-white text-indigo-600 border-2 border-indigo-600">El Desafío de Andrés</button>
+        </div>
+
+        <!-- LABORATORIO: TINTA INVISIBLE (SIN MODIFICAR) -->
+        <div id="section-laboratorio" class="hidden space-y-8">
+            <div class="bg-white p-8 rounded-2xl shadow-xl border-t-4 border-green-500">
+                <h2 class="text-3xl font-bold text-green-800 mb-6 text-center">🧪 Experimento: Mensajes Ocultos</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="recipe-card bg-blue-50 p-5 rounded-xl">
+                        <h3 class="font-bold text-blue-700 mb-2 text-lg"><i class="fas fa-ghost mr-2"></i>Tinta Invisible</h3>
+                        <p class="text-sm text-gray-700 mb-3">Mezcla <strong>agua y bicarbonato</strong> en un recipiente pequeño.</p>
+                        <ul class="text-xs space-y-1 text-gray-600">
+                            <li>✨ Usa 2 pinceles limpios.</li>
+                            <li>✨ Traza un <strong>cuadrado grande</strong> en una hoja.</li>
+                            <li>✨ Escribe tu mensaje positivo dentro.</li>
+                        </ul>
+                    </div>
+                    <div class="recipe-card bg-yellow-50 p-5 rounded-xl border-yellow-500">
+                        <h3 class="font-bold text-yellow-700 mb-2 text-lg"><i class="fas fa-eye mr-2"></i>Tinta Reveladora</h3>
+                        <p class="text-sm text-gray-700 mb-3">Mezcla <strong>alcohol y cúrcuma</strong> hasta que esté bien naranja.</p>
+                        <ul class="text-xs space-y-1 text-gray-600">
+                            <li>✨ Usa 2 pinceles exclusivos para esta tinta.</li>
+                            <li>✨ Pasa suavemente sobre el cuadrado invisible.</li>
+                            <li>✨ ¡Mira cómo aparece el mensaje!</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-green-50 p-6 rounded-2xl border-2 border-dashed border-green-200 text-center">
+                    <h3 class="font-bold text-green-800 mb-2">💌 El Reto de Hermandad</h3>
+                    <p class="text-gray-700">Ana escribe un mensaje para Andrés, y Andrés escribe uno para Ana. <br><strong>¡Solo se vale escribir cosas positivas y valientes!</strong></p>
+                </div>
+
+                <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-white rounded-xl shadow border-b-4 border-blue-400 text-center">
+                        <h4 class="font-bold text-blue-600 mb-2 italic">🔬 En las Ciencias</h4>
+                        <p class="text-xs text-gray-600">Reacción ácido-base: La cúrcuma revela el bicarbonato.</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-xl shadow border-b-4 border-yellow-400 text-center">
+                        <h4 class="font-bold text-yellow-600 mb-2 italic">💎 En los Valores</h4>
+                        <p class="text-xs text-gray-600">Valorar lo invisible: el cariño y las palabras de aliento.</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-xl shadow border-b-4 border-green-400 text-center">
+                        <h4 class="font-bold text-green-600 mb-2 italic">💰 En las Finanzas</h4>
+                        <p class="text-xs text-gray-600">Ingenio sobre gasto: Ciencia con recursos del hogar.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SARA: DIBUJO Y MEMORIA (LISTA ACTUALIZADA) -->
+        <div id="section-sara" class="hidden space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Dibujo de un solo sistema -->
+                <div class="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-pink-400">
+                    <h2 class="text-xl font-bold text-pink-700 mb-4 text-center">🎨 Un Sistema a la Vez</h2>
+                    <div class="bg-pink-50 p-4 rounded-xl mb-4 text-center">
+                        <p class="text-[10px] font-bold text-pink-400 uppercase">Dibuja este sistema:</p>
+                        <p id="sara-riddle-text" class="text-lg font-bold text-gray-800"></p>
+                    </div>
+                    <canvas id="drawing-canvas" width="400" height="250" class="w-full"></canvas>
+                    <div class="flex justify-between mt-4">
+                        <button onclick="clearCanvas()" class="text-gray-400 text-sm underline">Borrar</button>
+                        <button onclick="finishDrawing()" id="btn-photo" class="hidden btn-3d btn-pink btn-sm">📸 Enviar Foto</button>
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-2 text-center italic">Al enviar la foto, pasarás al siguiente sistema de la lista.</p>
+                </div>
+
+                <!-- Memoria (Sin cambios) -->
+                <div class="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-purple-400 flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-purple-700">🛒 Súper Memoria</h2>
+                        <div id="sara-timer" class="hidden bg-red-100 text-red-600 px-3 py-1 rounded-full font-bold timer-badge">
+                            00:<span id="sara-timer-val">10</span>
+                        </div>
+                    </div>
+                    <div id="sara-market-container" class="flex-1 min-h-[350px]">
+                        <div id="sara-start-ui" class="text-center py-10">
+                            <p class="mb-4 text-gray-600">Memoriza los artículos y clasifícalos.</p>
+                            <button onclick="startSaraMarket()" class="btn-3d btn-violet btn-pill">¡Aceptar el Reto!</button>
+                        </div>
+                        <div id="sara-list-ui" class="hidden">
+                            <h3 class="text-center font-bold mb-4">Memoriza estos 6 artículos:</h3>
+                            <div id="sara-memo-grid" class="grid grid-cols-3 gap-2"></div>
+                        </div>
+                        <div id="sara-select-ui" class="hidden">
+                            <h3 class="text-center font-bold mb-4">El Pasillo (Selecciona 6)</h3>
+                            <div id="sara-shelf-grid" class="grid grid-cols-4 gap-2"></div>
+                            <button onclick="evaluateSaraSelection()" class="w-full mt-4 bg-green-600 text-white py-2 rounded-xl font-bold italic">Revisar mi carrito</button>
+                        </div>
+                        <div id="sara-result-ui" class="hidden">
+                            <h3 class="text-center font-bold mb-4">¿Necesidad o Deseo?</h3>
+                            <div id="sara-final-list" class="space-y-2"></div>
+                            <button onclick="location.reload()" class="w-full mt-4 text-xs text-gray-400 underline">Reiniciar todo</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANDRES: TRABALENGUAS Y PROPIEDADES (SIN MODIFICAR) -->
+        <div id="section-andres" class="hidden space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Locutor -->
+                <div class="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-indigo-400">
+                    <h2 class="text-xl font-bold text-indigo-700 mb-4 text-center">🗣️ Locutor Nivel Experto</h2>
+                    <div class="bg-indigo-50 p-6 rounded-2xl mb-4 text-center">
+                        <p id="andres-phrase" class="text-lg font-bold text-gray-700 mb-2"></p>
+                        <div class="border-t border-indigo-200 pt-2">
+                            <p class="text-[10px] text-indigo-400 font-bold uppercase">Lectura al revés:</p>
+                            <p id="andres-reverse" class="text-sm italic text-indigo-600 font-medium"></p>
+                        </div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-xl flex items-center gap-3">
+                            <span class="text-2xl">✏️</span>
+                            <p class="text-xs font-bold text-yellow-800 uppercase italic">¡Póntelo en la boca para leer!</p>
+                        </div>
+                        <div class="flex justify-center gap-2">
+                            <button onclick="setTone('angry')" class="btn-3d btn-rose btn-sm btn-pill">😠 Bravo</button>
+                            <button onclick="setTone('sad')" class="btn-3d btn-blue btn-sm btn-pill">😢 Triste</button>
+                            <button onclick="setTone('happy')" class="btn-3d btn-green btn-sm btn-pill">😊 Alegre</button>
+                        </div>
+                        <button onclick="nextTraba()" class="btn-3d btn-indigo btn-full">Siguiente Trabalenguas 👉</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-cyan-400">
+                    <h2 class="text-xl font-bold text-cyan-700 mb-4 text-center">✨ Frases con Tono</h2>
+                    <div id="andres-phrases" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- Mercado con Propiedades -->
+            <div class="bg-white p-8 rounded-2xl shadow-xl border-t-4 border-orange-400">
+                <h2 class="text-2xl font-bold text-orange-700 mb-4 text-center">🛒 Mercado: Propiedades de la Suma</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div id="andres-shelf" class="grid grid-cols-3 gap-3"></div>
+                    <div class="bg-gray-50 p-6 rounded-3xl border-2 border-dashed border-gray-300">
+                        <div id="andres-cart-empty" class="text-center py-10 text-gray-400 italic">Selecciona 2 artículos</div>
+                        <div id="andres-cart-active" class="hidden space-y-6">
+                            <h3 class="font-bold text-center border-b pb-2">Propiedades a Resolver:</h3>
+                            <div class="bg-white p-3 rounded-xl shadow-sm">
+                                <p class="text-[10px] font-bold text-blue-500 uppercase">1. Conmutativa</p>
+                                <div class="flex items-center gap-2 font-bold mt-1">
+                                    <span id="con-a"></span> + <span id="con-b"></span> = 
+                                    <input id="in-con-1" class="prop-input"> + <input id="in-con-2" class="prop-input">
+                                </div>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl shadow-sm">
+                                <p class="text-[10px] font-bold text-purple-500 uppercase">2. Asociativa</p>
+                                <div class="flex items-center gap-1 font-bold mt-1 text-sm">
+                                    (<span id="aso-a"></span>+<span id="aso-b"></span>)+1 = 
+                                    <span id="aso-a2"></span>+(<input id="in-aso" class="prop-input">+1)
+                                </div>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl shadow-sm">
+                                <p class="text-[10px] font-bold text-green-500 uppercase">3. Elemento Neutro</p>
+                                <div class="flex items-center gap-2 font-bold mt-1">
+                                    <span id="neu-a"></span> + <input id="in-neu-1" class="prop-input"> = <input id="in-neu-2" class="prop-input">
+                                </div>
+                            </div>
+                            <button onclick="verifyAllProps()" class="w-full py-3 bg-orange-500 text-white rounded-xl font-bold shadow-lg">Verificar Desafío</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="feedback-toast" class="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-full shadow-2xl transform translate-y-20 transition-transform duration-300 z-50">¡Genial! ✨</div>
+    </div>
+
+    <script>
+        // --- DATA ACTUALIZADA PARA SARA ---
+        const saraSystems = [
+            { name: "Sistema Respiratorio", info: "Pulmones y tráquea." },
+            { name: "Sistema Circulatorio", info: "Corazón y venas." },
+            { name: "Sistema Óseo", info: "Huesos y esqueleto." },
+            { name: "Sistema Digestivo", info: "Estómago e intestinos." },
+            { name: "Sistema Muscular", info: "Músculos del cuerpo." },
+            { name: "Sistema Nervioso", info: "Cerebro y nervios." }
+        ];
+
+        const saraPool = [
+            { id: 1, name: "Agua", type: 'necesidad', icon: "💧" },
+            { id: 2, name: "Leche", type: 'necesidad', icon: "🥛" },
+            { id: 3, name: "Frutas", type: 'necesidad', icon: "🍎" },
+            { id: 4, name: "Jabón", type: 'necesidad', icon: "🧼" },
+            { id: 5, name: "Arroz", type: 'necesidad', icon: "🍚" },
+            { id: 6, name: "Pan", type: 'necesidad', icon: "🍞" },
+            { id: 7, name: "Huevos", type: 'necesidad', icon: "🥚" },
+            { id: 8, name: "Pollo", type: 'necesidad', icon: "🍗" },
+            { id: 9, name: "Helado", type: 'deseo', icon: "🍦" },
+            { id: 10, name: "Dulces", type: 'deseo', icon: "🍭" },
+            { id: 11, name: "Juguete", type: 'deseo', icon: "🧸" },
+            { id: 12, name: "Papitas", type: 'deseo', icon: "🍟" },
+            { id: 13, name: "Soda", type: 'deseo', icon: "🥤" },
+            { id: 14, name: "Cine", type: 'deseo', icon: "🎟️" },
+            { id: 15, name: "Videojuego", type: 'deseo', icon: "🎮" },
+            { id: 16, name: "Pegatinas", type: 'deseo', icon: "✨" }
+        ];
+
+        const andresTrabas = [
+            { t: "Pablito clavó un clavito en la calva de un calvito.", r: "Calvito un de calva la en clavito un clavó Pablito." },
+            { t: "Tres tristes tigres tragaban trigo en un trigal.", r: "Trigal un en trigo tragaban tigres tristes tres." }
+        ];
+
+        const powerPhrases = ["Soy un líder ingenioso", "Ahorrar es mi superpoder", "La excelencia es mi meta"];
+
+        // --- STATE ---
+        let currentSystemIdx = 0;
+        let selectedAndresItems = [];
+        let currentTrabaIdx = 0;
+        let memoList = [];
+        let saraChosenIds = [];
+
+        // --- NAVIGATION ---
+        function showTab(tab) {
+            ['laboratorio', 'sara', 'andres'].forEach(s => {
+                document.getElementById(`section-${s}`).classList.add('hidden');
+                document.getElementById(`btn-${s}`).className = "px-6 py-2 rounded-full font-bold border-2 border-gray-200 text-gray-400 bg-white";
+            });
+            document.getElementById(`section-${tab}`).classList.remove('hidden');
+            const colorMap = { andres: 'bg-indigo-600', sara: 'bg-pink-600', laboratorio: 'bg-green-600' };
+            document.getElementById(`btn-${tab}`).className = `px-6 py-2 rounded-full font-bold text-white shadow-lg ${colorMap[tab]}`;
+            if(tab === 'sara') { initSaraDrawing(); resetSaraMarketUI(); }
+            if(tab === 'andres') { renderAndresTraba(); renderAndresShelf(); renderAndresPhrases(); }
+        }
+
+        // --- SARA DRAWING ---
+        let canvas, ctx, isDrawing = false;
+        function initSaraDrawing() {
+            canvas = document.getElementById('drawing-canvas');
+            if(!canvas) return;
+            ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#f472b6';
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            
+            canvas.onmousedown = (e) => startDraw(e);
+            canvas.onmousemove = (e) => draw(e);
+            canvas.onmouseup = () => isDrawing = false;
+            
+            canvas.ontouchstart = (e) => { e.preventDefault(); startDraw(e.touches[0]); };
+            canvas.ontouchmove = (e) => { e.preventDefault(); draw(e.touches[0]); };
+            canvas.ontouchend = () => isDrawing = false;
+            
+            document.getElementById('sara-riddle-text').innerText = saraSystems[currentSystemIdx].name;
+        }
+
+        function startDraw(e) {
+            isDrawing = true;
+            ctx.beginPath();
+            const p = getPos(e);
+            ctx.moveTo(p.x, p.y);
+            document.getElementById('btn-photo').classList.remove('hidden');
+        }
+
+        function draw(e) {
+            if(!isDrawing) return;
+            const p = getPos(e);
+            ctx.lineTo(p.x, p.y);
+            ctx.stroke();
+        }
+
+        function getPos(e) { 
+            const r = canvas.getBoundingClientRect(); 
+            return { x: e.clientX - r.left, y: e.clientY - r.top }; 
+        }
+
+        function clearCanvas() { 
+            ctx.clearRect(0,0,canvas.width,canvas.height); 
+            document.getElementById('btn-photo').classList.add('hidden'); 
+        }
+
+        function finishDrawing() {
+            showToast(`📸 Foto del ${saraSystems[currentSystemIdx].name} enviada!`);
+            currentSystemIdx++;
+            if(currentSystemIdx >= saraSystems.length) {
+                currentSystemIdx = 0;
+                showToast("🏆 ¡Has completado todos los dibujos!");
+            }
+            clearCanvas();
+            document.getElementById('sara-riddle-text').innerText = saraSystems[currentSystemIdx].name;
+        }
+
+        // --- SARA MARKET ---
+        function resetSaraMarketUI() {
+            document.getElementById('sara-start-ui').classList.remove('hidden');
+            document.getElementById('sara-list-ui').classList.add('hidden');
+            document.getElementById('sara-select-ui').classList.add('hidden');
+            document.getElementById('sara-result-ui').classList.add('hidden');
+            document.getElementById('sara-timer').classList.add('hidden');
+        }
+
+        function startSaraMarket() {
+            document.getElementById('sara-start-ui').classList.add('hidden');
+            document.getElementById('sara-list-ui').classList.remove('hidden');
+            document.getElementById('sara-timer').classList.remove('hidden');
+            memoList = [...saraPool].sort(() => 0.5 - Math.random()).slice(0, 6);
+            document.getElementById('sara-memo-grid').innerHTML = memoList.map(i => `<div class='bg-purple-50 border p-2 rounded text-center text-xs'>${i.icon}<br>${i.name}</div>`).join('');
+            let time = 10;
+            document.getElementById('sara-timer-val').innerText = time;
+            const timer = setInterval(() => {
+                time--;
+                document.getElementById('sara-timer-val').innerText = time;
+                if(time <= 0) { clearInterval(timer); startSaraSelection(); }
+            }, 1000);
+        }
+
+        function startSaraSelection() {
+            document.getElementById('sara-list-ui').classList.add('hidden');
+            document.getElementById('sara-select-ui').classList.remove('hidden');
+            document.getElementById('sara-timer').classList.add('hidden');
+            saraChosenIds = [];
+            document.getElementById('sara-shelf-grid').innerHTML = saraPool.map(i => `
+                <button id="s-item-${i.id}" onclick="toggleSaraItem(${i.id})" class="p-2 border rounded-xl bg-white text-xs">${i.icon}<br>${i.name}</button>
+            `).join('');
+        }
+
+        function toggleSaraItem(id) {
+            const btn = document.getElementById(`s-item-${id}`);
+            if(saraChosenIds.includes(id)) {
+                saraChosenIds = saraChosenIds.filter(i => i !== id);
+                btn.classList.remove('bg-purple-600', 'text-white');
+            } else {
+                if(saraChosenIds.length < 6) {
+                    saraChosenIds.push(id);
+                    btn.classList.add('bg-purple-600', 'text-white');
+                }
+            }
+        }
+
+        function evaluateSaraSelection() {
+            document.getElementById('sara-select-ui').classList.add('hidden');
+            document.getElementById('sara-result-ui').classList.remove('hidden');
+            const memoIds = memoList.map(i => i.id);
+            const list = document.getElementById('sara-final-list');
+            list.innerHTML = saraChosenIds.map(id => {
+                const item = saraPool.find(i => i.id === id);
+                const wasOnList = memoIds.includes(id);
+                return `
+                    <div class="p-2 border rounded-lg flex justify-between items-center ${wasOnList ? 'bg-white' : 'bg-red-50'}">
+                        <span class="text-sm">${item.icon} ${item.name} ${wasOnList ? '' : '❌'}</span>
+                        ${wasOnList ? `
+                            <div id="c-btns-${id}">
+                                <button onclick="checkSaraCat(${id},'necesidad')" class="text-[9px] bg-blue-100 p-1 rounded">Necesidad</button>
+                                <button onclick="checkSaraCat(${id},'deseo')" class="text-[9px] bg-yellow-100 p-1 rounded">Deseo</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function checkSaraCat(id, choice) {
+            const item = saraPool.find(i => i.id === id);
+            if(item.type === choice) {
+                showToast("¡Correcto!");
+                document.getElementById(`c-btns-${id}`).innerHTML = "✅";
+            } else {
+                showToast("Piénsalo mejor...");
+            }
+        }
+
+        // --- ANDRES LOCUTOR ---
+        function renderAndresTraba() {
+            const t = andresTrabas[currentTrabaIdx];
+            document.getElementById('andres-phrase').innerText = t.t;
+            document.getElementById('andres-reverse').innerText = t.r;
+        }
+        function nextTraba() { currentTrabaIdx = (currentTrabaIdx + 1) % andresTrabas.length; renderAndresTraba(); }
+        function setTone(tone) { showToast("¡Excelente tono " + tone + "!"); }
+        function renderAndresPhrases() {
+            document.getElementById('andres-phrases').innerHTML = powerPhrases.map(p => `<div class="p-3 bg-white border rounded shadow-sm text-sm font-bold">⭐ ${p}</div>`).join('');
+        }
+
+        // --- ANDRES PROPIEDADES ---
+        function renderAndresShelf() {
+            document.getElementById('andres-shelf').innerHTML = saraPool.slice(0, 9).map(i => `
+                <div onclick="selectAndresItem(${i.id})" id="ash-${i.id}" class="market-item bg-white p-2 border rounded-xl text-center">
+                    <div class="text-xl">${i.icon}</div><div class="text-[10px] font-bold">$${i.id}</div>
+                </div>
+            `).join('');
+        }
+
+        function selectAndresItem(id) {
+            const item = saraPool.find(i => i.id === id);
+            if(selectedAndresItems.includes(item)) {
+                selectedAndresItems = selectedAndresItems.filter(i => i !== item);
+                document.getElementById(`ash-${id}`).classList.remove('selected');
+            } else {
+                if(selectedAndresItems.length < 2) {
+                    selectedAndresItems.push(item);
+                    document.getElementById(`ash-${id}`).classList.add('selected');
+                }
+            }
+            updateAndresCart();
+        }
+
+        function updateAndresCart() {
+            const empty = document.getElementById('andres-cart-empty');
+            const active = document.getElementById('andres-cart-active');
+            if(selectedAndresItems.length === 2) {
+                empty.classList.add('hidden');
+                active.classList.remove('hidden');
+                const [a, b] = selectedAndresItems;
+                document.getElementById('con-a').innerText = a.id;
+                document.getElementById('con-b').innerText = b.id;
+                document.getElementById('aso-a').innerText = a.id;
+                document.getElementById('aso-b').innerText = b.id;
+                document.getElementById('aso-a2').innerText = a.id;
+                document.getElementById('neu-a').innerText = a.id;
+            } else {
+                empty.classList.remove('hidden');
+                active.classList.add('hidden');
+            }
+        }
+
+        function verifyAllProps() {
+            const [a, b] = selectedAndresItems;
+            const c1 = parseInt(document.getElementById('in-con-1').value);
+            const c2 = parseInt(document.getElementById('in-con-2').value);
+            const aso = parseInt(document.getElementById('in-aso').value);
+            const n1 = parseInt(document.getElementById('in-neu-1').value);
+            const n2 = parseInt(document.getElementById('in-neu-2').value);
+            const conOk = (c1 === b.id && c2 === a.id);
+            const asoOk = (aso === b.id);
+            const neuOk = (n1 === 0 && n2 === a.id);
+            if(conOk && asoOk && neuOk) showToast("¡Propiedades dominadas! 🏆");
+            else showToast("Revisa los números, ¡tú puedes!");
+        }
+
+        function showToast(m) {
+            const t = document.getElementById('feedback-toast');
+            t.innerText = m; t.classList.remove('translate-y-20');
+            setTimeout(() => t.classList.add('translate-y-20'), 3000);
+        }
+
+        window.onload = () => showTab('laboratorio');
+    </script>
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoFinanzas · Movimiento Manual</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons (via CDN) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .perspective-1000 { perspective: 1000px; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+    .backface-hidden { backface-visibility: hidden; }
+    .preserve-3d { transform-style: preserve-3d; }
+    .board-grid { background-image: radial-gradient(#ffffff05 1px, transparent 1px); background-size: 30px 30px; }
+    .transition-transform { transition: transform 0.7s; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 flex flex-col items-center font-sans antialiased">
+
+<div id="app" class="w-full max-w-6xl flex flex-col items-center">
+  <!-- Setup Screen -->
+  <div id="setup-screen" class="flex flex-col items-center justify-center h-screen max-w-md w-full text-center">
+    <div class="bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl border border-slate-800 w-full relative">
+      <h1 class="text-4xl font-black mb-2 bg-gradient-to-r from-emerald-400 to-indigo-400 bg-clip-text text-transparent italic text-center">EcoFinanzas</h1>
+      <p class="text-slate-400 mb-8 font-medium">Edición: Movimiento Manual</p>
+      <div class="mb-10">
+        <label class="text-xs font-bold uppercase text-slate-500 block mb-4">¿Cuántos niños?</label>
+        <div class="flex justify-between gap-2">
+          <button data-players="2" class="player-count-btn flex-1 py-4 rounded-2xl font-black text-xl transition-all bg-emerald-600 text-white">2</button>
+          <button data-players="3" class="player-count-btn flex-1 py-4 rounded-2xl font-black text-xl transition-all bg-slate-800 text-slate-500">3</button>
+          <button data-players="4" class="player-count-btn flex-1 py-4 rounded-2xl font-black text-xl transition-all bg-slate-800 text-slate-500">4</button>
+          <button data-players="5" class="player-count-btn flex-1 py-4 rounded-2xl font-black text-xl transition-all bg-slate-800 text-slate-500">5</button>
+        </div>
+      </div>
+      <button id="start-game-btn" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-xl shadow-xl flex items-center justify-center gap-2">¡COMENZAR!</button>
+    </div>
+  </div>
+
+  <!-- Main Game Screen (hidden initially) -->
+  <div id="game-screen" class="w-full hidden flex-col lg:flex-row gap-6 items-start h-full">
+    <!-- Tablero -->
+    <div class="relative w-full lg:w-3/4 aspect-video bg-slate-900 rounded-[2.5rem] p-4 border border-slate-800 shadow-2xl board-grid overflow-hidden">
+      <svg id="board-svg" class="absolute inset-0 w-full h-full pointer-events-none opacity-20" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <polyline id="board-path-line" fill="none" stroke="white" stroke-width="0.5" stroke-dasharray="2" />
+      </svg>
+      <div id="board-tiles-container" class="relative w-full h-full"></div>
+    </div>
+
+    <!-- Panel derecho -->
+    <div class="w-full lg:w-1/4 flex flex-col gap-4">
+      <div class="bg-slate-900 p-6 rounded-[2rem] border border-slate-800 shadow-xl">
+        <div class="flex items-center gap-3 mb-6">
+          <div id="current-player-icon" class="p-3 rounded-xl"></div>
+          <div>
+            <p class="text-[10px] font-bold text-slate-500 uppercase">Turno de</p>
+            <h2 id="current-player-name" class="text-xl font-black"></h2>
+          </div>
+        </div>
+        <button id="roll-dice-btn" class="w-full py-6 bg-emerald-600 rounded-3xl border-b-[8px] border-emerald-800 text-white font-black text-4xl shadow-lg active:translate-y-1 active:border-b-0 transition-all disabled:opacity-50 disabled:pointer-events-none">
+          ?
+        </button>
+        <div id="moves-info" class="mt-4 p-3 bg-indigo-500/20 rounded-2xl text-center border border-indigo-500/50 hidden">
+          <p class="text-indigo-300 font-black animate-pulse text-xs uppercase tracking-tighter">¡Pulsa espacio o flechas!</p>
+          <p id="moves-left-display" class="text-2xl font-black text-white">0 PASOS</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/50 p-4 rounded-3xl border border-slate-800">
+        <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-3 px-2">Cartas Disponibles</h4>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-emerald-500/10 p-2 rounded-xl border border-emerald-500/30">
+            <i data-lucide="brain" class="w-4 h-4 mx-auto mb-1 text-emerald-500"></i>
+            <p id="green-cards-count" class="text-sm font-black">5</p>
+          </div>
+          <div class="bg-amber-500/10 p-2 rounded-xl border border-amber-500/30">
+            <i data-lucide="lightbulb" class="w-4 h-4 mx-auto mb-1 text-amber-500"></i>
+            <p id="yellow-cards-count" class="text-sm font-black">10</p>
+          </div>
+          <div class="bg-sky-500/10 p-2 rounded-xl border border-sky-500/30">
+            <i data-lucide="skull" class="w-4 h-4 mx-auto mb-1 text-sky-500"></i>
+            <p id="blue-cards-count" class="text-sm font-black">4</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de evento (carta) -->
+  <div id="event-modal" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md hidden">
+    <div class="perspective-1000 w-full max-w-sm aspect-[3/4]">
+      <div id="card-flipper" class="relative w-full h-full preserve-3d cursor-pointer transition-transform duration-700">
+        <!-- Cara frontal (sin voltear) -->
+        <div id="card-front" class="absolute inset-0 backface-hidden rounded-[2.5rem] flex flex-col items-center justify-center p-10 border-[10px] border-white/5 shadow-2xl">
+          <div id="card-front-icon" class="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center mb-6"></div>
+          <h2 id="card-front-title" class="text-2xl font-black text-white uppercase italic tracking-widest"></h2>
+          <p class="mt-4 text-white/60 text-[10px] font-bold">TOCA LA CARTA</p>
+        </div>
+        <!-- Cara trasera (contenido) -->
+        <div id="card-back" class="absolute inset-0 backface-hidden rounded-[2.5rem] bg-white rotate-y-180 p-8 flex flex-col items-center text-center border-4 border-slate-200">
+          <span id="card-back-subtitle" class="text-[10px] font-black text-slate-400 uppercase mb-2"></span>
+          <h4 id="card-back-content" class="text-slate-900 text-lg font-black mb-4 flex-1 flex items-center"></h4>
+          <div class="bg-slate-50 p-4 rounded-xl border-2 border-dashed border-slate-200 mb-6">
+            <p id="card-back-task" class="text-slate-600 font-bold text-xs italic"></p>
+          </div>
+          <button id="accept-card-btn" class="w-full py-4 bg-slate-950 text-white rounded-xl font-black">¡ACEPTADO!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pantalla de ganador -->
+  <div id="winner-screen" class="fixed inset-0 z-[100] bg-indigo-950 flex-col items-center justify-center text-center p-8 hidden">
+    <i data-lucide="trophy" class="w-40 h-40 text-yellow-400 mb-8 animate-bounce"></i>
+    <h1 class="text-5xl font-black text-white mb-2 italic">¡GANASTE!</h1>
+    <p id="winner-message" class="text-xl text-indigo-300 mb-10"></p>
+    <button id="new-game-btn" class="px-10 py-4 bg-white text-indigo-950 rounded-full font-black text-xl shadow-2xl hover:scale-105 transition-transform">NUEVA PARTIDA</button>
+  </div>
+</div>
+
+<script>
+  (function(){
+    // ---------- DATOS Y CONSTANTES ----------
+    const originalDecks = {
+      green: [
+        { title: 'El Vendedor Loco', content: 'Tienes 20 segundos para vender un objeto imaginario (ej: una piedra mágica).', task: 'Ganas si convences al grupo.' },
+        { title: 'La Calculadora Humana', content: 'Resuelve rápido: 12 + 8 – 5 = ?', task: 'Si fallas, retrocede 1 casilla.', penalty: 1 },
+        { title: 'El Trabalenguas Millonario', content: 'Di 2 veces: "Paco paga poco porque poco a poco ahorra."', task: 'Si te equivocas... ¡baila 5 segundos!' },
+        { title: 'Ahorro Invisible', content: 'Imagina que te dan $10.', task: 'Di 2 cosas en las que gastarías y 1 que ahorrarías.' },
+        { title: 'Detective Financiero', content: 'Juan gastó todo en dulces y no pudo comprar su cuaderno.', task: '¿Qué consejo le darías?' },
+      ],
+      yellow: [
+        { title: 'Sabiduría', content: '¿Qué es el dinero?', task: 'Explica para qué sirve.' },
+        { title: 'Sabiduría', content: '¿Por qué es importante ahorrar?', task: 'Menciona una situación de ayuda.' },
+        { title: 'Sabiduría', content: 'Si tienes $10, ¿gastarlo todo o guardar?', task: '¿Por qué?' },
+        { title: 'Sabiduría', content: '¿Qué es una meta?', task: 'Da un ejemplo de algo que quieras lograr.' },
+        { title: 'Sabiduría', content: '¿Qué significa compartir?', task: '¿Por qué es parte de usar bien el dinero?' },
+        { title: 'Sabiduría', content: 'Si ves algo que te gusta pero no necesitas...', task: '¿Qué deberías hacer?' },
+        { title: 'Sabiduría', content: '¿Qué es trabajar?', task: '¿De dónde viene el dinero de los adultos?' },
+        { title: 'Sabiduría', content: 'Si tienes $100...', task: '1 para gastar, 1 para ahorrar y 1 para ayudar.' },
+        { title: 'Sabiduría', content: '¿Qué es ser responsable?', task: 'Explica una acción responsable.' },
+        { title: 'Sabiduría', content: '¿Dinero o ser buena persona?', task: '¿Por qué?' },
+      ],
+      blue: [
+        { title: 'Gasto Hormiga', content: 'Compraste un dulce sin pensar.', task: 'Retrocede 2 casillas.', penalty: 2 },
+        { title: '¡Se rompió!', content: 'No cuidaste tu juguete.', task: 'Retrocede 1 casilla.', penalty: 1 },
+        { title: 'Olvido', content: 'Olvidaste tu alcancía.', task: 'Pierdes el siguiente turno.', skipTurn: true },
+        { title: 'Tarde', content: 'Tardaste mucho en decidir.', task: 'Retrocede 1 casilla.', penalty: 1 },
+      ]
+    };
+
+    const playerProfiles = [
+      { name: 'Ahorrador', icon: 'coins', color: 'text-yellow-600', bg: 'bg-yellow-100' },
+      { name: 'Emprendedor', icon: 'zap', color: 'text-orange-500', bg: 'bg-orange-100' },
+      { name: 'Analista', icon: 'shield-check', color: 'text-blue-600', bg: 'bg-blue-100' },
+      { name: 'Inversionista', icon: 'star', color: 'text-purple-600', bg: 'bg-purple-100' },
+      { name: 'Planificador', icon: 'book-open', color: 'text-emerald-600', bg: 'bg-emerald-100' },
+    ];
+
+    let gameState = 'setup';
+    let playerCount = 2;
+    let players = [];
+    let currentPlayerIdx = 0;
+    let diceValue = 0;
+    let movesLeft = 0;
+    let moveQueue = [];
+    let isActionLocked = false;
+    let currentEvent = null;
+    let dynamicDecks = { green: [], yellow: [], blue: [] };
+    let boardPath = [];
+
+    const setupScreen = document.getElementById('setup-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const eventModal = document.getElementById('event-modal');
+    const winnerScreen = document.getElementById('winner-screen');
+    const boardTilesContainer = document.getElementById('board-tiles-container');
+    const boardPathLine = document.getElementById('board-path-line');
+    const rollDiceBtn = document.getElementById('roll-dice-btn');
+    const movesInfoDiv = document.getElementById('moves-info');
+    const movesLeftDisplay = document.getElementById('moves-left-display');
+    const currentPlayerName = document.getElementById('current-player-name');
+    const currentPlayerIcon = document.getElementById('current-player-icon');
+    const greenCount = document.getElementById('green-cards-count');
+    const yellowCount = document.getElementById('yellow-cards-count');
+    const blueCount = document.getElementById('blue-cards-count');
+    const cardFlipper = document.getElementById('card-flipper');
+    const cardFront = document.getElementById('card-front');
+    const cardFrontTitle = document.getElementById('card-front-title');
+    const cardFrontIcon = document.getElementById('card-front-icon');
+    const cardBackSubtitle = document.getElementById('card-back-subtitle');
+    const cardBackContent = document.getElementById('card-back-content');
+    const cardBackTask = document.getElementById('card-back-task');
+    const acceptCardBtn = document.getElementById('accept-card-btn');
+    const winnerMessage = document.getElementById('winner-message');
+
+    const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+
+    function generateBoard() {
+      const path = [];
+      const rows = 4;
+      const cols = 6;
+      let idCounter = 0;
+      for (let r = 0; r < rows; r++) {
+        const isReverse = r % 2 !== 0;
+        for (let c = 0; c < cols; c++) {
+          const colIdx = isReverse ? (cols - 1 - c) : c;
+          let type = 'yellow';
+          if (idCounter === 0) type = 'start';
+          else if (idCounter === 21) type = 'finish';
+          else if (idCounter % 4 === 0) type = 'blue';
+          else if (idCounter % 3 === 0) type = 'green';
+          path.push({
+            id: idCounter,
+            type,
+            label: type === 'start' ? 'Inicio' : type === 'finish' ? 'Meta' : '',
+            color: type === 'start' ? 'bg-slate-300' : 
+                   type === 'finish' ? 'bg-indigo-600' :
+                   type === 'yellow' ? 'bg-amber-400' :
+                   type === 'green' ? 'bg-emerald-500' : 'bg-sky-500',
+            x: 15 + colIdx * 14,
+            y: 15 + r * 23,
+            penalty: type === 'blue' ? Math.floor(Math.random() * 2) + 1 : 0
+          });
+          idCounter++;
+          if (idCounter > 21) break;
+        }
+        if (idCounter > 21) break;
+      }
+      return path;
+    }
+
+    function playWinSound() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + i * 0.1 + 0.5);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(ctx.currentTime + i * 0.1);
+          osc.stop(ctx.currentTime + i * 0.1 + 0.5);
+        });
+      } catch (e) { }
+    }
+
+    function calculateMoveQueue(currentPos, dice) {
+      let queue = [];
+      let tempPos = currentPos;
+      let direction = 1;
+      for (let i = 0; i < dice; i++) {
+        if (tempPos === 21) direction = -1;
+        tempPos += direction;
+        queue.push(tempPos);
+      }
+      return queue;
+    }
+
+    function checkLanding(finalPosition) {
+      const tile = boardPath[finalPosition];
+      if (finalPosition === 21) {
+        playWinSound();
+        gameState = 'winner';
+        updateUI();
+        return;
+      }
+
+      if (tile.type !== 'start' && tile.type !== 'finish') {
+        const type = tile.type;
+        let deck = [...dynamicDecks[type]];
+        if (deck.length === 0) {
+          deck = shuffle(originalDecks[type]);
+        }
+        const card = deck.pop();
+        dynamicDecks[type] = deck;
+        currentEvent = { ...card, type };
+        gameState = 'event';
+        updateUI();
+        showEventModal();
+      } else {
+        setTimeout(() => nextTurn(), 500);
+      }
+    }
+
+    function processNextMove() {
+      if (moveQueue.length === 0 || movesLeft <= 0 || gameState !== 'playing') return;
+
+      const nextPos = moveQueue[0];
+      players[currentPlayerIdx].position = nextPos;
+      
+      moveQueue = moveQueue.slice(1);
+      movesLeft--;
+
+      updateBoardAndPlayers();
+
+      if (movesLeft === 0) {
+        setTimeout(() => checkLanding(nextPos), 400);
+      }
+      updateUI();
+    }
+
+    function nextTurn() {
+      movesLeft = 0;
+      diceValue = 0;
+      moveQueue = [];
+      currentPlayerIdx = (currentPlayerIdx + 1) % players.length;
+      isActionLocked = false;
+      gameState = 'playing';
+      updateUI();
+    }
+
+    function rollDice() {
+      if (isActionLocked || movesLeft > 0 || gameState !== 'playing') return;
+      const p = players[currentPlayerIdx];
+      if (p.skipped) {
+        isActionLocked = true;
+        players[currentPlayerIdx].skipped = false;
+        updateUI();
+        setTimeout(() => {
+          isActionLocked = false;
+          nextTurn();
+          updateUI();
+        }, 1500);
+        return;
+      }
+
+      isActionLocked = true;
+      let count = 0;
+      const interval = setInterval(() => {
+        diceValue = Math.floor(Math.random() * 6) + 1;
+        rollDiceBtn.textContent = diceValue;
+        if (++count > 10) {
+          clearInterval(interval);
+          finalizeRoll();
+        }
+      }, 60);
+    }
+
+    function finalizeRoll() {
+      const val = Math.floor(Math.random() * 6) + 1;
+      diceValue = val;
+      rollDiceBtn.textContent = val;
+      const p = players[currentPlayerIdx];
+      
+      if (!p.isOut) {
+        if (val === 1 || val === 6) {
+          players[currentPlayerIdx].isOut = true;
+          const queue = calculateMoveQueue(0, val);
+          moveQueue = queue;
+          movesLeft = val;
+        } else {
+          setTimeout(() => { isActionLocked = false; nextTurn(); updateUI(); }, 1200);
+          updateUI();
+          return;
+        }
+      } else {
+        const queue = calculateMoveQueue(p.position, val);
+        moveQueue = queue;
+        movesLeft = val;
+      }
+      isActionLocked = false;
+      updateUI();
+    }
+
+    function applyPenaltyAndClose() {
+      if (currentEvent) {
+        const p = players[currentPlayerIdx];
+        if (currentEvent.penalty) {
+          p.position = Math.max(0, p.position - currentEvent.penalty);
+        }
+        if (currentEvent.skipTurn) {
+          p.skipped = true;
+        }
+      }
+      hideEventModal();
+      gameState = 'playing';
+      currentEvent = null;
+      updateBoardAndPlayers();
+      updateUI();
+      setTimeout(() => nextTurn(), 500);
+    }
+
+    function showEventModal() {
+      if (!currentEvent) return;
+      const type = currentEvent.type;
+      const typeName = type === 'green' ? 'Reto' : type === 'yellow' ? 'Sabiduría' : 'Peligro';
+      const bgColor = type === 'green' ? 'bg-emerald-600' : type === 'yellow' ? 'bg-amber-500' : 'bg-sky-600';
+      const iconName = type === 'green' ? 'brain' : type === 'yellow' ? 'lightbulb' : 'skull';
+      
+      cardFront.className = `absolute inset-0 backface-hidden rounded-[2.5rem] flex flex-col items-center justify-center p-10 border-[10px] border-white/5 shadow-2xl ${bgColor}`;
+      cardFrontTitle.textContent = typeName;
+      cardFrontIcon.innerHTML = `<i data-lucide="${iconName}" width="40" height="40"></i>`;
+      
+      cardBackSubtitle.textContent = currentEvent.title;
+      cardBackContent.textContent = currentEvent.content;
+      cardBackTask.textContent = currentEvent.task;
+      
+      cardFlipper.classList.remove('rotate-y-180');
+      
+      eventModal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function hideEventModal() {
+      eventModal.classList.add('hidden');
+    }
+
+    function updateBoardAndPlayers() {
+      renderBoard();
+      updateCardsCount();
+    }
+
+    function renderBoard() {
+      boardTilesContainer.innerHTML = '';
+      boardPath.forEach((tile, i) => {
+        const tileDiv = document.createElement('div');
+        tileDiv.className = `absolute w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center shadow-lg border-b-4 border-black/30 ${tile.color} transition-all duration-700`;
+        tileDiv.style.left = `${tile.x}%`;
+        tileDiv.style.top = `${tile.y}%`;
+        tileDiv.style.transform = 'translate(-50%, -50%)';
+        
+        let content = '';
+        if (tile.id === 0) content = '<i data-lucide="rotate-ccw" width="20" height="20"></i>';
+        else if (tile.id === 21) content = '<i data-lucide="trophy" width="20" height="20"></i>';
+        else content = tile.id;
+        
+        const span = document.createElement('span');
+        span.className = 'text-white font-black text-xs md:text-lg drop-shadow-md';
+        if (typeof content === 'number') span.textContent = content;
+        else span.innerHTML = content;
+        tileDiv.appendChild(span);
+        
+        const tokensContainer = document.createElement('div');
+        tokensContainer.className = 'absolute inset-0 flex flex-wrap items-center justify-center gap-0.5 p-1';
+        
+        players.forEach((p, pIdx) => {
+          if (p.position === i) {
+            const token = document.createElement('div');
+            token.className = `w-6 h-6 md:w-8 md:h-8 rounded-full bg-white p-0.5 shadow-xl border-2 border-slate-900 z-20 transform transition-all ${currentPlayerIdx === pIdx ? 'scale-125 ring-2 ring-white animate-bounce' : 'scale-75 opacity-70'}`;
+            const inner = document.createElement('div');
+            inner.className = `w-full h-full rounded-full flex items-center justify-center ${playerProfiles[pIdx].color} ${playerProfiles[pIdx].bg}`;
+            inner.innerHTML = `<i data-lucide="${playerProfiles[pIdx].icon}" width="16" height="16"></i>`;
+            token.appendChild(inner);
+            tokensContainer.appendChild(token);
+          }
+        });
+        
+        tileDiv.appendChild(tokensContainer);
+        boardTilesContainer.appendChild(tileDiv);
+      });
+      
+      const points = boardPath.map(p => `${p.x},${p.y}`).join(' ');
+      boardPathLine.setAttribute('points', points);
+      
+      lucide.createIcons();
+    }
+
+    function updateCardsCount() {
+      greenCount.textContent = dynamicDecks.green.length;
+      yellowCount.textContent = dynamicDecks.yellow.length;
+      blueCount.textContent = dynamicDecks.blue.length;
+    }
+
+    function updateUI() {
+      setupScreen.classList.toggle('hidden', gameState !== 'setup');
+      gameScreen.classList.toggle('hidden', gameState === 'setup');
+      winnerScreen.classList.toggle('hidden', gameState !== 'winner');
+      
+      if (gameState === 'playing' || gameState === 'event') {
+        const player = players[currentPlayerIdx];
+        if (player) {
+          currentPlayerName.textContent = playerProfiles[currentPlayerIdx].name;
+          currentPlayerIcon.className = `p-3 rounded-xl ${playerProfiles[currentPlayerIdx].bg} ${playerProfiles[currentPlayerIdx].color}`;
+          currentPlayerIcon.innerHTML = `<i data-lucide="${playerProfiles[currentPlayerIdx].icon}" width="24" height="24"></i>`;
+        }
+        
+        rollDiceBtn.textContent = diceValue || '?';
+        rollDiceBtn.disabled = isActionLocked || movesLeft > 0 || gameState !== 'playing';
+        
+        if (movesLeft > 0) {
+          movesInfoDiv.classList.remove('hidden');
+          movesLeftDisplay.textContent = `${movesLeft} PASOS`;
+        } else {
+          movesInfoDiv.classList.add('hidden');
+        }
+        
+        updateCardsCount();
+        lucide.createIcons();
+      }
+      
+      if (gameState === 'winner') {
+        winnerMessage.innerHTML = `<strong>${players[currentPlayerIdx] ? playerProfiles[currentPlayerIdx].name : ''}</strong> llegó a la meta exacta.`;
+      }
+    }
+
+    function initGame() {
+      boardPath = generateBoard();
+      dynamicDecks = {
+        green: shuffle(originalDecks.green),
+        yellow: shuffle(originalDecks.yellow),
+        blue: shuffle(originalDecks.blue)
+      };
+      
+      players = Array(playerCount).fill(null).map((_, idx) => ({
+        ...playerProfiles[idx],
+        id: idx,
+        position: 0,
+        isOut: false,
+        skipped: false
+      }));
+      
+      currentPlayerIdx = 0;
+      diceValue = 0;
+      movesLeft = 0;
+      moveQueue = [];
+      isActionLocked = false;
+      currentEvent = null;
+      gameState = 'playing';
+      
+      renderBoard();
+      updateUI();
+    }
+
+    function resetGame() {
+      gameState = 'setup';
+      updateUI();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      
+      document.querySelectorAll('.player-count-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.player-count-btn').forEach(b => {
+            b.classList.remove('bg-emerald-600', 'text-white');
+            b.classList.add('bg-slate-800', 'text-slate-500');
+          });
+          btn.classList.remove('bg-slate-800', 'text-slate-500');
+          btn.classList.add('bg-emerald-600', 'text-white');
+          playerCount = parseInt(btn.dataset.players);
+        });
+      });
+      
+      document.getElementById('start-game-btn').addEventListener('click', initGame);
+      
+      rollDiceBtn.addEventListener('click', rollDice);
+      
+      window.addEventListener('keydown', (e) => {
+        if (gameState !== 'playing' || movesLeft <= 0 || isActionLocked) return;
+        if (['ArrowRight', 'ArrowUp', 'ArrowDown', 'ArrowLeft', ' '].includes(e.key)) {
+          e.preventDefault();
+          processNextMove();
+        }
+      });
+      
+      cardFlipper.addEventListener('click', () => {
+        cardFlipper.classList.add('rotate-y-180');
+      });
+      
+      acceptCardBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        applyPenaltyAndClose();
+      });
+      
+      document.getElementById('new-game-btn').addEventListener('click', () => {
+        resetGame();
+      });
+    });
+
+  })();
+</script>
+</body>
+</html>

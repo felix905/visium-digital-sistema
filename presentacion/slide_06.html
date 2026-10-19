@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Slide 6 - Definición económica del dinero</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                        'visium-blue': '#1e3a8a',
+                        'pastel-mint': '#A8E6CF',
+                        'pastel-yellow': '#FDFD96',
+                        'pastel-lavender': '#D4B8E8',
+                        'pastel-lime': '#C1E1C1',
+                        'accent-orange': '#FF9F43',
+                    },
+                    animation: { 'fade-in': 'fadeIn 0.4s ease-out' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #F8F9FA; font-family: 'Inter', sans-serif; }
+        .nav-btn { transition: all 0.2s; backdrop-filter: blur(8px); }
+        .nav-btn:hover { transform: scale(1.05); background-color: rgba(59,130,246,0.15); }
+        .card { transition: transform 0.3s ease; }
+        .card:hover { transform: translateY(-4px); }
+        .wave-decoration {
+            position: absolute;
+            width: 200px;
+            height: 100px;
+            background: linear-gradient(135deg, #D4B8E8 0%, #FDFD96 100%);
+            border-radius: 50%;
+            opacity: 0.3;
+            filter: blur(40px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-4">
+
+<!-- Main Content -->
+<div class="flex-1 flex items-center justify-center relative overflow-hidden">
+    <div class="wave-decoration top-10 left-10"></div>
+    
+    <div class="max-w-7xl w-full mx-auto animate-fade-in relative z-10">
+        <div class="bg-white rounded-3xl p-10 card">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-pastel-lavender/30">
+                    <i class="ti ti-book text-3xl text-gray-700"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-800">Definición económica del dinero</h2>
+                </div>
+            </div>
+            <p class="text-gray-600 mt-4 text-lg">El Dinero es cualquier activo o bien que sea aceptado generalmente como medio de pago por los agentes económicos para sus intercambios. No tiene por qué tener valor intrínseco (como el oro); su valor reside en la <strong>confianza</strong> y el respaldo institucional de los bancos centrales.</p>
+            <div class="flex flex-wrap gap-3 mt-6">
+                <span class="bg-pastel-mint/20 px-4 py-2 rounded-full text-sm text-gray-700"><i class="ti ti-scroll mr-1"></i>Convención social</span>
+                <span class="bg-pastel-yellow/20 px-4 py-2 rounded-full text-sm text-gray-700"><i class="ti ti-building-bank mr-1"></i>Dinero fiduciario</span>
+                <span class="bg-pastel-lime/20 px-4 py-2 rounded-full text-sm text-gray-700"><i class="ti ti-shield-check mr-1"></i>Confianza</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer with Pagination -->
+<footer class="bg-white border-t border-gray-200 py-4 px-6">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-500">Slide</span>
+            <span class="text-sm font-bold text-gray-800">6</span>
+            <span class="text-sm text-gray-500">de</span>
+            <span class="text-sm font-bold text-gray-800">40</span>
+        </div>
+        
+        <!-- Pagination Dots -->
+        <div class="flex items-center gap-2">
+            <a href="slide_05.html" class="nav-btn bg-white/80 p-3 rounded-full inline-flex items-center justify-center border border-gray-200">
+                <i class="ti ti-arrow-left text-gray-600"></i>
+            </a>
+            <div class="flex gap-1 mx-4">
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="w-2 h-2 rounded-full bg-accent-orange"></span>
+            </div>
+            <a href="slide_07.html" class="nav-btn bg-white/80 p-3 rounded-full inline-flex items-center justify-center border border-gray-200">
+                <i class="ti ti-arrow-right text-gray-600"></i>
+            </a>
+        </div>
+        
+        <div class="text-sm text-gray-400">Visium Digital</div>
+    </div>
+</footer>
+
+</body>
+</html>

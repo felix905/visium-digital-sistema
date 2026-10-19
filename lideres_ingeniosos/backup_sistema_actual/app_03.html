@@ -1,0 +1,1253 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Líderes Ingeniosos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    * { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+    .challenge-card { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+    .challenge-card:hover { transform: translateY(-5px); }
+    .timer-active { animation: ch-pulse 1s infinite; }
+    @keyframes ch-pulse { 0%{color:#ef4444}50%{color:#991b1b}100%{color:#ef4444} }
+    .grid-cell { aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; font-size:2rem; cursor:pointer; border:2px solid #e5e7eb; background:white; border-radius:.5rem; transition:all .2s; }
+    .grid-cell:hover { background-color:#f3f4f6; }
+    .btn-done { background-color:#10b981; color:white; padding:.5rem 1rem; border-radius:9999px; font-weight:bold; font-size:.8rem; margin-top:1rem; display:inline-block; cursor:pointer; }
+    .btn-done.completed { background-color:#6b7280; }
+    .btn-help { color:#6366f1; font-size:.75rem; text-decoration:underline; margin-left:1rem; cursor:pointer; }
+    .dot { width:12px; height:12px; background-color:#2563eb; border-radius:50%; }
+    .game-card { 
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1); 
+      cursor: pointer; 
+      background: white;
+      border-radius: 2rem;
+      box-shadow: 0 4px 16px rgba(124,58,237,.08);
+      display: flex; flex-direction: column; align-items: center;
+      padding: 1.5rem 1rem 1.2rem;
+      position: relative;
+      text-align: center;
+    }
+    .game-card:not(.locked):hover { 
+      transform: translateY(-8px); 
+      box-shadow: 0 20px 40px rgba(124,58,237,.2); 
+    }
+    .game-card.locked {
+      cursor: not-allowed;
+      opacity: .35;
+      filter: grayscale(1) blur(1px);
+      pointer-events: none;
+    }
+    .game-icon {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.6rem;
+      margin-bottom: 14px;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .cat-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: .65rem; font-weight: 700;
+      padding: .2rem .6rem; border-radius: 9999px;
+      margin-top: 8px;
+    }
+    .play-ring {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #7c3aed; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; margin-top: 10px;
+      opacity: 0; transform: scale(.7);
+      transition: all .25s;
+    }
+    .game-card:not(.locked):hover .play-ring { opacity: 1; transform: scale(1); }
+    .ftab {
+      transition: all .2s; cursor: pointer;
+      font-size: .75rem; font-weight: 700;
+      padding: .4rem 1rem; border-radius: 9999px;
+      border: 2px solid #e5e7eb; color: #6b7280;
+      background: white;
+    }
+    .ftab.active { background: #7c3aed; color: white; border-color: #7c3aed; }
+    .hero-strip {
+      background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 45%, #a855f7 75%, #ec4899 100%);
+      border-radius: 2rem; padding: 1.5rem;
+      position: relative; overflow: hidden;
+    }
+    .level-badge {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .user-chip {
+      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    #game-modal { display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.85); flex-direction:column; }
+    #game-modal.open { display:flex; }
+    #game-modal iframe { flex:1; width:100%; border:none; }
+  </style>
+  <link rel="stylesheet" href="styles/btn.css">
+</head>
+<body class="bg-gray-100">
+<div class="flex h-screen overflow-hidden">
+
+  <aside class="w-64 bg-white border-r border-gray-200 flex-shrink-0 hidden md:flex flex-col">
+    <div class="p-6 border-b border-gray-200"><img src="img/logo.svg" alt="Logo" class="h-16"></div>
+    <nav class="flex-1 p-4 space-y-2" id="sidebar-nav">
+      <a href="#" data-page="dashboard" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> Inicio
+      </a>
+      <a href="#" data-page="modules" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg> Módulos
+      </a>
+      <a href="#" data-page="games" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Juegos
+      </a>
+      <a href="#" data-page="challenges" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg> Retos
+      </a>
+      <a href="#" data-page="progress" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg> Progreso
+      </a>
+      <a href="#" data-page="profile" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 text-gray-700 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> Perfil
+      </a>
+    </nav>
+    <div class="p-4 border-t border-gray-200">
+      <div id="user-mini-card" class="bg-gradient-to-r from-violet-500 to-purple-600 rounded-lg p-4 text-white">
+        <p id="user-mini-name" class="text-sm font-semibold mb-1">Usuario</p>
+        <div class="flex items-center gap-2">
+          <span id="user-mini-level" class="text-xs bg-white/20 px-2 py-0.5 rounded-full">Nivel 1</span>
+          <span id="user-mini-points" class="text-xs opacity-90">0 pts</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <header class=" px-6 py-4 flex-shrink-0">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <h1 class="text-2xl font-bold text-gray-900">Hola, <span id="userName">Usuario</span> 👋</h1>
+          <span id="userLevelBadge" class="level-badge">Nivel 1</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="user-chip">
+            <i class="fas fa-star"></i>
+            <span id="headerPoints">0 puntos</span>
+          </div>
+          <a href="admin.html" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-semibold transition flex items-center gap-2">
+            <i class="fas fa-cog"></i> Admin
+          </a>
+          <div id="avatarInitial" class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">U</div>
+          <button id="logoutBtn" class="text-gray-600 hover:text-red-600 transition-colors text-xl" title="Cerrar sesión"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto">
+
+      <div id="page-dashboard" class="page-section active">
+        <main class="p-6">
+        
+
+          <!-- Layout de 2 columnas: Main + Sidebar -->
+          <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Columna Principal (2/3) -->
+            <div class="lg:col-span-2 space-y-6">
+              
+          <!-- HERO PRINCIPAL -->
+<div class="relative mb-8">
+
+  <!-- Personaje flotante -->
+  <div class="absolute right-0 -top-10 z-20 pointer-events-none">
+    <img 
+      src="img/03.png" 
+      alt="Character" 
+      class="hero-float w-[520px] xl:w-[420px] 2xl:w-[520px] h-auto object-contain drop-shadow-2xl"
+    >
+  </div>
+
+  <!-- Card principal -->
+  <div class="bg-[#c4b5fd] rounded-2xl p-16 xl:p-12 relative overflow-hidden min-h-[350px]">
+
+    <!-- Contenido -->
+    <div class="relative z-10 max-w-[70%]">
+
+      <!-- Badge -->
+      <div class="pb-2">
+        <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-[#fde047] text-yellow-800 text-xs font-black rounded-lg shadow-sm">
+          🎮 Finanzas & Ciencia
+        </span>
+      </div>
+
+      <h2 class="text-4xl xl:text-3xl 2xl:text-5xl font-semibold text-white tracking-[-1.5pt] mb-2 drop-shadow-md">
+        Aprende a manejar dinero mientras juegas
+      </h2>
+
+      <p class="text-purple-50 text-sm xl:text-xs mb-5">
+        Descubre mundos increíbles mientras aprendes.
+      </p>
+
+      <button onclick="showPage('games')" 
+        class="group bg-[#f472b6] hover:bg-[#f9a8d4] text-white px-6 py-3 rounded-full font-bold text-sm flex items-center gap-2 transition-all shadow-md">
+        <span>Empieza tu viaje</span>
+        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+        </svg>
+      </button>
+
+    </div>
+  </div>
+</div>
+              <!-- 3 MÓDULOS RANDOM - Card única estilo lista -->
+            
+
+             
+         
+              <!-- JUEGOS RECOMENDADOS - Juegos reales de la plataforma -->
+              <div>
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-gray-700 font-semibold text-2xl tracking-[-1pt]">Juegos Recomendados</h3>
+                  <button onclick="showPage('games')" class="text-purple-600 text-xs font-bold hover:text-purple-700">Ver todos</button>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                  <!-- Game 1: Sopa de Letras -->
+                  <div onclick="openGame('https://wordwall.net/embed/7c1f1f3b0f6d4f7e8c9d8b7a6f5e4d3c', 'Sopa de Letras')" class="group cursor-pointer relative overflow-hidden rounded-2xl bg-rose-600/60 p-6 min-h-[170px]">
+                    <div class="absolute -right-1 bottom-0 ">
+                      <img src="img/01.png" alt="" class="w-[170px] drop-shadow-lg group-hover:scale-110 transition-transform">
+                    </div>
+                    <div class="relative z-10">
+                      <p class="text-white font-medium text-3xl drop-shadow-md tracking-[-1.5pt] ">Sopa de<br> Letras</p>
+                      
+                      <p class="text-white/80 text-xs mt-2 font-semibold">Lenguaje</p>
+                    </div>
+                    <button class="mt-2 px-3 py-1 bg-white/90 text-rose-500 text-xs font-bold rounded-full group-hover:bg-white transition-colors">Jugar</button>
+                  </div>
+                  <!-- Game 2: Puzzle Geografía -->
+                  <div onclick="openGame('https://wordwall.net/embed/b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7', 'Puzzle Mapa')" class="group cursor-pointer relative overflow-hidden rounded-2xl bg-blue-300/80 p-6 min-h-[170px]">
+                    <div class="absolute -right-10 -bottom-16 ">
+                       <img src="img/juego_01.png"  alt="" class="w-[170px] drop-shadow-lg group-hover:scale-110 transition-transform">
+                    </div>
+                    <div class="relative z-10">
+                      <p class="text-white font-medium text-3xl drop-shadow-md tracking-[-1.5pt] ">Puzzle <br> Mapa</p>
+                     
+                      <p class="text-white/80 text-xs mt-2 font-semibold">Geografía</p>
+                    </div>
+                    <button class="mt-2 px-3 py-1 bg-white/90 text-cyan-500 text-xs font-bold rounded-full group-hover:bg-white transition-colors">Jugar</button>
+                  </div>
+                  <!-- Game 3: Quiz Financiero -->
+                  <div onclick="openGame('https://wordwall.net/embed/a1b2c3d4e5f67890abcdef1234567890', 'Quiz Financiero')" class="group cursor-pointer relative overflow-hidden rounded-2xl bg-orange-300/80 p-6 min-h-[170px]">
+                    <div class="absolute -right-2 bottom-0 ">
+                      <img src="img/03.png" alt="" class="w-[170px] drop-shadow-lg group-hover:scale-110 transition-transform">
+                    </div>
+                    <div class="relative z-10">
+                      <p class="text-white font-medium text-3xl drop-shadow-md tracking-[-1.5pt] ">Quiz<br> Financiero</p>
+                      
+                      <p class="text-white/80 text-xs mt-2 font-semibold">Finanzas</p>
+                    </div>
+                    <button class="mt-2 px-3 py-1 bg-white/90 text-orange-500 text-xs font-bold rounded-full group-hover:bg-white transition-colors">Jugar</button>
+                  </div>
+                </div>
+              </div>
+
+
+
+            </div>
+
+            <!-- Columna Sidebar (1/3) -->
+            <div class="space-y-6">
+              <!-- Módulos más trabajados -->
+
+
+<!-- Top Módulos -->
+<div class="bg-green-500/50 rounded-2xl p-5">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="font-bold text-gray-900">
+      Aprende con retos rápidos
+    </h3>
+    <button onclick="showPage('modules')" 
+      class="text-green-700 text-xs font-medium hover:text-green-800 flex items-center gap-1">
+      Ver todo
+      <i class="ti ti-chevron-right text-sm"></i>
+    </button>
+  </div>
+
+  <div class="space-y-3">
+
+    <!-- Item -->
+    <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/60 transition cursor-pointer"
+      onclick="window.location.href='pages/page_modules.html'">
+      
+      <div class="w-10 h-10 bg-green-600/20 rounded-xl flex items-center justify-center">
+        <i class="ti ti-coin text-green-700 text-2xl"></i>
+      </div>
+
+      <div class="flex-1">
+        <p class="font-semibold text-gray-900 text-sm">¿Qué es el dinero?</p>
+        <p class="text-xs text-gray-500">Conceptos básicos</p>
+      </div>
+
+      <span class="text-xs font-bold text-green-700">+50 pts</span>
+    </div>
+
+    <!-- Item -->
+    <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/60 transition cursor-pointer"
+      onclick="window.location.href='pages/page_modules.html'">
+      
+      <div class="w-10 h-10 bg-green-600/20 rounded-xl flex items-center justify-center">
+        <i class="ti ti-pig-money text-green-700 text-2xl"></i>
+      </div>
+
+      <div class="flex-1">
+        <p class="font-semibold text-gray-900 text-sm">Cómo ahorrar</p>
+        <p class="text-xs text-gray-500">Hábitos inteligentes</p>
+      </div>
+
+      <span class="text-xs font-bold text-green-700">+50 pts</span>
+    </div>
+
+    <!-- Item -->
+    <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/60 transition cursor-pointer"
+      onclick="window.location.href='pages/page_modules.html'">
+      
+      <div class="w-10 h-10 bg-green-600/20 rounded-xl flex items-center justify-center">
+        <i class="ti ti-shopping-cart text-green-700 text-2xl"></i>
+      </div>
+
+      <div class="flex-1">
+        <p class="font-semibold text-gray-900 text-sm">Necesidades vs deseos</p>
+        <p class="text-xs text-gray-500">Toma decisiones</p>
+      </div>
+
+      <span class="text-xs font-bold text-green-700">+50 pts</span>
+    </div>
+
+  </div>
+</div>
+
+
+              <!-- Progreso Circular -->
+           <div class="bg-purple-500/70 rounded-2xl p-5 text-white relative overflow-visible">
+  
+  <!-- Imagen decorativa -->
+  <div class="absolute -right-6 bottom-0 -top-12 pointer-events-none">
+    <img src="img/juego_01.png" 
+         class="w-[180px] object-contain drop-shadow-lg">
+  </div>
+
+  <h3 class="font-bold mb-4">Tu progreso</h3>
+
+  <div class="flex items-center gap-4">
+    
+    <div class="relative w-20 h-20">
+      <svg class="w-full h-full transform -rotate-90">
+        <circle cx="40" cy="40" r="32" stroke="rgba(255,255,255,0.2)" stroke-width="6" fill="none"/>
+        <circle id="progress-circle" cx="40" cy="40" r="32" stroke="white" stroke-width="6" fill="none" stroke-dasharray="201" stroke-dashoffset="201" stroke-linecap="round"/>
+      </svg>
+
+      <div class="absolute inset-0 flex items-center justify-center">
+        <span id="progress-percent" class="text-lg font-bold">0%</span>
+      </div>
+    </div>
+
+    <div>
+      <p class="text-purple-200 text-xs">Nivel <span id="sidebar-level">1</span></p>
+      <p id="sidebar-title" class="font-semibold text-sm">Explorador Novato</p>
+    </div>
+
+  </div>
+</div>
+
+              <!-- Última actividad -->
+           
+            </div>
+          </div>
+
+          <!-- Última Actividad -->
+       
+        </main>
+      </div>
+
+      <div id="page-modules" class="page-section">
+        <div class="h-full w-full" style="background: linear-gradient(135deg,#ede9fe 0%,#fce7f3 40%,#dbeafe 100%);">
+          <iframe src="pages/page_modules.html" class="w-full h-full border-0" style="min-height: calc(100vh - 80px);"></iframe>
+        </div>
+      </div>
+
+      <div id="page-games" class="page-section">
+        <main class="p-6">
+          <div class="bg-purple-700/30 rounded-2xl p-6 mb-6">
+           
+            <div class="relative z-10 flex items-center justify-between gap-4">
+              <div>
+                <p class="text-purple-200 text-xs font-bold uppercase tracking-widest mb-1">🎮 Zona de Juegos</p>
+                <h2 class="text-2xl font-black text-white mb-0.5">¡Elige tu misión!</h2>
+                <p class="text-purple-100 text-sm" id="hero-sub">Cargando juegos...</p>
+              </div>
+              <div class="hidden sm:flex flex-col items-end gap-2">
+                <div class="bg-white/20 backdrop-blur rounded-2xl px-4 py-2.5 text-center">
+                  <p id="hero-count" class="text-white font-black text-xl leading-none">—</p>
+                  <p class="text-purple-200 text-[10px] mt-0.5">disponibles</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-2 mb-5 flex-wrap">
+            <button onclick="filterGames('all',this)" class="ftab active"><i class="fas fa-th mr-1"></i>Todos</button>
+            <button onclick="filterGames('Geografía',this)" class="ftab"><i class="fas fa-map-marker-alt mr-1"></i>Geografía</button>
+            <button onclick="filterGames('Liderazgo',this)" class="ftab"><i class="fas fa-lightbulb mr-1"></i>Liderazgo</button>
+            <button onclick="filterGames('Ciencias',this)" class="ftab"><i class="fas fa-flask mr-1"></i>Ciencias</button>
+            <button onclick="filterGames('Lenguaje',this)" class="ftab"><i class="fas fa-font mr-1"></i>Lenguaje</button>
+            <button onclick="filterGames('Gramática',this)" class="ftab"><i class="fas fa-pen mr-1"></i>Gramática</button>
+            <button onclick="filterGames('Familia',this)" class="ftab"><i class="fas fa-users mr-1"></i>Familia</button>
+          </div>
+          <div id="games-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+          <div id="empty-state" class="hidden text-center py-16">
+            <div class="text-5xl mb-3">🔍</div>
+            <p class="text-gray-500 font-semibold">No hay juegos en esta categoría</p>
+          </div>
+        </main>
+      </div>
+
+      <div id="page-challenges" class="page-section">
+        <main class="p-6">
+          <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-blue-600 mb-1">¡DÍA SIN TAREAS!</h2>
+            <p class="text-indigo-700 text-lg italic">"Al terminar, grita: ¡RETO CUMPLIDO!"</p>
+          </div>
+          <div id="challengesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <!-- Retos se generan dinámicamente -->
+          </div>
+        </main>
+      </div>
+
+      <div id="page-progress" class="page-section">
+        <main class="p-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">Tu Progreso</h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-xl p-5 border border-gray-200 text-center">
+              <div id="statProgress" class="text-3xl font-bold text-blue-600">0%</div>
+              <div class="text-xs text-gray-500 mt-1">Progreso general</div>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-gray-200 text-center">
+              <div id="statModules" class="text-3xl font-bold text-green-600">0</div>
+              <div class="text-xs text-gray-500 mt-1">Módulos completados</div>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-gray-200 text-center">
+              <div id="statPoints" class="text-3xl font-bold text-purple-600">0</div>
+              <div class="text-xs text-gray-500 mt-1">Puntos acumulados</div>
+            </div>
+            <div class="bg-white rounded-xl p-5 border border-gray-200 text-center">
+              <div id="statChallenges" class="text-3xl font-bold text-orange-600">0</div>
+              <div class="text-xs text-gray-500 mt-1">Retos completados</div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-6 border border-gray-200 mb-6">
+            <h3 class="text-lg font-bold text-gray-900 mb-5">Progreso por módulo</h3>
+            <div id="modulesProgressList" class="space-y-4">
+              <!-- Se genera dinámicamente -->
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-6 border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Logros desbloqueados 🏆</h3>
+            <div id="achievementsGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <!-- Se genera dinámicamente -->
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <div id="page-profile" class="page-section">
+        <main class="p-6 max-w-2xl mx-auto">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">Mi Perfil</h2>
+          <div class="bg-white rounded-xl p-8 border border-gray-200 mb-6 text-center">
+            <div id="profile-avatar" class="w-24 h-24 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-4xl mx-auto mb-4">U</div>
+            <h3 id="profile-name" class="text-2xl font-bold text-gray-900 mb-1">Usuario</h3>
+            <p id="profile-title" class="text-gray-500 text-sm">Explorador Financiero · Nivel 1</p>
+          </div>
+          <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-white rounded-xl p-4 border border-gray-200 text-center">
+              <div id="profile-points" class="text-2xl font-bold text-blue-600">0</div>
+              <div class="text-xs text-gray-500 mt-1">Puntos</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-gray-200 text-center">
+              <div id="profile-modules" class="text-2xl font-bold text-green-600">0</div>
+              <div class="text-xs text-gray-500 mt-1">Módulos</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-gray-200 text-center">
+              <div id="profile-challenges" class="text-2xl font-bold text-orange-600">0</div>
+              <div class="text-xs text-gray-500 mt-1">Retos</div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-6 border border-gray-200 mb-6">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Información</h3>
+            <div class="space-y-3 text-sm text-gray-600">
+              <div class="flex justify-between"><span>Nombre</span><span id="info-name" class="font-medium text-gray-900">Usuario</span></div>
+              <div class="flex justify-between"><span>Nivel</span><span id="info-level" class="font-medium text-gray-900">1 - Explorador</span></div>
+              <div class="flex justify-between"><span>Título</span><span id="info-title" class="font-medium text-gray-900">Explorador Novato</span></div>
+              <div class="flex justify-between"><span>Retos completados</span><span id="info-challenges" class="font-medium text-gray-900">0</span></div>
+              <div class="flex justify-between"><span>Miembro desde</span><span id="info-date" class="font-medium text-gray-900">-</span></div>
+            </div>
+          </div>
+          <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-xl p-6 text-white text-center">
+            <button onclick="logout()" class="w-full py-3 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition flex items-center justify-center gap-2">
+              <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+            </button>
+          </div>
+        </main>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="game-modal">
+  <div class="flex items-center justify-between px-4 py-2 bg-gray-900">
+    <span id="game-modal-title" class="text-white font-bold text-sm"></span>
+    <button onclick="closeGame()" class="text-white bg-red-600 hover:bg-red-700 px-4 py-1.5 rounded-lg text-sm font-bold flex items-center gap-2">
+      <i class="fas fa-times"></i> Cerrar juego
+    </button>
+  </div>
+  <iframe id="game-frame" src=""></iframe>
+</div>
+
+<script>
+  // ===================== SISTEMA DE USUARIOS =====================
+  const user = sessionStorage.getItem('li_user');
+  const userId = sessionStorage.getItem('li_user_id');
+  const userColor = sessionStorage.getItem('li_user_color') || '#7c3aed';
+  
+  if (!user || !userId) {
+    window.location.href = 'login.html';
+  }
+
+  const defaultModules = [
+    { id: 1, emoji: '💰', title: '¿Qué es el dinero?', desc: 'Aprende el origen y función del dinero en la sociedad.', progress: 0, completed: false },
+    { id: 2, emoji: '🐷', title: 'Cómo ahorrar', desc: 'Estrategias prácticas para guardar dinero desde pequeño.', progress: 0, completed: false },
+    { id: 3, emoji: '🛒', title: 'Necesidades vs Deseos', desc: 'Aprende a distinguir lo que necesitas de lo que quieres.', progress: 0, completed: false },
+    { id: 4, emoji: '📊', title: 'Presupuesto personal', desc: 'Crea y gestiona tu primer presupuesto mensual.', progress: 0, completed: false },
+    { id: 5, emoji: '🏦', title: 'El banco y yo', desc: 'Entiende cómo funcionan los bancos y las cuentas.', progress: 0, completed: false },
+    { id: 6, emoji: '🤝', title: 'Liderazgo y equipo', desc: 'Desarrolla habilidades de liderazgo y trabajo en equipo.', progress: 0, completed: false }
+  ];
+
+  const defaultChallenges = [
+    { id: 1, title: 'La Alcancía Express', color: 'pink', completed: false, help: 'COMODÍN: Pide una caja de cereal o un bote de yogurt vacío.' },
+    { id: 2, title: 'Los Establos', color: 'blue', completed: false, help: 'COMODÍN: Dibuja cuadrados uno dentro de otro como una muñeca rusa.' },
+    { id: 3, title: 'Memoria', color: 'emerald', completed: false, help: 'COMODÍN: ¡Toma una foto rápida con tu mente!' },
+    { id: 4, title: 'Movimiento Genial', color: 'orange', completed: false, help: 'COMODÍN: ¿Y si el número que formas es el 11?' },
+    { id: 5, title: '¿Cuántos huevos?', color: 'yellow', completed: false, help: 'COMODÍN: ¿Desde cuándo los GALLOS ponen huevos? 😉' },
+    { id: 6, title: 'Unión Imposible', color: 'purple', completed: false, help: 'COMODÍN: La clave es pensar fuera de la caja.' }
+  ];
+
+  const levelTitles = [
+    { min: 0, title: 'Explorador Novato' },
+    { min: 100, title: 'Ahorrador Principiante' },
+    { min: 250, title: 'Gestor de Presupuestos' },
+    { min: 500, title: 'Líder Financiero' },
+    { min: 800, title: 'Maestro del Dinero' },
+    { min: 1200, title: 'Experto en Inversiones' },
+    { min: 1600, title: 'Líder Ingenioso Élite' }
+  ];
+
+  function getUserProgressKey() { return `li_progress_${userId}`; }
+
+  function getUserData() {
+    const key = getUserProgressKey();
+    const saved = localStorage.getItem(key);
+    if (saved) return JSON.parse(saved);
+    const newData = {
+      userId: userId, userName: user, userColor: userColor,
+      points: 0, level: 1,
+      modules: JSON.parse(JSON.stringify(defaultModules)),
+      challenges: JSON.parse(JSON.stringify(defaultChallenges)),
+      achievements: [],
+      joinDate: new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
+      lastActivity: null
+    };
+    saveUserData(newData);
+    return newData;
+  }
+
+  function saveUserData(data) { localStorage.setItem(getUserProgressKey(), JSON.stringify(data)); }
+  function calculateLevel(points) { return Math.floor(points / 100) + 1; }
+  function getTitleForLevel(level) {
+    const points = (level - 1) * 100;
+    for (let i = levelTitles.length - 1; i >= 0; i--) if (points >= levelTitles[i].min) return levelTitles[i].title;
+    return levelTitles[0].title;
+  }
+
+  function updateUserProgress() {
+    const data = getUserData();
+    const completedModules = data.modules.filter(m => m.completed).length;
+    const totalProgress = Math.round(data.modules.reduce((sum, m) => sum + m.progress, 0) / data.modules.length);
+    const completedChallenges = data.challenges.filter(c => c.completed).length;
+    const level = calculateLevel(data.points);
+    const title = getTitleForLevel(level);
+    
+    document.getElementById('userName').innerText = data.userName;
+    document.getElementById('avatarInitial').innerText = data.userName.charAt(0).toUpperCase();
+    document.getElementById('profile-avatar').innerText = data.userName.charAt(0).toUpperCase();
+    document.getElementById('profile-name').innerText = data.userName;
+    document.getElementById('info-name').innerText = data.userName;
+    document.getElementById('userLevelBadge').innerText = `Nivel ${level}`;
+    document.getElementById('user-mini-name').innerText = data.userName;
+    document.getElementById('user-mini-level').innerText = `Nivel ${level}`;
+    document.getElementById('user-mini-points').innerText = `${data.points} pts`;
+    document.getElementById('headerPoints').innerText = `${data.points} puntos`;
+    document.getElementById('profile-title').innerText = `${title} · Nivel ${level}`;
+    document.getElementById('info-level').innerText = `${level} - ${title}`;
+    document.getElementById('info-title').innerText = title;
+    document.getElementById('info-challenges').innerText = completedChallenges;
+    document.getElementById('info-date').innerText = data.joinDate;
+    document.getElementById('statProgress').innerText = `${totalProgress}%`;
+    document.getElementById('statModules').innerText = completedModules;
+    document.getElementById('statPoints').innerText = data.points;
+    document.getElementById('statChallenges').innerText = completedChallenges;
+    document.getElementById('profile-points').innerText = data.points;
+    document.getElementById('profile-modules').innerText = completedModules;
+    document.getElementById('profile-challenges').innerText = completedChallenges;
+    
+    // Actualizar nuevo dashboard
+    updateDashboard(data, completedModules, totalProgress, completedChallenges, level, title);
+  }
+
+  function updateDashboard(data, completedModules, totalProgress, completedChallenges, level, title) {
+    // Banner 1: Bienvenida
+    const hour = new Date().getHours();
+    let welcomeMsg = '¡Buenos días!';
+    if (hour >= 12 && hour < 18) welcomeMsg = '¡Buenas tardes!';
+    else if (hour >= 18) welcomeMsg = '¡Buenas noches!';
+    
+    document.getElementById('welcome-message').innerText = welcomeMsg;
+    document.getElementById('dash-user-name').innerText = data.userName;
+    
+    // Stats grid - Actualizar valores (stats originales)
+    document.getElementById('dash-stat-progress').innerText = `${totalProgress}%`;
+    document.getElementById('dash-stat-modules').innerText = completedModules;
+    document.getElementById('dash-stat-points').innerText = data.points;
+    
+    // TU ACTIVIDAD - Actualizar con datos reales
+    document.getElementById('activity-progress').innerText = `${totalProgress}%`;
+    document.getElementById('activity-points').innerText = data.points;
+    document.getElementById('activity-modules').innerText = completedModules;
+    
+    // Sidebar - Progreso circular
+    const circle = document.getElementById('progress-circle');
+    const circumference = 201; // 2 * π * 32
+    const offset = circumference - (totalProgress / 100) * circumference;
+    circle.style.strokeDashoffset = offset;
+    document.getElementById('progress-percent').innerText = `${totalProgress}%`;
+    document.getElementById('sidebar-level').innerText = level;
+    document.getElementById('sidebar-title').innerText = title;
+    
+    // MÓDULOS RANDOM - 3 módulos aleatorios (usar default si no hay datos)
+    const modulesToShow = (data.modules && data.modules.length > 0) ? data.modules : defaultModules;
+    console.log('Modules to show:', modulesToShow);
+    updateRandomModules(modulesToShow);
+    
+    // MÓDULOS MÁS TRABAJADOS - Mostrar los 3 módulos con más progreso
+    updateTopModules(data.modules);
+    
+    // ÚLTIMA ACTIVIDAD - Detectar la última actividad del usuario
+    updateLastActivity(data);
+    
+    // Banner 2: Acción rápida
+    updateActionBanner(data, completedModules, completedChallenges);
+  }
+  
+  // Función para actualizar "Módulos más trabajados"
+  function updateTopModules(modules) {
+    const topModulesList = document.getElementById('top-modules-list');
+    if (!topModulesList) return;
+    
+    // Ordenar módulos por progreso (de mayor a menor)
+    const sortedModules = [...modules].sort((a, b) => b.progress - a.progress).slice(0, 3);
+    
+    topModulesList.innerHTML = sortedModules.map((module, index) => `
+      <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location.href='pages/page_modules.html'">
+        <div class="w-10 h-10 ${index === 0 ? 'bg-amber-100 text-amber-600' : index === 1 ? 'bg-gray-100 text-gray-600' : 'bg-orange-100 text-orange-600'} rounded-lg flex items-center justify-center font-bold text-sm">
+          ${index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-gray-800 truncate">${module.title}</p>
+          <div class="flex items-center gap-2">
+            <div class="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div class="h-full ${module.progress === 100 ? 'bg-green-500' : 'bg-blue-500'} rounded-full" style="width: ${module.progress}%"></div>
+            </div>
+            <span class="text-xs text-gray-500">${module.progress}%</span>
+          </div>
+        </div>
+        <span class="text-lg">${module.emoji}</span>
+      </div>
+    `).join('');
+  }
+  
+  // Función para mostrar 3 módulos aleatorios en el dashboard
+  function updateRandomModules(modules) {
+    console.log('>>> updateRandomModules called with:', modules);
+    const container = document.getElementById('random-modules-list');
+    console.log('>>> Container found:', container);
+    if (!container) {
+      console.error('>>> ERROR: Container random-modules-list not found!');
+      return;
+    }
+    if (!modules || modules.length === 0) {
+      console.error('>>> ERROR: No modules data available!');
+      container.innerHTML = '<p class="text-gray-500 text-center py-4">No hay módulos disponibles</p>';
+      return;
+    }
+    
+    // Seleccionar 3 módulos aleatorios
+    const shuffled = [...modules].sort(() => 0.5 - Math.random());
+    const randomModules = shuffled.slice(0, 3);
+    
+    const iconColors = [
+      'bg-green-500',
+      'bg-blue-500',
+      'bg-purple-500'
+    ];
+    
+    const textColors = [
+      'text-green-700',
+      'text-blue-700',
+      'text-purple-700'
+    ];
+    
+    container.innerHTML = randomModules.map((module, index) => `
+      <div onclick="window.location.href='pages/page_modules.html'" 
+           class="group cursor-pointer flex items-center gap-4 p-3 rounded-xl hover:bg-white/20 transition-colors">
+        <!-- Icono circular -->
+        <div class="w-12 h-12 ${iconColors[index]} rounded-2xl flex items-center justify-center text-2xl shadow-md group-hover:scale-110 transition-transform">
+          ${module.emoji}
+        </div>
+        <!-- Info -->
+        <div class="flex-1 min-w-0">
+          <p class="text-gray-800 font-bold text-sm truncate">${module.title}</p>
+          <p class="text-gray-500 text-xs">${module.desc || 'Módulo interactivo'}</p>
+        </div>
+        <!-- Puntos -->
+        <div class="${textColors[index]} font-bold text-sm whitespace-nowrap">
+          +50 pts
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  // Función para actualizar "Última actividad"
+  function updateLastActivity(data) {
+    const lastActivityEl = document.getElementById('last-activity');
+    if (!lastActivityEl) return;
+    
+    // Buscar el módulo con actividad más reciente (mayor progreso > 0 pero < 100)
+    const activeModules = data.modules.filter(m => m.progress > 0 && m.progress < 100);
+    const completedModulesList = data.modules.filter(m => m.progress === 100);
+    
+    let activityText = 'Sin actividad reciente';
+    let activityIcon = '⏰';
+    let activityColor = 'text-gray-500';
+    
+    if (activeModules.length > 0) {
+      // Priorizar el que tiene más progreso pero no está completo
+      const currentModule = activeModules.sort((a, b) => b.progress - a.progress)[0];
+      activityText = `Trabajando en: ${currentModule.title} (${currentModule.progress}%)`;
+      activityIcon = currentModule.emoji;
+      activityColor = 'text-blue-600';
+    } else if (completedModulesList.length > 0) {
+      const lastCompleted = completedModulesList[completedModulesList.length - 1];
+      activityText = `Completaste: ${lastCompleted.title}`;
+      activityIcon = '✅';
+      activityColor = 'text-green-600';
+    } else if (data.modules.length > 0) {
+      const firstModule = data.modules[0];
+      activityText = `Por empezar: ${firstModule.title}`;
+      activityIcon = '🎯';
+      activityColor = 'text-purple-600';
+    }
+    
+    lastActivityEl.innerHTML = `
+      <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+        <span class="text-2xl">${activityIcon}</span>
+        <div class="flex-1">
+          <p class="text-sm font-semibold ${activityColor}">Última actividad</p>
+          <p class="text-xs text-gray-600 truncate">${activityText}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  function updateActionBanner(data, completedModules, completedChallenges) {
+    const nextModule = data.modules.find(m => m.progress < 100);
+    const nextChallenge = data.challenges.find(c => !c.completed);
+    
+    const actionIcon = document.getElementById('action-icon');
+    const actionLabel = document.getElementById('action-label');
+    const actionTitle = document.getElementById('action-title');
+    const actionButton = document.getElementById('action-button');
+    
+    if (nextModule && nextModule.progress > 0) {
+      // Continuar módulo en progreso
+      actionIcon.innerText = nextModule.emoji;
+      actionIcon.className = 'w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center text-2xl';
+      actionLabel.innerText = 'Continúa tu aprendizaje';
+      actionTitle.innerText = `${nextModule.title} (${nextModule.progress}%)`;
+      actionButton.onclick = () => window.location.href = 'pages/page_modules.html';
+    } else if (nextModule) {
+      // Comenzar nuevo módulo
+      actionIcon.innerText = nextModule.emoji;
+      actionIcon.className = 'w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center text-2xl';
+      actionLabel.innerText = 'Nuevo módulo disponible';
+      actionTitle.innerText = nextModule.title;
+      actionButton.onclick = () => window.location.href = 'pages/page_modules.html';
+    } else if (nextChallenge) {
+      // Hacer reto
+      actionIcon.innerText = '💡';
+      actionIcon.className = 'w-14 h-14 bg-yellow-100 rounded-xl flex items-center justify-center text-2xl';
+      actionLabel.innerText = 'Reto pendiente';
+      actionTitle.innerText = nextChallenge.title;
+      actionButton.onclick = () => showPage('challenges');
+    } else {
+      // Todo completado
+      actionIcon.innerText = '🏆';
+      actionIcon.className = 'w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center text-2xl';
+      actionLabel.innerText = '¡Felicitaciones!';
+      actionTitle.innerText = 'Has completado todo';
+      actionButton.innerHTML = '<span>Ver logros</span><i class="fas fa-trophy"></i>';
+      actionButton.onclick = () => showPage('progress');
+    }
+  }
+
+  function renderModules() {
+    const data = getUserData();
+    const grid = document.getElementById('modulesGrid');
+    grid.innerHTML = '';
+    data.modules.forEach((module, index) => {
+      const progressColor = module.progress === 100 ? 'bg-green-500' : module.progress > 50 ? 'bg-blue-500' : module.progress > 0 ? 'bg-yellow-500' : 'bg-gray-300';
+      const statusText = module.progress === 100 ? 'Completado' : module.progress > 0 ? 'En progreso' : 'Sin iniciar';
+      const statusColor = module.progress === 100 ? 'text-green-600' : module.progress > 0 ? 'text-blue-600' : 'text-gray-400';
+      const card = document.createElement('div');
+      card.className = 'bg-white rounded-xl p-6 border border-gray-200 hover:shadow-md transition-shadow';
+      card.innerHTML = `
+        <div class="text-4xl mb-3">${module.emoji}</div>
+        <h3 class="text-lg font-bold text-gray-900 mb-1">${module.title}</h3>
+        <p class="text-sm text-gray-500 mb-4">${module.desc}</p>
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+          <div class="${progressColor} h-2 rounded-full transition-all" style="width:${module.progress}%"></div>
+        </div>
+        <div class="flex justify-between text-xs text-gray-500">
+          <span>${statusText}</span>
+          <span class="font-bold ${statusColor}">${module.progress}%</span>
+        </div>
+        ${module.progress < 100 ? `
+          <button onclick="updateModuleProgress(${index})" class="mt-3 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition">
+            ${module.progress === 0 ? 'Comenzar' : 'Continuar'} (+10 pts)
+          </button>
+        ` : `
+          <div class="mt-3 w-full py-2 bg-green-100 text-green-700 rounded-lg text-sm font-semibold text-center">
+            <i class="fas fa-check"></i> Completado (+50 pts)
+          </div>
+        `}
+      `;
+      grid.appendChild(card);
+    });
+    const list = document.getElementById('modulesProgressList');
+    list.innerHTML = '';
+    data.modules.forEach(module => {
+      const progressColor = module.progress === 100 ? 'bg-green-500' : module.progress > 50 ? 'bg-blue-500' : module.progress > 0 ? 'bg-yellow-500' : 'bg-gray-300';
+      const statusColor = module.progress === 100 ? 'text-green-600' : module.progress > 0 ? 'text-blue-600' : 'text-gray-400';
+      const item = document.createElement('div');
+      item.innerHTML = `
+        <div class="flex justify-between text-sm mb-1">
+          <span class="text-gray-700">${module.emoji} ${module.title}</span>
+          <span class="font-bold ${statusColor}">${module.progress}%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3">
+          <div class="${progressColor} h-3 rounded-full transition-all" style="width:${module.progress}%"></div>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  function renderChallenges() {
+    const data = getUserData();
+    const grid = document.getElementById('challengesGrid');
+    grid.innerHTML = '';
+    const challengeData = [
+      { desc: 'Construye una alcancía con materiales de casa en menos de 3 minutos.', hasTimer: true },
+      { desc: '9 cuadrados (establos) y 9 vacas. Acomoda 9 vacas en cada establo sin que quede uno vacío.', hasTimer: false },
+      { desc: '', hasTimer: false, hasMemory: true },
+      { desc: 'Con 4 colores forma un 4. Mueve solo uno para formar un número mayor que 4.', hasTimer: false },
+      { desc: '"Si tuviera 4 huevos, y un ladrón me lleva 3 y un gallo de mi casa pone 5 huevos, ¿cuántos huevos tengo?"', hasTimer: false, isRiddle: true },
+      { desc: 'Dibuja estos puntos en una hoja y únelos todos con una sola línea sin levantar el lápiz.', hasTimer: false, hasDots: true }
+    ];
+    data.challenges.forEach((challenge, index) => {
+      const info = challengeData[index];
+      const isCompleted = challenge.completed;
+      const card = document.createElement('div');
+      card.className = `challenge-card bg-white p-6 rounded-3xl shadow-md border-8 border-${challenge.color}-500 ${isCompleted ? 'opacity-75' : ''}`;
+      let extraContent = '';
+      if (info.hasTimer) extraContent = `<div class="text-center"><div id="timer-${index}" class="text-4xl font-bold mb-2">03:00</div><button onclick="startTimer(180,'timer-${index}')" class="bg-${challenge.color}-500 text-white px-4 py-2 rounded-full text-xs font-bold">INICIAR</button></div>`;
+      else if (info.hasMemory) extraContent = `<div id="memory-grid-${index}" class="grid grid-cols-3 gap-1 mb-2"></div><button onclick="showMemoryPattern(${index})" class="bg-${challenge.color}-500 text-white w-full py-2 rounded-xl text-xs font-bold">MOSTRAR PATRÓN</button>`;
+      else if (info.hasDots) extraContent = `<div class="bg-gray-50 rounded-xl p-4 flex flex-col items-start space-y-4 shadow-inner"><div class="flex space-x-4"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="flex space-x-4"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="flex space-x-4"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="flex space-x-4"><div class="dot"></div><div class="dot"></div></div><div class="flex space-x-4"><div class="dot"></div></div></div>`;
+      else if (info.isRiddle) extraContent = `<div class="bg-yellow-50 p-3 rounded-lg text-xs text-yellow-800">Piénsalo bien... lee la pregunta palabra por palabra.</div>`;
+      card.innerHTML = `
+        <h2 class="text-xl text-${challenge.color}-600 mb-2">Reto ${index + 1}: ${challenge.title}</h2>
+        ${info.desc ? `<p class="text-gray-600 mb-4 text-sm">${info.desc}</p>` : ''}
+        ${extraContent}
+        <div class="flex items-center justify-between mt-4">
+          <div class="btn-done ${isCompleted ? 'completed' : ''}" onclick="completeChallenge(${index}, this)">${isCompleted ? '✅ LOGRADO' : '¡RETO CUMPLIDO!'}</div>
+          <div class="btn-help" onclick="alert('${challenge.help}')">Pedir Comodín 💡</div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function renderAchievements() {
+    const data = getUserData();
+    const grid = document.getElementById('achievementsGrid');
+    grid.innerHTML = '';
+    const allAchievements = [
+      { id: 'first_module', emoji: '🌟', title: 'Primer módulo', desc: 'Completa tu primer módulo', condition: () => data.modules.some(m => m.completed) },
+      { id: 'half_modules', emoji: '📚', title: 'Mitad del camino', desc: 'Completa la mitad de los módulos', condition: () => data.modules.filter(m => m.completed).length >= 3 },
+      { id: 'all_modules', emoji: '🎓', title: 'Graduado', desc: 'Completa todos los módulos', condition: () => data.modules.every(m => m.completed) },
+      { id: 'first_challenge', emoji: '💡', title: 'Primer reto', desc: 'Completa tu primer reto', condition: () => data.challenges.some(c => c.completed) },
+      { id: 'half_challenges', emoji: '🏃', title: 'Retador', desc: 'Completa la mitad de los retos', condition: () => data.challenges.filter(c => c.completed).length >= 3 },
+      { id: 'all_challenges', emoji: '🏆', title: 'Maestro de retos', desc: 'Completa todos los retos', condition: () => data.challenges.every(c => c.completed) },
+      { id: 'points_100', emoji: '💰', title: 'Primeros ahorros', desc: 'Alcanza 100 puntos', condition: () => data.points >= 100 },
+      { id: 'points_500', emoji: '💎', title: 'Riqueza acumulada', desc: 'Alcanza 500 puntos', condition: () => data.points >= 500 }
+    ];
+    allAchievements.forEach(ach => {
+      const unlocked = ach.condition();
+      const div = document.createElement('div');
+      div.className = `text-center p-4 rounded-xl border ${unlocked ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-100 border-gray-200 opacity-40'}`;
+      div.innerHTML = `<div class="text-3xl mb-2">${ach.emoji}</div><div class="text-xs font-bold ${unlocked ? 'text-yellow-700' : 'text-gray-500'}">${ach.title}</div>${unlocked ? `<div class="text-[10px] text-yellow-600 mt-1">${ach.desc}</div>` : '<div class="text-[10px] text-gray-400 mt-1">Bloqueado</div>'}`;
+      grid.appendChild(div);
+    });
+  }
+
+  function updateModuleProgress(index) {
+    const data = getUserData();
+    const module = data.modules[index];
+    if (module.progress < 100) {
+      module.progress = Math.min(module.progress + 20, 100);
+      if (module.progress === 100) {
+        module.completed = true;
+        data.points += 50;
+        showNotification('¡Módulo completado! +50 puntos');
+      } else {
+        data.points += 10;
+        showNotification('¡Progreso guardado! +10 puntos');
+      }
+      data.level = calculateLevel(data.points);
+      data.lastActivity = { type: 'module', title: module.title, date: new Date().toISOString() };
+      saveUserData(data);
+      updateUserProgress();
+      renderModules();
+      renderAchievements();
+      updateLastActivity();
+    }
+  }
+
+  function completeChallenge(index, btn) {
+    const data = getUserData();
+    if (!data.challenges[index].completed) {
+      data.challenges[index].completed = true;
+      data.points += 25;
+      data.level = calculateLevel(data.points);
+      data.lastActivity = { type: 'challenge', title: data.challenges[index].title, date: new Date().toISOString() };
+      saveUserData(data);
+      btn.innerText = '✅ LOGRADO';
+      btn.classList.add('completed');
+      showNotification('¡Reto completado! +25 puntos');
+      updateUserProgress();
+      renderChallenges();
+      renderAchievements();
+      updateLastActivity();
+    }
+  }
+
+  function updateLastActivity() {
+    const data = getUserData();
+    const container = document.getElementById('lastActivity');
+    if (data.lastActivity) {
+      const activity = data.lastActivity;
+      const timeAgo = getTimeAgo(new Date(activity.date));
+      const points = activity.type === 'module' ? '+50 puntos' : '+25 puntos';
+      container.innerHTML = `
+        <div class="w-10 h-10 ${activity.type === 'module' ? 'bg-green-100' : 'bg-blue-100'} rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 ${activity.type === 'module' ? 'text-green-600' : 'text-blue-600'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-900">${activity.type === 'module' ? 'Completaste' : 'Lograste'}: "${activity.title}"</p>
+          <p class="text-sm text-gray-500">${timeAgo} • ${points}</p>
+        </div>
+      `;
+    }
+  }
+
+  function getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    if (seconds < 60) return 'Hace un momento';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `Hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `Hace ${hours} hora${hours > 1 ? 's' : ''}`;
+    const days = Math.floor(hours / 24);
+    return `Hace ${days} día${days > 1 ? 's' : ''}`;
+  }
+
+  function showNotification(message) {
+    const notif = document.createElement('div');
+    notif.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50';
+    notif.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${message}`;
+    document.body.appendChild(notif);
+    setTimeout(() => notif.remove(), 3000);
+  }
+
+  function logout() {
+    sessionStorage.removeItem('li_user');
+    sessionStorage.removeItem('li_user_id');
+    sessionStorage.removeItem('li_user_color');
+    window.location.href = 'login.html';
+  }
+
+  function showPage(page) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(a => {
+      const active = a.dataset.page === page;
+      a.classList.toggle('bg-blue-50', active);
+      a.classList.toggle('text-blue-600', active);
+      a.classList.toggle('font-medium', active);
+      a.classList.toggle('text-gray-700', !active);
+    });
+    if (page === 'challenges') renderChallenges();
+    if (page === 'games') renderGamesGrid();
+    if (page === 'modules') renderModules();
+    if (page === 'progress') { renderModules(); renderAchievements(); }
+  }
+
+  document.getElementById('sidebar-nav').addEventListener('click', e => {
+    const link = e.target.closest('.nav-link');
+    if (!link) return;
+    e.preventDefault();
+    showPage(link.dataset.page);
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+
+  function startTimer(duration, displayId) {
+    let timer = duration;
+    const display = document.getElementById(displayId);
+    display.classList.add('timer-active');
+    const interval = setInterval(() => {
+      const m = parseInt(timer/60), s = parseInt(timer%60);
+      display.textContent = (m<10?'0'+m:m)+':'+(s<10?'0'+s:s);
+      if (--timer < 0) { clearInterval(interval); display.textContent='¡TIEMPO!'; display.classList.remove('timer-active'); }
+    }, 1000);
+  }
+
+  const emojis = ['🐶','🍎','🚗','⭐','🎈','🍕','🚀','🌈','🍦'];
+  let currentPattern = [...emojis].sort(() => Math.random() - 0.5);
+
+  function showMemoryPattern(challengeIndex) {
+    const gridId = `memory-grid-${challengeIndex}`;
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    grid.innerHTML = '';
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'grid-cell text-lg';
+      cell.innerText = currentPattern[i];
+      grid.appendChild(cell);
+    }
+    setTimeout(() => { Array.from(grid.children).forEach(cell => cell.innerText = '?'); }, 3000);
+  }
+
+  const STORAGE_KEY = "li_games_config";
+  
+  // ===== CONFIGURACIÓN FIREBASE =====
+  const firebaseConfig = {
+    apiKey: "AIzaSyDummyKeyForDemo",
+    authDomain: "lideres-ingeniosos.firebaseapp.com",
+    databaseURL: "https://lideres-ingeniosos-default-rtdb.firebaseio.com",
+    projectId: "lideres-ingeniosos",
+    storageBucket: "lideres-ingeniosos.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:abcdef123456"
+  };
+  
+  // Inicializar Firebase
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  
+  // Cache de configuración de Firebase
+  let gamesConfigCache = {};
+  let firebaseListenerInitialized = false;
+  
+  const gamesData = [
+    { id: "game_exploradores", label: "Exploradores de Venezuela", emoji: "🗺️", color: "from-blue-400 to-cyan-300", cat: "Geografía", retos: 4, diff: "Medio" },
+    { id: "game_mision_ingeniosa", label: "Misión Ingeniosa", emoji: "🎰", color: "from-violet-500 to-purple-400", cat: "Liderazgo", retos: 3, diff: "Difícil" },
+    { id: "game_club_lideres", label: "Club de Líderes", emoji: "🚀", color: "from-indigo-500 to-blue-400", cat: "Ciencias", retos: 3, diff: "Medio" },
+    { id: "game_clasificacion", label: "Clasificación de Palabras", emoji: "🎯", color: "from-cyan-500 to-teal-400", cat: "Lenguaje", retos: 0, diff: "Arcade" },
+    { id: "game_ruleta", label: "Ruleta del Conocimiento", emoji: "🎡", color: "from-rose-500 to-pink-400", cat: "Gramática", retos: 12, diff: "Difícil" },
+    { id: "game_tinta_invisible", label: "Tinta Invisible", emoji: "🧪", color: "from-emerald-500 to-green-400", cat: "Ciencias", retos: 3, diff: "Fácil" },
+    { id: "game_retos_familiares", label: "Retos Familiares", emoji: "🏆", color: "from-amber-500 to-orange-400", cat: "Familia", retos: 6, diff: "Fácil" },
+    { id: "juego_12", label: "Mario Liderazgo", emoji: "🍄", color: "from-red-500 to-orange-500", cat: "Liderazgo", retos: 5, diff: "Medio" },
+  ];
+  const diffColor = { "Fácil": "bg-green-100 text-green-700", "Medio": "bg-yellow-100 text-yellow-700", "Difícil": "bg-red-100 text-red-700", "Arcade": "bg-blue-100 text-blue-700" };
+  const catColor = { "Geografía": "bg-blue-100 text-blue-700", "Liderazgo": "bg-purple-100 text-purple-700", "Ciencias": "bg-green-100 text-green-700", "Lenguaje": "bg-cyan-100 text-cyan-700", "Gramática": "bg-rose-100 text-rose-700", "Familia": "bg-amber-100 text-amber-700" };
+  let activeFilter = "all";
+
+  // Inicializar listener de Firebase para escuchar cambios en tiempo real
+  function initFirebaseListener() {
+    if (firebaseListenerInitialized) return;
+    
+    const userId = sessionStorage.getItem("li_userId");
+    if (!userId) return;
+    
+    database.ref('games_config/' + userId).on('value', (snapshot) => {
+      gamesConfigCache = snapshot.val() || {};
+      // Actualizar el grid si existe
+      if (document.getElementById("games-grid")) {
+        renderGamesGrid();
+      }
+    });
+    
+    firebaseListenerInitialized = true;
+  }
+
+  function isUnlocked(gameId) {
+    // Por defecto, todos los juegos están desbloqueados
+    if (!gamesConfigCache) return true;
+    return gamesConfigCache[gameId] !== false;
+  }
+
+  function renderGamesGrid() {
+    const grid = document.getElementById("games-grid");
+    if (!grid) return;
+    grid.innerHTML = "";
+    let visible = 0, available = 0;
+    gamesData.forEach((g, i) => {
+      const show = activeFilter === "all" || g.cat === activeFilter;
+      if (!show) return;
+      visible++;
+      const unlocked = isUnlocked(g.id);
+      if (unlocked) available++;
+      const card = document.createElement("div");
+      card.className = "game-card" + (unlocked ? "" : " locked");
+      card.dataset.cat = g.cat;
+      card.style.animationDelay = (visible * 0.06) + "s";
+      if (unlocked) card.onclick = () => openGame("pages/" + g.id + ".html", g.label);
+      card.innerHTML = `
+        <div class="game-icon bg-gradient-to-br ${g.color}">
+          ${g.emoji}
+          ${!unlocked ? '<div class="lock-ring">🔒</div>' : ''}
+        </div>
+        <p class="text-xs font-black text-gray-800 leading-tight">${g.label}</p>
+        <div class="flex gap-1 mt-2 flex-wrap justify-center">
+          <span class="cat-badge ${catColor[g.cat]}">${g.cat}</span>
+          <span class="cat-badge ${diffColor[g.diff]}">${g.diff}</span>
+        </div>
+        ${g.retos > 0 ? `<p class="text-[10px] text-gray-400 mt-1 flex items-center gap-1"><i class="fas fa-bullseye text-[10px]"></i> ${g.retos} retos</p>` : ''}
+        ${unlocked ? '<div class="play-ring"><i class="fas fa-play text-xs"></i></div>' : '<p class="text-[10px] text-red-400 font-bold mt-2">Bloqueado</p>'}
+      `;
+      grid.appendChild(card);
+    });
+    document.getElementById("empty-state").classList.toggle("hidden", visible > 0);
+    document.getElementById("hero-count").innerText = available + " / " + gamesData.length;
+    document.getElementById("hero-sub").innerText = available === gamesData.length ? "Todos los juegos disponibles" : available + " juegos activos · " + (gamesData.length - available) + " bloqueados";
+  }
+
+  function filterGames(cat, btn) {
+    activeFilter = cat;
+    document.querySelectorAll(".ftab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    renderGamesGrid();
+  }
+
+  window.addEventListener('storage', e => {
+    if (e.key === 'li_games_config') renderGamesGrid();
+  });
+
+  function openGame(url, gameTitle) {
+    const modal = document.getElementById('game-modal');
+    const frame = document.getElementById('game-frame');
+    const title = document.getElementById('game-modal-title');
+    const names = {
+      'pages/game_exploradores.html': 'Exploradores de Venezuela',
+      'pages/game_mision_ingeniosa.html': 'Misión Ingeniosa',
+      'pages/game_club_lideres.html': 'Club de Líderes Ingeniosos',
+      'pages/game_clasificacion.html': 'Clasificación de Palabras',
+      'pages/game_ruleta.html': 'Ruleta del Conocimiento',
+      'pages/game_tinta_invisible.html': 'Tinta Invisible',
+      'pages/game_retos_familiares.html': 'Tablero de Retos Familiares',
+    };
+    title.innerText = gameTitle || names[url] || 'Juego';
+    frame.src = url;
+    modal.classList.add('open');
+  }
+
+  function closeGame() {
+    const modal = document.getElementById('game-modal');
+    const frame = document.getElementById('game-frame');
+    modal.classList.remove('open');
+    frame.src = '';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    updateUserProgress();
+    renderModules();
+    renderChallenges();
+    renderAchievements();
+    updateLastActivity();
+    showPage('dashboard');
+    
+    // Llamada directa para cargar módulos random inmediatamente
+    console.log('Direct call to updateRandomModules with defaultModules');
+    if (typeof defaultModules !== 'undefined' && defaultModules.length > 0) {
+      updateRandomModules(defaultModules);
+    } else {
+      console.error('defaultModules is not defined or empty!');
+    }
+    
+    // Test directo con datos hardcodeados
+    setTimeout(() => {
+      console.log('Test call with hardcoded data');
+      updateRandomModules([
+        { title: "¿Qué es el dinero?", emoji: "💰", desc: "Finanzas básicas", progress: 50 },
+        { title: "Cómo ahorrar", emoji: "🐷", desc: "Ahorro inteligente", progress: 30 },
+        { title: "Necesidades vs Deseos", emoji: "🛒", desc: "Toma decisiones", progress: 20 }
+      ]);
+    }, 1000);
+  });
+</script>
+</body>
+</html>

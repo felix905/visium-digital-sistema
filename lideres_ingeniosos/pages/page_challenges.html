@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="stylesheet" href="../styles/btn.css">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body { background: transparent; margin: 0; }
+    .glass { background:rgba(255,255,255,.72); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,.85); }
+    .ch-card { transition:all .3s; }
+    .ch-card:hover { transform:translateY(-4px); }
+    .timer-active { animation:tpulse 1s infinite; }
+    @keyframes tpulse { 0%,100%{color:#ef4444}50%{color:#991b1b} }
+    .grid-cell { aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; font-size:1.6rem; cursor:pointer; border:2px solid #e5e7eb; background:white; border-radius:.5rem; transition:all .2s; }
+    .grid-cell:hover { background:#f3f4f6; }
+    .btn-done { background:linear-gradient(135deg,#10b981,#059669); color:white; padding:.45rem 1.1rem; border-radius:9999px; font-weight:700; font-size:.78rem; cursor:pointer; display:inline-block; }
+    .btn-help { color:#8b5cf6; font-size:.72rem; text-decoration:underline; margin-left:.7rem; cursor:pointer; }
+    .dot { width:11px; height:11px; background:#8b5cf6; border-radius:50%; }
+  </style>
+</head>
+<body class="p-5">
+
+  <div class="mb-5"><h2 class="text-2xl font-black text-gray-800">Retos del día</h2><p class="text-sm text-gray-400">¡Al terminar grita: RETO CUMPLIDO!</p></div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-5xl">
+
+    <div class="ch-card glass rounded-3xl p-5 border-l-4 border-pink-400">
+      <div class="flex items-center gap-2 mb-2"><i class="ti ti-piggy-bank text-pink-500 text-xl"></i><h3 class="font-bold text-gray-800 text-sm">Reto 1: La Alcancía Express</h3></div>
+      <p class="text-xs text-gray-500 mb-3">Construye una alcancía con materiales de casa en menos de 3 minutos.</p>
+      <div class="text-center mb-3"><div id="timer-1" class="text-3xl font-black text-gray-800 mb-2">03:00</div><button onclick="startTimer(180,'timer-1')" class="btn-3d btn-pink btn-sm btn-pill inline-flex items-center gap-1"><i class="ti ti-player-play"></i> INICIAR</button></div>
+      <div class="flex items-center justify-between"><div class="btn-done" onclick="this.innerText='✅ LOGRADO'">¡RETO CUMPLIDO!</div><div class="btn-help" onclick="alert('COMODÍN: Pide una caja de cereal o un bote de yogurt vacío.')">Comodín 💡</div></div>
+    </div>
+
+    <div class="ch-card glass rounded-3xl p-5 border-l-4 border-blue-400">
+      <div class="flex items-center gap-2 mb-2"><i class="ti ti-puzzle text-blue-500 text-xl"></i><h3 class="font-bold text-gray-800 text-sm">Reto 2: Los Establos</h3></div>
+      <p class="text-xs text-gray-500 mb-3">9 cuadrados y 9 vacas. Acomoda 9 vacas en cada establo sin que quede uno vacío.</p>
+      <div class="flex items-center justify-between mt-6"><div class="btn-done" onclick="this.innerText='✅ LOGRADO'">¡RETO CUMPLIDO!</div><div class="btn-help" onclick="alert('COMODÍN: Dibuja cuadrados uno dentro de otro como una muñeca rusa.')">Comodín 💡</div></div>
+    </div>
+
+    <div class="ch-card glass rounded-3xl p-5 border-l-4 border-emerald-400">
+      <div class="flex items-center gap-2 mb-2"><i class="ti ti-brain text-emerald-500 text-xl"></i><h3 class="font-bold text-gray-800 text-sm">Reto 4: Memoria</h3></div>
+      <div id="memory-grid" class="grid grid-cols-3 gap-1.5 mb-3"></div>
+      <button onclick="showMemoryPattern()" class="btn-3d btn-emerald btn-full btn-sm mb-3 flex items-center justify-center gap-1"><i class="ti ti-eye"></i> MOSTRAR PATRÓN</button>
+      <div class="flex items-center justify-between"><div class="btn-done" onclick="this.innerText='✅ LOGRADO'">¡RETO CUMPLIDO!</div><div class="btn-help" onclick="alert('COMODÍN: ¡Toma una foto rápida con tu mente!')">Comodín 💡</div></div>
+    </div>
+
+    <div class="ch-card glass rounded-3xl p-5 border-l-4 border-orange-400">
+      <div class="flex items-center gap-2 mb-2"><i class="ti ti-math text-orange-500 text-xl"></i><h3 class="font-bold text-gray-800 text-sm">Reto 5: Movimiento Genial</h3></div>
+      <p class="text-xs text-gray-500 mb-3">Con 4 colores forma un 4. Mueve solo uno para formar un número mayor que 4.</p>
+      <div class="flex items-center justify-between mt-6"><div class="btn-done" onclick="this.innerText='✅ LOGRADO'">¡RETO CUMPLIDO!</div><div class="btn-help" onclick="alert('COMODÍN: ¿Y si el número que formas es el 11?')">Comodín 💡</div></div>
+    </div>
+
+    <div class="ch-card glass rounded-3xl p-5 border-l-4 border-yellow-400">
+      <div class="flex items-center gap-2 mb-2"><i class="ti ti-egg text-yellow-500 text-xl"></i><h3 class="font-bold text-gray-800 text-sm">Reto 6: ¿Cuántos huevos?</h3></div>
+      <p class="text-xs text-gray-700 font-medium mb-2">"Si tuviera 4 huevos, un ladrón me lleva 3 y un gallo pone 5, ¿cuántos tengo?"</p>
+      <div class="bg-yellow-50 border border-yellow-200 p-2.5 rounded-xl text-xs text-yellow-700 mb-3 flex items-start gap-1.5"><i class="ti ti-info-circle flex-shrink-0 mt-0.5"></i> Piénsalo bien... lee palabra por palabra.</div>
+      <div class="flex items-center justify-between"><div class="btn-done" onclick="this.innerText='✅ LOGRADO'">¡RETO CUMPLIDO!</div><div class="btn-help" onclick="alert('COMODÍN: ¿Desde cuándo los GALLOS ponen huevos? 😉')">Comodín 💡</div></div>
+    </div>
+
+    <div class="ch-card glass rounded-3xl p-5 border-l-4 border-purple-400">
+      <div class="flex items-center gap-2 mb-2"><i class="ti ti-dots text-purple-500 text-xl"></i><h3 class="font-bold text-gray-800 text-sm">Reto 7: Unión Imposible</h3></div>
+      <p class="text-xs text-gray-500 mb-2">Une todos los puntos con una sola línea sin levantar el lápiz.</p>
+      <div class="bg-gray-50 rounded-2xl p-3 flex flex-col items-start gap-2.5 mb-3">
+        <div class="flex gap-2.5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="flex gap-2.5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="flex gap-2.5"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="flex gap-2.5"><div class="dot"></div><div class="dot"></div></div>
+        <div class="flex gap-2.5"><div class="dot"></div></div>
+      </div>
+      <div class="flex items-center justify-between"><div class="btn-done" onclick="this.innerText='✅ LOGRADO'">¡RETO CUMPLIDO!</div><div class="btn-help" onclick="alert('COMODÍN: Piensa fuera de la caja.')">Comodín 💡</div></div>
+    </div>
+
+  </div>
+
+  <script>
+    function startTimer(duration, id) {
+      let t = duration;
+      const el = document.getElementById(id);
+      el.classList.add('timer-active');
+      const iv = setInterval(() => {
+        const m = parseInt(t/60), s = parseInt(t%60);
+        el.textContent = (m<10?'0'+m:m)+':'+(s<10?'0'+s:s);
+        if (--t < 0) { clearInterval(iv); el.textContent='¡TIEMPO!'; el.classList.remove('timer-active'); }
+      }, 1000);
+    }
+    const emojis = ['🐶','🍎','🚗','⭐','🎈','🍕','🚀','🌈','🍦'];
+    let pattern = [...emojis].sort(() => Math.random() - 0.5);
+    function initMemoryGrid() {
+      const g = document.getElementById('memory-grid');
+      if (!g) return;
+      g.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const c = document.createElement('div');
+        c.className = 'grid-cell'; c.id = 'mc-'+i; c.innerText = '?';
+        g.appendChild(c);
+      }
+    }
+    function showMemoryPattern() {
+      initMemoryGrid();
+      pattern.forEach((e,i) => { document.getElementById('mc-'+i).innerText = e; });
+      setTimeout(() => { for(let i=0;i<9;i++) document.getElementById('mc-'+i).innerText='?'; }, 3000);
+    }
+    initMemoryGrid();
+  </script>
+</body>
+</html>
+

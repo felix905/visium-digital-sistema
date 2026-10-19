@@ -1,0 +1,406 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exploradores de Venezuela</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Nunito', sans-serif; }
+    body { background: #ede9fe; min-height: 100vh; }
+
+    .tab-btn {
+      padding: .55rem 1.2rem; border-radius: 9999px; font-weight: 800; font-size: .82rem;
+      transition: all .2s; cursor: pointer; border: 2px solid transparent;
+    }
+    .tab-btn.active { background: #7c3aed; color: white; box-shadow: 0 4px 0 #5b21b6; }
+    .tab-btn:not(.active) { background: white; color: #7c3aed; border-color: #c4b5fd; }
+    .tab-btn:not(.active):hover { background: #f5f3ff; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .game-card {
+      background: white; border-radius: 2rem;
+      box-shadow: 0 8px 0 rgba(0,0,0,.07);
+      overflow: hidden;
+    }
+
+    .card-top { height: 6px; }
+
+    .memory-card {
+      aspect-ratio: 1/1; position: relative;
+      transform-style: preserve-3d;
+      transition: transform .6s cubic-bezier(.4,0,.2,1);
+      cursor: pointer;
+    }
+    .memory-card.flipped { transform: rotateY(180deg); }
+    .card-face {
+      position: absolute; width: 100%; height: 100%;
+      backface-visibility: hidden;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 1rem; padding: 6px; text-align: center;
+      font-weight: 800; font-size: .72rem;
+    }
+    .card-front { background: #7c3aed; color: white; font-size: 1.5rem; border: 3px solid #a78bfa; }
+    .card-back { background: white; color: #374151; transform: rotateY(180deg); border: 2px solid #c4b5fd; }
+    .memory-card.matched .card-back { background: #d1fae5; border-color: #34d399; color: #065f46; }
+
+    .hangman-slot {
+      width: 1.6rem; height: 2rem;
+      border-bottom: 3px solid #7c3aed;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 900; color: #7c3aed;
+    }
+    .key-btn {
+      padding: 5px 3px; background: #f5f3ff; border: 2px solid #ddd6fe;
+      border-radius: 8px; font-weight: 800; font-size: .68rem; cursor: pointer; transition: .15s;
+    }
+    .key-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .key-btn.hit { background: #a7f3d0; border-color: #34d399; color: #065f46; }
+    .key-btn.miss { background: #fecaca; border-color: #f87171; color: #991b1b; }
+
+    .drop-zone {
+      min-height: 44px; border: 2px dashed #c4b5fd; border-radius: .75rem;
+      padding: 5px; transition: all .2s; background: #faf5ff;
+    }
+    .drop-zone.correct { background: #d1fae5; border-color: #34d399; border-style: solid; }
+    .drag-item {
+      cursor: grab; background: white; border: 2px solid #e9d5ff;
+      padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: .78rem;
+      box-shadow: 0 2px 0 #ddd6fe;
+    }
+
+    .btn-primary {
+      background: #7c3aed; color: white; font-weight: 900;
+      padding: .55rem 1.4rem; border-radius: 9999px; cursor: pointer;
+      box-shadow: 0 5px 0 #5b21b6; transition: all .15s; border: none; font-size: .85rem;
+    }
+    .btn-primary:active { transform: translateY(4px); box-shadow: 0 1px 0 #5b21b6; }
+
+    .reflection-input {
+      width: 100%; border: 2px solid #e9d5ff; border-radius: 1rem;
+      padding: 10px 14px; font-size: .9rem; min-height: 80px;
+      transition: border-color .2s; outline: none; font-family: 'Nunito', sans-serif;
+    }
+    .reflection-input:focus { border-color: #7c3aed; }
+
+    .header-banner {
+      background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #0ea5e9 100%);
+    }
+  </style>
+  <link rel="stylesheet" href="../styles/btn.css">
+</head>
+<body class="pb-12">
+
+  <!-- HEADER -->
+  <div class="header-banner text-white py-8 px-6 text-center relative overflow-hidden mb-6">
+    <div class="absolute -top-8 -right-8 w-44 h-44 bg-white/10 rounded-full"></div>
+    <div class="absolute -bottom-10 -left-6 w-36 h-36 bg-white/10 rounded-full"></div>
+    <div class="relative z-10">
+      <div class="inline-flex items-center gap-2 bg-white/20 px-4 py-1.5 rounded-full text-sm font-bold mb-3">
+        🗺️ Geografía · 5 Misiones
+      </div>
+      <h1 class="text-3xl md:text-4xl font-black mb-1">Exploradores de Venezuela</h1>
+      <p class="text-blue-100 font-bold">Venezuela y sus Secretos 🇻🇪</p>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="flex flex-wrap justify-center gap-2 px-4 mb-6">
+    <button onclick="showTab('capitales')" id="btn-capitales" class="tab-btn active">🗺️ Capitales</button>
+    <button onclick="showTab('clima')" id="btn-clima" class="tab-btn">☀️ Clima</button>
+    <button onclick="showTab('regiones')" id="btn-regiones" class="tab-btn">⛰️ Regiones</button>
+    <button onclick="showTab('experimento')" id="btn-experimento" class="tab-btn">🧪 Experimento</button>
+    <button onclick="showTab('metas')" id="btn-metas" class="tab-btn">🎯 Mi Visión</button>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4">
+
+    <!-- CAPITALES -->
+    <div id="tab-capitales" class="tab-panel active">
+      <div class="game-card">
+        <div class="card-top bg-gradient-to-r from-blue-400 to-cyan-400"></div>
+        <div class="p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl">🏙️</div>
+            <div>
+              <h2 class="text-xl font-black text-gray-800">Conecta las Capitales</h2>
+              <p class="text-xs text-gray-400 font-bold">Arrastra la capital al estado correcto</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="bg-purple-50 p-4 rounded-2xl border-2 border-purple-100">
+              <p class="text-xs font-black text-purple-600 mb-3 uppercase text-center">Capitales disponibles:</p>
+              <div class="flex flex-wrap gap-2 justify-center" id="draggables-geo"></div>
+            </div>
+            <div class="space-y-2" id="drop-col-1"></div>
+            <div class="space-y-2" id="drop-col-2"></div>
+          </div>
+          <div class="mt-5 text-center">
+            <button onclick="initGeoDragDrop()" class="btn-primary">🔄 Reiniciar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIMA -->
+    <div id="tab-clima" class="tab-panel">
+      <div class="game-card">
+        <div class="card-top bg-gradient-to-r from-green-400 to-emerald-400"></div>
+        <div class="p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center text-3xl">🌿</div>
+            <div>
+              <h2 class="text-xl font-black text-gray-800">Memoria: Clima y Flora</h2>
+              <p class="text-xs text-gray-400 font-bold">Encuentra el par del ecosistema con su planta</p>
+            </div>
+          </div>
+          <div class="max-w-lg mx-auto grid grid-cols-4 gap-3" id="climateGrid"></div>
+          <div class="mt-5 text-center">
+            <button onclick="initClimateMemory()" class="btn-primary">🔄 Reiniciar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGIONES -->
+    <div id="tab-regiones" class="tab-panel">
+      <div class="game-card">
+        <div class="card-top bg-gradient-to-r from-orange-400 to-amber-400"></div>
+        <div class="p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center text-3xl">⛰️</div>
+            <div>
+              <h2 class="text-xl font-black text-gray-800">Ahorcado: Regiones</h2>
+              <p class="text-xs text-gray-400 font-bold">Descubre las 7 regiones de Venezuela</p>
+            </div>
+          </div>
+          <div id="hangman-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPERIMENTO -->
+    <div id="tab-experimento" class="tab-panel">
+      <div class="game-card">
+        <div class="card-top bg-gradient-to-r from-purple-400 to-violet-500"></div>
+        <div class="p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-3xl">🧪</div>
+            <div>
+              <h2 class="text-xl font-black text-gray-800">Tinta Invisible</h2>
+              <p class="text-xs text-gray-400 font-bold">Experimento de ciencias</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+            <div class="bg-blue-50 p-5 rounded-2xl border-l-4 border-blue-400">
+              <h3 class="font-black text-blue-700 mb-2 flex items-center gap-2">👻 Tinta Invisible</h3>
+              <p class="text-sm text-gray-600 mb-2">Mezcla <strong>agua y bicarbonato</strong>.</p>
+              <ul class="text-xs space-y-1 text-gray-500 font-semibold">
+                <li>✨ Traza un cuadrado grande</li>
+                <li>✨ Escribe tu mensaje positivo</li>
+              </ul>
+            </div>
+            <div class="bg-yellow-50 p-5 rounded-2xl border-l-4 border-yellow-400">
+              <h3 class="font-black text-yellow-700 mb-2 flex items-center gap-2">👁️ Tinta Reveladora</h3>
+              <p class="text-sm text-gray-600 mb-2">Mezcla <strong>alcohol y cúrcuma</strong>.</p>
+              <ul class="text-xs space-y-1 text-gray-500 font-semibold">
+                <li>✨ Pasa sobre el cuadrado</li>
+                <li>✨ ¡Mira cómo aparece!</li>
+              </ul>
+            </div>
+            <div class="bg-purple-900 text-white p-5 rounded-2xl flex items-center">
+              <p class="text-sm italic font-semibold text-center">"La ciencia explica lo invisible, los valores guían nuestras emociones y las Finanzas muestran resultados con el tiempo."</p>
+            </div>
+          </div>
+          <div class="bg-purple-50 rounded-2xl p-4">
+            <h4 class="font-black text-purple-700 mb-2">📓 Bitácora del Científico</h4>
+            <textarea class="reflection-input" placeholder="¿Qué cambios de color observaste? ¿Por qué crees que ocurre?"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- METAS -->
+    <div id="tab-metas" class="tab-panel">
+      <div class="game-card">
+        <div class="card-top bg-gradient-to-r from-yellow-400 to-orange-400"></div>
+        <div class="p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center text-3xl">🎯</div>
+            <div>
+              <h2 class="text-xl font-black text-gray-800">Mi Mapa de Misión</h2>
+              <p class="text-xs text-gray-400 font-bold">Define tu propósito y tus metas</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="space-y-4">
+              <div class="bg-blue-50 p-5 rounded-2xl border-l-4 border-blue-400">
+                <h3 class="font-black text-blue-700 mb-2">🧭 Mi Propósito</h3>
+                <textarea id="input-proposito" class="reflection-input h-24" placeholder="¿Qué quieres lograr para Venezuela y para ti?" oninput="updateVisionBoard()"></textarea>
+              </div>
+              <div class="bg-yellow-50 p-5 rounded-2xl border-l-4 border-yellow-400">
+                <h3 class="font-black text-yellow-700 mb-2">🚩 Mis Metas</h3>
+                <div class="flex gap-2 mt-2">
+                  <input id="meta-nombre" type="text" class="flex-grow p-3 rounded-xl border-2 border-yellow-200 text-sm focus:outline-none focus:border-yellow-400 font-semibold" placeholder="Ej: Aprender sobre el Salto Ángel">
+                  <button onclick="addMeta()" class="btn-primary">+ Añadir</button>
+                </div>
+              </div>
+            </div>
+            <div class="bg-gray-900 rounded-2xl p-5 flex flex-col min-h-[380px]">
+              <div class="flex justify-between items-center border-b border-gray-700 pb-3 mb-4">
+                <h3 class="text-yellow-400 font-black text-xs uppercase tracking-widest">Tablero del Explorador</h3>
+                <div class="flex gap-1"><div class="w-3 h-3 rounded-full bg-red-500"></div><div class="w-3 h-3 rounded-full bg-yellow-500"></div><div class="w-3 h-3 rounded-full bg-green-500"></div></div>
+              </div>
+              <div class="mb-4">
+                <span class="text-gray-500 text-[9px] uppercase font-bold block mb-1">MI PROPÓSITO:</span>
+                <div id="vision-proposito" class="text-blue-200 text-sm italic leading-relaxed min-h-[50px] border-l-2 border-blue-400 pl-3">"Escribe tu propósito..."</div>
+              </div>
+              <div class="flex-grow overflow-hidden flex flex-col">
+                <span class="text-gray-500 text-[9px] uppercase font-bold block mb-2">OBJETIVOS:</span>
+                <div id="vision-metas" class="flex-grow space-y-2 overflow-y-auto pr-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function showTab(id) {
+      document.querySelectorAll('.tab-panel').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-'+id).classList.add('active');
+      document.getElementById('btn-'+id).classList.add('active');
+    }
+
+    const geoData = [
+      {estado:"Zulia",capital:"Maracaibo"},{estado:"Bolívar",capital:"Ciudad Bolívar"},
+      {estado:"Mérida",capital:"Mérida"},{estado:"Nueva Esparta",capital:"La Asunción"},
+      {estado:"Carabobo",capital:"Valencia"},{estado:"Anzoátegui",capital:"Barcelona"},
+      {estado:"Lara",capital:"Barquisimeto"},{estado:"Falcón",capital:"Coro"}
+    ];
+
+    function initGeoDragDrop() {
+      const dc=document.getElementById('draggables-geo'), c1=document.getElementById('drop-col-1'), c2=document.getElementById('drop-col-2');
+      dc.innerHTML=''; c1.innerHTML=''; c2.innerHTML='';
+      geoData.map(d=>d.capital).sort(()=>Math.random()-.5).forEach(cap=>{
+        const item=document.createElement('div');
+        item.className='drag-item'; item.draggable=true; item.textContent=cap;
+        item.addEventListener('dragstart',e=>e.dataTransfer.setData('text',cap));
+        dc.appendChild(item);
+      });
+      geoData.forEach((data,i)=>{
+        const zone=document.createElement('div');
+        zone.innerHTML=`<span class="text-[9px] font-black text-gray-500 uppercase">${data.estado}</span><div class="drop-zone" data-capital="${data.capital}"></div>`;
+        const drop=zone.querySelector('.drop-zone');
+        drop.addEventListener('dragover',e=>e.preventDefault());
+        drop.addEventListener('drop',e=>{
+          const cap=e.dataTransfer.getData('text');
+          if(cap===drop.dataset.capital){
+            drop.innerHTML=`<div class="bg-green-500 text-white p-1 rounded-lg text-[10px] font-bold text-center">✅ ${cap}</div>`;
+            drop.classList.add('correct');
+            document.querySelectorAll('.drag-item').forEach(el=>{if(el.textContent===cap)el.remove();});
+          }
+        });
+        if(i<4)c1.appendChild(zone); else c2.appendChild(zone);
+      });
+    }
+
+    const memoryItems=[
+      {id:1,val:"☀️ Desierto",match:"🌵 Cactus"},{id:1,val:"🌵 Cactus",match:"☀️ Desierto"},
+      {id:2,val:"❄️ Páramo",match:"🌿 Frailejón"},{id:2,val:"🌿 Frailejón",match:"❄️ Páramo"},
+      {id:3,val:"🌧️ Selva",match:"🌳 Árbol Gigante"},{id:3,val:"🌳 Árbol Gigante",match:"🌧️ Selva"},
+      {id:4,val:"🌾 Sabana",match:"🌴 Moriche"},{id:4,val:"🌴 Moriche",match:"🌾 Sabana"}
+    ];
+    let flippedCards=[],lockBoard=false;
+
+    function initClimateMemory(){
+      const grid=document.getElementById('climateGrid');
+      grid.innerHTML=''; flippedCards=[]; lockBoard=false;
+      [...memoryItems].sort(()=>Math.random()-.5).forEach(item=>{
+        const card=document.createElement('div');
+        card.className='memory-card';
+        card.dataset.val=item.val; card.dataset.match=item.match;
+        card.innerHTML=`<div class="card-face card-front">?</div><div class="card-face card-back text-xs">${item.val}</div>`;
+        card.onclick=()=>handleFlip(card);
+        grid.appendChild(card);
+      });
+    }
+    function handleFlip(card){
+      if(lockBoard||card.classList.contains('flipped')||card.classList.contains('matched'))return;
+      card.classList.add('flipped'); flippedCards.push(card);
+      if(flippedCards.length===2){
+        const[c1,c2]=flippedCards;
+        if(c1.dataset.val===c2.dataset.match){c1.classList.add('matched');c2.classList.add('matched');flippedCards=[];}
+        else{lockBoard=true;setTimeout(()=>{c1.classList.remove('flipped');c2.classList.remove('flipped');flippedCards=[];lockBoard=false;},1000);}
+      }
+    }
+
+    const regions=[
+      {w:"ZULIANA",p:"Alrededor del lago más grande."},{w:"ANDINA",p:"Montañas y frío."},
+      {w:"OCCIDENTAL",p:"Falcón, Lara y Yaracuy."},{w:"CENTRAL",p:"Cerca de la capital."},
+      {w:"INSULAR",p:"Nuestras islas y el Mar Caribe."},{w:"GUAYANA",p:"Tepuyes y selvas."},
+      {w:"NOR ORIENTAL",p:"Playas hermosas de oriente."}
+    ];
+
+    function initHangman(){
+      const container=document.getElementById('hangman-container');
+      container.innerHTML='';
+      regions.forEach((item,idx)=>{
+        const wrap=document.createElement('div');
+        wrap.className="bg-purple-50 p-4 rounded-2xl border-2 border-purple-100";
+        wrap.innerHTML=`<p class="text-[9px] font-black text-purple-600 uppercase mb-2">Pista: ${item.p}</p>
+                        <div class="flex flex-wrap gap-1 justify-center mb-3" id="slots-${idx}"></div>
+                        <div class="grid grid-cols-7 gap-1" id="kbd-${idx}"></div>`;
+        container.appendChild(wrap);
+        const slots=document.getElementById(`slots-${idx}`);
+        item.w.split('').forEach(char=>{
+          const s=document.createElement('div');
+          s.className=char===' '?'w-2':' hangman-slot';
+          if(char===' ')s.style.border='none';
+          slots.appendChild(s);
+        });
+        "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split('').forEach(l=>{
+          const b=document.createElement('button');
+          b.className='key-btn'; b.textContent=l;
+          b.onclick=()=>{
+            b.disabled=true;
+            if(item.w.includes(l)){b.classList.add('hit');item.w.split('').forEach((c,i)=>{if(c===l)slots.children[i].textContent=l;});}
+            else b.classList.add('miss');
+          };
+          document.getElementById(`kbd-${idx}`).appendChild(b);
+        });
+      });
+    }
+
+    let metas=[];
+    function updateVisionBoard(){
+      const p=document.getElementById('input-proposito').value;
+      document.getElementById('vision-proposito').textContent=p||'"Escribe tu propósito..."';
+    }
+    function addMeta(){
+      const input=document.getElementById('meta-nombre');
+      const text=input.value.trim();
+      if(text){metas.push({id:Date.now(),text});renderMetas();input.value='';input.focus();}
+    }
+    function removeMeta(id){metas=metas.filter(m=>m.id!==id);renderMetas();}
+    function renderMetas(){
+      const c=document.getElementById('vision-metas');
+      if(!metas.length){c.innerHTML='<div class="text-gray-600 italic text-xs text-center py-6 opacity-50">Sin metas aún...</div>';return;}
+      c.innerHTML=metas.map(m=>`<div class="bg-gray-800 p-2.5 rounded-xl flex justify-between items-center border-l-4 border-yellow-500">
+        <span class="text-gray-100 text-xs font-bold">🎯 ${m.text}</span>
+        <button onclick="removeMeta(${m.id})" class="text-gray-500 hover:text-red-400 text-xs ml-2">✕</button>
+      </div>`).join('');
+    }
+
+    window.onload=()=>{initGeoDragDrop();initClimateMemory();initHangman();renderMetas();};
+  </script>
+</body>
+</html>
+
+

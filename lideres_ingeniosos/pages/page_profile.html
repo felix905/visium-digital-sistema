@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="stylesheet" href="../styles/btn.css">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body { background: transparent; margin: 0; }
+    .glass { background:rgba(255,255,255,.72); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,.85); }
+    .stat-card { transition:all .2s; }
+    .stat-card:hover { transform:translateY(-3px); }
+  </style>
+</head>
+<body class="p-5">
+
+  <div class="max-w-xl mx-auto">
+    <div class="glass rounded-3xl p-7 mb-4 text-center relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-pink-500/10"></div>
+      <div class="relative z-10">
+        <div id="profile-avatar" class="w-20 h-20 rounded-3xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center text-white font-black text-3xl mx-auto mb-3 shadow-xl">U</div>
+        <h3 id="profile-name" class="text-xl font-black text-gray-800 mb-1">Usuario</h3>
+        <span class="inline-flex items-center gap-1.5 bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full"><i class="ti ti-award"></i> Explorador Financiero · Nivel 5</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      <div class="stat-card glass rounded-2xl p-4 text-center"><p class="text-2xl font-black text-purple-600">350</p><p class="text-xs text-gray-400 mt-1">Puntos</p></div>
+      <div class="stat-card glass rounded-2xl p-4 text-center"><p class="text-2xl font-black text-green-600">4</p><p class="text-xs text-gray-400 mt-1">Módulos</p></div>
+      <div class="stat-card glass rounded-2xl p-4 text-center"><p class="text-2xl font-black text-orange-500">7</p><p class="text-xs text-gray-400 mt-1">Días seguidos</p></div>
+    </div>
+
+    <div class="glass rounded-2xl p-5">
+      <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2"><i class="ti ti-id-badge text-purple-500"></i> Información</h3>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-400 flex items-center gap-1.5"><i class="ti ti-user"></i> Nombre</span><span id="info-name" class="font-semibold text-gray-800">Usuario</span></div>
+        <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-400 flex items-center gap-1.5"><i class="ti ti-award"></i> Nivel</span><span class="font-semibold text-gray-800">5 - Explorador</span></div>
+        <div class="flex justify-between py-2"><span class="text-gray-400 flex items-center gap-1.5"><i class="ti ti-calendar"></i> Miembro desde</span><span class="font-semibold text-gray-800">Enero 2025</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Recibe el nombre del usuario desde el parent
+    try {
+      const u = window.parent.sessionStorage.getItem('li_user') || 'Usuario';
+      document.getElementById('profile-avatar').innerText = u.charAt(0).toUpperCase();
+      document.getElementById('profile-name').innerText = u;
+      document.getElementById('info-name').innerText = u;
+    } catch(e) {}
+  </script>
+</body>
+</html>
+

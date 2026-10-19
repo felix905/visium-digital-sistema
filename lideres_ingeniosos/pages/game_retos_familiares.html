@@ -1,0 +1,299 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retos Familiares</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Nunito', sans-serif; }
+    body { background: #ede9fe; min-height: 100vh; }
+
+    .reto-card {
+      background: white;
+      border-radius: 2rem;
+      box-shadow: 0 8px 0 rgba(0,0,0,.08);
+      transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+      overflow: hidden;
+    }
+    .reto-card:hover { transform: translateY(-6px); }
+
+    .icon-circle {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4rem;
+      flex-shrink: 0;
+      box-shadow: 0 6px 0 rgba(0,0,0,.12);
+    }
+
+    .btn-done {
+      background: #fbbf24;
+      color: #78350f;
+      font-weight: 900;
+      padding: .6rem 1.4rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #d97706;
+      transition: all .15s;
+      font-size: .85rem;
+      display: inline-block;
+    }
+    .btn-done:active { transform: translateY(4px); box-shadow: 0 1px 0 #d97706; }
+
+    .btn-hint {
+      background: #ede9fe;
+      color: #7c3aed;
+      font-weight: 800;
+      padding: .5rem 1rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: .8rem;
+      border: 2px solid #c4b5fd;
+      transition: all .15s;
+    }
+    .btn-hint:hover { background: #ddd6fe; }
+
+    .btn-start {
+      background: #7c3aed;
+      color: white;
+      font-weight: 900;
+      padding: .55rem 1.4rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #5b21b6;
+      transition: all .15s;
+      font-size: .85rem;
+      border: none;
+    }
+    .btn-start:active { transform: translateY(4px); box-shadow: 0 1px 0 #5b21b6; }
+
+    .timer-display {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #7c3aed;
+      letter-spacing: -1px;
+    }
+    .timer-active { animation: tpulse 1s infinite; }
+    @keyframes tpulse { 0%,100%{color:#ef4444}50%{color:#991b1b} }
+
+    .grid-cell {
+      aspect-ratio: 1/1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      cursor: pointer;
+      border: 3px solid #e9d5ff;
+      background: #faf5ff;
+      border-radius: .75rem;
+      transition: all .2s;
+      font-weight: 900;
+    }
+    .grid-cell:hover { background: #ede9fe; border-color: #a78bfa; }
+
+    .dot { width: 13px; height: 13px; background: #7c3aed; border-radius: 50%; }
+
+    .header-banner {
+      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 60%, #ec4899 100%);
+    }
+  </style>
+  <link rel="stylesheet" href="../styles/btn.css">
+</head>
+<body class="pb-12">
+
+  <!-- HEADER -->
+  <div class="header-banner text-white py-8 px-6 text-center relative overflow-hidden mb-8">
+    <div class="absolute -top-8 -left-8 w-40 h-40 bg-white/10 rounded-full"></div>
+    <div class="absolute -bottom-10 -right-6 w-32 h-32 bg-white/10 rounded-full"></div>
+    <div class="relative z-10">
+      <div class="inline-flex items-center gap-2 bg-white/20 px-4 py-1.5 rounded-full text-sm font-bold mb-3">
+        🏆 6 Retos · ¡Tú puedes!
+      </div>
+      <h1 class="text-3xl md:text-4xl font-black mb-1">¡DÍA SIN TAREAS!</h1>
+      <p class="text-purple-100 font-bold italic">Al terminar cada reto, grita: ¡RETO CUMPLIDO! 🎉</p>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- RETO 1 -->
+    <div class="reto-card">
+      <div class="h-3 bg-gradient-to-r from-pink-400 to-rose-400"></div>
+      <div class="p-6">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="icon-circle bg-pink-100">🐷</div>
+          <div>
+            <span class="text-xs font-black text-pink-400 uppercase tracking-wider">Reto 1</span>
+            <h2 class="text-lg font-black text-gray-800 leading-tight">La Alcancía Express</h2>
+          </div>
+        </div>
+        <p class="text-sm text-gray-500 font-semibold mb-5">Construye una alcancía con materiales de casa en menos de 3 minutos.</p>
+        <div class="bg-purple-50 rounded-2xl p-4 text-center mb-4">
+          <div id="timer-1" class="timer-display">03:00</div>
+          <p class="text-xs text-gray-400 font-bold mt-1">minutos restantes</p>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+          <button onclick="startTimer(180,'timer-1')" class="btn-start">▶ INICIAR</button>
+          <div class="btn-done" onclick="this.innerText='✅ ¡LOGRADO!'">¡RETO CUMPLIDO!</div>
+          <button class="btn-hint" onclick="alert('💡 COMODÍN: Pide una caja de cereal o un bote de yogurt vacío.')">Comodín 💡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RETO 2 -->
+    <div class="reto-card">
+      <div class="h-3 bg-gradient-to-r from-blue-400 to-cyan-400"></div>
+      <div class="p-6">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="icon-circle bg-blue-100">🐄</div>
+          <div>
+            <span class="text-xs font-black text-blue-400 uppercase tracking-wider">Reto 2</span>
+            <h2 class="text-lg font-black text-gray-800 leading-tight">Los Establos</h2>
+          </div>
+        </div>
+        <p class="text-sm text-gray-500 font-semibold mb-5">9 cuadrados (establos) y 9 vacas. Acomoda 9 vacas en cada establo sin que quede uno vacío.</p>
+        <div class="bg-blue-50 rounded-2xl p-4 text-center mb-4">
+          <div class="text-4xl">🐄🐄🐄</div>
+          <p class="text-xs text-blue-500 font-bold mt-2">¡Piensa fuera de la caja!</p>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+          <div class="btn-done" onclick="this.innerText='✅ ¡LOGRADO!'">¡RETO CUMPLIDO!</div>
+          <button class="btn-hint" onclick="alert('💡 COMODÍN: Dibuja cuadrados uno dentro de otro como una muñeca rusa.')">Comodín 💡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RETO 4: MEMORIA -->
+    <div class="reto-card">
+      <div class="h-3 bg-gradient-to-r from-emerald-400 to-teal-400"></div>
+      <div class="p-6">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="icon-circle bg-emerald-100">🧠</div>
+          <div>
+            <span class="text-xs font-black text-emerald-500 uppercase tracking-wider">Reto 4</span>
+            <h2 class="text-lg font-black text-gray-800 leading-tight">Memoria Visual</h2>
+          </div>
+        </div>
+        <p class="text-sm text-gray-500 font-semibold mb-3">Memoriza el patrón en 3 segundos y recuérdalo.</p>
+        <div id="memory-grid" class="grid grid-cols-3 gap-2 mb-4"></div>
+        <div class="flex items-center gap-3 flex-wrap">
+          <button onclick="showMemoryPattern()" class="btn-start">👁 MOSTRAR</button>
+          <div class="btn-done" onclick="this.innerText='✅ ¡LOGRADO!'">¡RETO CUMPLIDO!</div>
+          <button class="btn-hint" onclick="alert('💡 COMODÍN: ¡Toma una foto rápida con tu mente!')">Comodín 💡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RETO 5 -->
+    <div class="reto-card">
+      <div class="h-3 bg-gradient-to-r from-orange-400 to-amber-400"></div>
+      <div class="p-6">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="icon-circle bg-orange-100">🔢</div>
+          <div>
+            <span class="text-xs font-black text-orange-400 uppercase tracking-wider">Reto 5</span>
+            <h2 class="text-lg font-black text-gray-800 leading-tight">Movimiento Genial</h2>
+          </div>
+        </div>
+        <p class="text-sm text-gray-500 font-semibold mb-4">Con 4 colores forma un 4. Mueve solo uno para formar un número mayor que 4.</p>
+        <div class="bg-orange-50 rounded-2xl p-4 text-center mb-4">
+          <div class="text-5xl font-black text-orange-400">4 → ?</div>
+          <p class="text-xs text-orange-400 font-bold mt-2">¡Solo mueves 1!</p>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+          <div class="btn-done" onclick="this.innerText='✅ ¡LOGRADO!'">¡RETO CUMPLIDO!</div>
+          <button class="btn-hint" onclick="alert('💡 COMODÍN: ¿Y si el número que formas es el 11?')">Comodín 💡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RETO 6 -->
+    <div class="reto-card">
+      <div class="h-3 bg-gradient-to-r from-yellow-400 to-lime-400"></div>
+      <div class="p-6">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="icon-circle bg-yellow-100">🥚</div>
+          <div>
+            <span class="text-xs font-black text-yellow-500 uppercase tracking-wider">Reto 6</span>
+            <h2 class="text-lg font-black text-gray-800 leading-tight">¿Cuántos huevos?</h2>
+          </div>
+        </div>
+        <div class="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4 mb-4">
+          <p class="text-sm text-gray-700 font-bold italic">"Si tuviera 4 huevos, un ladrón me lleva 3 y un gallo pone 5... ¿cuántos tengo?"</p>
+        </div>
+        <div class="bg-amber-50 rounded-xl p-3 mb-4 flex items-start gap-2">
+          <span class="text-lg">💡</span>
+          <p class="text-xs text-amber-700 font-bold">Lee la pregunta palabra por palabra...</p>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+          <div class="btn-done" onclick="this.innerText='✅ ¡LOGRADO!'">¡RETO CUMPLIDO!</div>
+          <button class="btn-hint" onclick="alert('💡 COMODÍN: ¿Desde cuándo los GALLOS ponen huevos? 😉')">Comodín 💡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RETO 7 -->
+    <div class="reto-card">
+      <div class="h-3 bg-gradient-to-r from-purple-400 to-violet-500"></div>
+      <div class="p-6">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="icon-circle bg-purple-100">✏️</div>
+          <div>
+            <span class="text-xs font-black text-purple-400 uppercase tracking-wider">Reto 7</span>
+            <h2 class="text-lg font-black text-gray-800 leading-tight">Unión Imposible</h2>
+          </div>
+        </div>
+        <p class="text-sm text-gray-500 font-semibold mb-3">Une todos los puntos con una sola línea sin levantar el lápiz.</p>
+        <div class="bg-purple-50 rounded-2xl p-4 flex flex-col items-start gap-3 mb-4">
+          <div class="flex gap-3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="flex gap-3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="flex gap-3"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="flex gap-3"><div class="dot"></div><div class="dot"></div></div>
+          <div class="flex gap-3"><div class="dot"></div></div>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+          <div class="btn-done" onclick="this.innerText='✅ ¡LOGRADO!'">¡RETO CUMPLIDO!</div>
+          <button class="btn-hint" onclick="alert('💡 COMODÍN: Piensa fuera de la caja. ¿Puedes trazar líneas que salgan del dibujo?')">Comodín 💡</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function startTimer(duration, id) {
+      let t = duration;
+      const el = document.getElementById(id);
+      el.classList.add('timer-active');
+      const iv = setInterval(() => {
+        const m = parseInt(t/60), s = parseInt(t%60);
+        el.textContent = (m<10?'0'+m:m)+':'+(s<10?'0'+s:s);
+        if (--t < 0) { clearInterval(iv); el.textContent='¡TIEMPO!'; el.classList.remove('timer-active'); }
+      }, 1000);
+    }
+
+    const emojis = ['🐶','🍎','🚗','⭐','🎈','🍕','🚀','🌈','🍦'];
+    let pattern = [...emojis].sort(() => Math.random() - 0.5);
+
+    function initMemoryGrid() {
+      const g = document.getElementById('memory-grid');
+      if (!g) return;
+      g.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const c = document.createElement('div');
+        c.className = 'grid-cell'; c.id = 'mc-'+i; c.innerText = '?';
+        g.appendChild(c);
+      }
+    }
+    function showMemoryPattern() {
+      initMemoryGrid();
+      pattern.forEach((e,i) => { document.getElementById('mc-'+i).innerText = e; });
+      setTimeout(() => { for(let i=0;i<9;i++) document.getElementById('mc-'+i).innerText='?'; }, 3000);
+    }
+
+    window.onload = initMemoryGrid;
+  </script>
+</body>
+</html>
+
+

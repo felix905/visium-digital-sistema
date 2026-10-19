@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retos Financieros - Dashboard de Debate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Librería de iconos Tabler Icons (integración oficial vía CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .bg-card-1 { background-color: #e6de6694; }
+        .bg-card-2 { background-color: #c3e9a1cf; }
+        .bg-card-3 { background-color: #a3ddcbbd; }
+        .bg-card-4 { background-color: #bbf7d0c9; }
+
+        .timer-active {
+            color: #16a34a;
+        }
+
+        .timer-danger {
+            color: #dc2626;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .twist-section {
+            display: none;
+            animation: slideUp 0.4s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            transition: all 0.3s ease;
+        }
+
+        .number-btn {
+            transition: all 0.2s ease;
+        }
+
+        .number-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .number-btn.active {
+            background-color: #16a34a;
+            color: white;
+            border-color: #16a34a;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4">
+
+    <!-- Header con Logo -->
+    <header class="sticky top-0 z-50 pt-6 pb-3">
+        <div class="container mx-auto px-4">
+            <nav class="flex items-center justify-between text-sm font-normal bg-white/80 py-3 pl-2 pr-4 backdrop-blur-md rounded-xl shadow-sm">
+                <a href="index.html" class="flex items-center">
+                    <img src="img/logo_v.svg" alt="Visium Digital" class="ml-3 h-7">
+                </a>
+                <div class="hidden md:block text-right">
+                    <div class="text-sm font-normal text-gray-800 leading-tight">Escuela de diseño</div>
+                    <div class="text-sm font-normal text-gray-800 leading-tight">e innovación</div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto pt-8">
+        <!-- Header Section -->
+        <div class="text-center mb-10">
+            <span class="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
+                <i class="ti ti-cards"></i>
+                Juego de Debate
+            </span>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                Mazo de <span class="text-green-600">Retos Financieros</span>
+            </h1>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                Selecciona una tarjeta para revelar un caso de estudio. Analiza, debate y toma decisiones inteligentes.
+            </p>
+        </div>
+
+        <!-- Timer Section -->
+        <div class="flex justify-center mb-8">
+            <div class="inline-flex items-center gap-6 bg-white p-6 rounded-3xl border border-gray-200 shadow-lg">
+                <div class="text-left">
+                    <div id="timer-label" class="text-xs uppercase font-bold text-gray-500 tracking-widest mb-1">Tiempo de Defensa</div>
+                    <div id="timer" class="text-5xl md:text-6xl font-mono font-bold timer-active leading-none">02:00</div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button onclick="toggleTimer()" id="timer-btn" class="bg-green-600 hover:bg-green-500 text-white w-12 h-12 rounded-full transition-all flex items-center justify-center text-xl shadow-md">
+                        <i class="ti ti-player-play"></i>
+                    </button>
+                    <button onclick="resetTimer()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 w-12 h-12 rounded-full transition-all flex items-center justify-center text-lg">
+                        <i class="ti ti-rotate-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Challenge Area -->
+        <div class="bg-white rounded-3xl p-8 md:p-10 min-h-[450px] shadow-lg border border-gray-100 relative overflow-hidden flex flex-col justify-between card-hover">
+            <div id="card-content">
+                <div class="text-center py-16">
+                    <div class="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="ti ti-cards text-4xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">¿Listo para el debate?</h3>
+                    <p class="text-gray-500 text-lg">Selecciona una tarjeta numerada para revelar el caso de estudio.</p>
+                </div>
+            </div>
+
+            <!-- Twist Container (Inside Card) -->
+            <div id="twist-content" class="twist-section mt-6 bg-red-50 p-6 rounded-2xl border border-red-200">
+                <div class="flex items-center gap-2 mb-3">
+                    <i class="ti ti-bolt text-red-500 text-xl"></i>
+                    <h4 class="text-red-600 text-sm font-bold uppercase tracking-wider">¡Giro del Destino!</h4>
+                </div>
+                <p id="twist-text" class="text-gray-800 text-lg font-medium leading-relaxed"></p>
+            </div>
+
+            <!-- Controls & Selector -->
+            <div class="mt-10 border-t border-gray-100 pt-8">
+                <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <div id="twist-btn-container" class="hidden w-full md:w-auto">
+                        <button onclick="showTwist()" class="bg-red-500 hover:bg-red-600 text-white font-bold px-6 py-3 rounded-xl transition-all uppercase text-sm tracking-wide flex items-center gap-2 shadow-md">
+                            <i class="ti ti-sparkles"></i>
+                            Añadir Dificultad
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-2" id="card-buttons">
+                        <script>
+                            for(let i=1; i<=12; i++) {
+                                document.write(`<button onclick="loadCard(${i})" id="btn-${i}" class="number-btn w-12 h-12 rounded-xl bg-gray-100 hover:bg-green-600 hover:text-white text-gray-700 font-bold border border-gray-200">${i}</button>`);
+                            }
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions Footer -->
+        <div class="flex flex-wrap justify-center gap-4 md:gap-8 mt-8 text-gray-500 font-semibold text-xs uppercase tracking-wider">
+            <span class="flex items-center gap-2"><i class="ti ti-eye text-green-600"></i> 1. Lee el caso</span>
+            <span class="hidden md:inline text-gray-300">|</span>
+            <span class="flex items-center gap-2"><i class="ti ti-clock text-green-600"></i> 2. Inicia el reloj</span>
+            <span class="hidden md:inline text-gray-300">|</span>
+            <span class="flex items-center gap-2"><i class="ti ti-message-circle text-green-600"></i> 3. Defiende tu postura</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 border-t border-gray-300">
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Visium Digital</h3>
+                    <p class="text-gray-600 text-sm">Escuela de diseño e innovación</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Contactos</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-brand-whatsapp"></i> (+58) 424 152 9071
+                        </li>
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-mail"></i> visiumdigitalca@gmail.com
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Síguenos</h3>
+                    <div class="flex space-x-3">
+                        <a href="https://www.instagram.com/visium.digital.c.a/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-instagram text-xl"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/visium-digital/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-500">© 2025 Visium Digital</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const cards = [
+            { id: 1, title: "Outfit de Graduación", sit: "Tus amigos compran un traje de $300. Solo tienes $150 para tu primer curso profesional.", q: "¿Compras el traje para encajar o el curso para tu futuro?", twist: "Premio de $200 al mejor vestido VS el curso acaba de subir de precio." },
+            { id: 2, title: "Crypto-Influencer", sit: "Un influencer asegura que una moneda subirá mañana. Tienes $100 que eran para el regalo de tu madre.", q: "¿Arriesgas el dinero o vas a lo seguro?", twist: "La moneda cae un 40% en horas. Un amigo te ofrece comprar tu parte por $60 'por lástima'." },
+            { id: 3, title: "Zapatillas en Cuotas", sit: "Vendes zapatillas limitadas. Un comprador ofrece el doble pero en 3 cuotas sin intereses.", q: "¿Aceptas cuotas o esperas un pago al contado?", twist: "La marca anuncia re-lanzamiento masivo mañana. El valor de reventa caerá a la mitad." },
+            { id: 4, title: "Suscripción Fantasma", sit: "Te cobran $15 por un streaming que no usas. Son tus últimos $15 para el almuerzo de hoy.", q: "¿Cancelas hoy mismo o intentas usarlo una última vez?", twist: "Si cancelas hoy, te ofrecen 50% de descuento anual, tentándote a seguir gastando." },
+            { id: 5, title: "Deseo de Smartphone", sit: "Tu teléfono funciona bien, pero el nuevo modelo cuesta el 40% de tu mesada por 24 meses.", q: "¿Te endeudas por el modelo nuevo o esperas?", twist: "A las dos semanas se rompe. El seguro no cubre la pantalla. Deuda extra acumulada." },
+            { id: 6, title: "Concierto vs Emergencia", sit: "Ahorraste $200 para emergencias. Tu artista favorito anuncia concierto único por $180.", q: "¿Es una 'emergencia emocional' o proteges tu ahorro?", twist: "Al día siguiente se rompe tu laptop de estudio. Reparación: $150." },
+            { id: 7, title: "Competencia Desleal", sit: "Vendes snacks con $50. Un competidor grande baja sus precios a pérdida para sacarte.", q: "¿Bajas tus precios perdiendo dinero o buscas diferenciarte?", twist: "La escuela prohíbe ventas a menos que pagues un permiso oficial de $20." },
+            { id: 8, title: "Gastos Hormiga Digitales", sit: "Gastas $2 diarios en micro-compras de juegos ($60 al mes) sin darte cuenta.", q: "¿Cómo cortas ese gasto sin dejar de divertirte?", twist: "Sale una skin legendaria solo por 24 horas. Cuesta exactamente $60." },
+            { id: 9, title: "Préstamo a Amigo", sit: "Un amigo pide $50 para su bici de trabajo. Sabes que es muy desorganizado financieramente.", q: "¿Prestas, regalas o dices que no?", twist: "Ves fotos de él de fiesta esa noche. Te dice que 'el trabajo puede esperar'." },
+            { id: 10, title: "Dinero vs Aprendizaje", sit: "Trabajo manual hoy por $400 vs Taller gratis que promete empleos de $1500 a futuro.", q: "¿Dinero rápido hoy o inversión en conocimientos?", twist: "Tu familia tiene un gasto médico urgente y necesitan esos $400 ya mismo." },
+            { id: 11, title: "Gimnasio por Estatus", sit: "Gym Top de $80 (donde están todos) vs Gym Municipal de $10 (viejo y solo).", q: "¿Pagas por los contactos o solo por el ejercicio?", twist: "El gimnasio caro cierra por reforma un mes y no congela las cuotas." },
+            { id: 12, title: "Herencia Inesperada", sit: "Recibes $500. ¿Guardas en banco (2% anual), compras equipo o gastas la mitad?", q: "¿Cuál es el movimiento más inteligente?", twist: "La inflación sube un 15% de golpe. El dinero en el banco pierde valor real." }
+        ];
+
+        let countdown;
+        let timeLeft = 120;
+        let isRunning = false;
+
+        function loadCard(id) {
+            const card = cards.find(c => c.id === id);
+            const content = document.getElementById('card-content');
+            const twistBtn = document.getElementById('twist-btn-container');
+            const twistSection = document.getElementById('twist-content');
+            
+            // Update active button state
+            document.querySelectorAll('.number-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${id}`).classList.add('active');
+            
+            content.innerHTML = `
+                <div class="animate-in fade-in zoom-in duration-300">
+                    <div class="flex justify-between items-start mb-6">
+                        <h3 class="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">${card.title}</h3>
+                        <span class="bg-green-600 text-white px-4 py-1 rounded-full text-xs font-bold">CASO #${card.id}</span>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i class="ti ti-file-description text-green-600"></i>
+                                <span class="text-sm font-bold text-gray-500 uppercase tracking-wider">Situación</span>
+                            </div>
+                            <p class="text-gray-700 text-lg leading-relaxed">${card.sit}</p>
+                        </div>
+                        
+                        <div class="bg-green-50 p-6 rounded-2xl border border-green-100">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i class="ti ti-help-circle text-green-600"></i>
+                                <span class="text-sm font-bold text-green-600 uppercase tracking-wider">Decisión Crítica</span>
+                            </div>
+                            <p class="text-gray-800 text-xl font-semibold">"${card.q}"</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('twist-text').innerText = card.twist;
+            twistSection.style.display = 'none';
+            twistBtn.classList.remove('hidden');
+            resetTimer();
+        }
+
+        function showTwist() {
+            document.getElementById('twist-content').style.display = 'block';
+            document.getElementById('twist-btn-container').classList.add('hidden');
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(countdown);
+                document.getElementById('timer-btn').innerHTML = '<i class="ti ti-player-play"></i>';
+                document.getElementById('timer-btn').classList.replace('bg-orange-500', 'bg-green-600');
+            } else {
+                if (timeLeft <= 0) timeLeft = 120;
+                countdown = setInterval(updateTimer, 1000);
+                document.getElementById('timer-btn').innerHTML = '<i class="ti ti-player-pause"></i>';
+                document.getElementById('timer-btn').classList.replace('bg-green-600', 'bg-orange-500');
+            }
+            isRunning = !isRunning;
+        }
+
+        function resetTimer() {
+            clearInterval(countdown);
+            isRunning = false;
+            timeLeft = 120;
+            updateTimerDisplay();
+            document.getElementById('timer-btn').innerHTML = '<i class="ti ti-player-play"></i>';
+            document.getElementById('timer-btn').classList.replace('bg-orange-500', 'bg-green-600');
+            document.getElementById('timer').classList.remove('timer-danger');
+            document.getElementById('timer').classList.add('timer-active');
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            updateTimerDisplay();
+            if (timeLeft <= 10) {
+                document.getElementById('timer').classList.add('timer-danger');
+            }
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                isRunning = false;
+            }
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            document.getElementById('timer').innerText = 
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>

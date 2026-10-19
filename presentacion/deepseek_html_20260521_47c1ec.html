@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Visium Digital | Curso Finanzas para Niños y Jóvenes - 40 lecciones completas</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                    colors: {
+                        primary: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
+                        'visium-blue': '#1e3a8a',
+                    },
+                    animation: { 'fade-in': 'fadeIn 0.4s ease-out' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: linear-gradient(145deg, #f9fafc 0%, #eef2ff 100%); font-family: 'Inter', sans-serif; }
+        .slide-container { scroll-snap-type: x mandatory; overflow-x: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .slide { scroll-snap-align: start; flex: 0 0 100%; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem 1.5rem; }
+        .slide-content { max-width: 1200px; width: 100%; margin: 0 auto; }
+        .nav-btn { transition: all 0.2s; backdrop-filter: blur(8px); }
+        .nav-btn:hover { transform: scale(1.05); background-color: rgba(59,130,246,0.15); }
+        .slide-container::-webkit-scrollbar { display: none; }
+        .slide-container { -ms-overflow-style: none; scrollbar-width: none; }
+        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+<div id="slidesWrapper" class="slide-container flex flex-row w-full h-screen overflow-x-auto relative">
+    <!-- ==================== 01 ==================== -->
+    <div class="slide"><div class="slide-content text-center animate-fade-in">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary-100 text-primary-600 mb-6"><i class="ti ti-coins text-4xl"></i></div>
+        <h1 class="text-5xl md:text-7xl font-extrabold bg-gradient-to-r from-primary-700 to-primary-500 bg-clip-text text-transparent">Finanzas digitales<br>para niños & jóvenes</h1>
+        <p class="text-xl text-gray-600 mt-4 max-w-2xl mx-auto">Escuela de diseño e innovación · Visium Digital</p>
+        <p class="text-gray-500 mt-2">Aprende a dominar el dinero, construir sueños y liderar en la era digital.</p>
+        <div class="mt-8 flex flex-wrap justify-center gap-3"><span class="px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm font-medium shadow">💰 Ahorro</span><span class="px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm font-medium shadow">📈 Inversión</span><span class="px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm font-medium shadow">🚀 Liderazgo Digital</span><span class="px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm font-medium shadow">🔐 Criptomonedas</span></div>
+    </div></div>
+
+    <!-- ==================== 02 ==================== -->
+    <div class="slide"><div class="slide-content"><div class="text-center mb-8"><span class="text-primary-500 text-sm font-semibold tracking-wide">Tu hoja de ruta</span><h2 class="text-3xl md:text-4xl font-bold">Ruta de aprendizaje</h2><div class="w-24 h-1 bg-primary-500 mx-auto mt-2 rounded-full"></div><p class="text-gray-500 mt-2">4 unidades para transformar tu relación con el dinero</p></div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white/80 backdrop-blur-sm p-5 rounded-2xl shadow card-hover border border-gray-100"><i class="ti ti-cash text-3xl text-primary-600"></i><h3 class="font-bold text-xl mt-2">Unidad I · El Dinero</h3><p class="text-gray-500 text-sm">Fundamentos, mentalidad, historia del dinero y su evolución.</p></div>
+            <div class="bg-white/80 backdrop-blur-sm p-5 rounded-2xl shadow card-hover"><i class="ti ti-heart-handshake text-3xl text-amber-600"></i><h3 class="font-bold text-xl mt-2">Unidad II · Deseos y necesidades</h3><p class="text-gray-500 text-sm">Diferencias críticas, priorización y decisiones conscientes.</p></div>
+            <div class="bg-white/80 backdrop-blur-sm p-5 rounded-2xl shadow card-hover"><i class="ti ti-pig-money text-3xl text-emerald-600"></i><h3 class="font-bold text-xl mt-2">Unidad III · Ahorro</h3><p class="text-gray-500 text-sm">Gestión con propósito, seguridad, fondo de emergencia.</p></div>
+            <div class="bg-white/80 backdrop-blur-sm p-5 rounded-2xl shadow card-hover"><i class="ti ti-brand-binance text-3xl text-indigo-600"></i><h3 class="font-bold text-xl mt-2">Unidad IV · Liderazgo Digital</h3><p class="text-gray-500 text-sm">Finanzas digitales, billeteras, blockchain, infoproductos.</p></div>
+        </div>
+    </div></div>
+
+    <!-- ==================== 03 ==================== -->
+    <div class="slide"><div class="slide-content bg-white/70 backdrop-blur-md p-8 rounded-3xl shadow-xl"><div class="flex flex-col md:flex-row gap-6 items-center"><div class="w-32 h-32 rounded-full bg-primary-100 flex items-center justify-center"><i class="ti ti-user-circle text-6xl text-primary-600"></i></div><div><h2 class="text-2xl font-bold">Yennifer Perez</h2><p class="text-primary-600 font-semibold">Licenciada en Administración y Contador Público</p><p class="text-gray-600 mt-2">Más de 15 años de experiencia asesorando empresas e innovando con estrategias digitales. Docente y facilitadora de procesos de cambio. Apasionada por guiar a jóvenes y emprendedores en el mundo de las <strong>Finanzas Digitales</strong>.</p><div class="flex gap-2 mt-3"><span class="bg-primary-50 px-3 py-1 rounded-full text-xs">Transformación digital</span><span class="bg-primary-50 px-3 py-1 rounded-full text-xs">Educación financiera</span></div></div></div></div></div>
+
+    <!-- ==================== 04 ==================== -->
+    <div class="slide"><div class="slide-content text-center"><i class="ti ti-rocket text-6xl text-primary-500 mb-4"></i><h2 class="text-4xl font-bold">¡Bienvenidos al futuro!</h2><p class="text-lg text-gray-700 max-w-2xl mx-auto mt-4">Tu gran aventura comienza hoy. Descubres un conocimiento que te dará superpoderes. Aprender sobre el dinero no es solo contar monedas, es aprender a <strong>construir tus sueños</strong> y ser el dueño de tu destino. El Dinero es una herramienta para ayudar a los demás y cambiar el mundo.</p><div class="mt-6 inline-block bg-white/60 rounded-full px-5 py-2 text-sm shadow">✨ “El dinero bien usado siembra libertad” ✨</div></div></div>
+
+    <!-- ==================== 05 ==================== -->
+    <div class="slide"><div class="slide-content"><h2 class="text-3xl font-bold text-center mb-2">El dinero: herramienta, no un fin</h2><p class="text-center text-gray-500 mb-8">Tres metáforas para entender su verdadero poder</p><div class="grid md:grid-cols-3 gap-6"><div class="bg-white p-6 rounded-2xl shadow text-center card-hover"><i class="ti ti-grip-horizontal text-5xl text-primary-500"></i><h3 class="font-bold text-xl mt-2">El Martillo</h3><p>Úsalo para construir puentes hacia tus metas. Tú decides qué crear con él.</p></div><div class="bg-white p-6 rounded-2xl shadow text-center card-hover"><i class="ti ti-seedling text-5xl text-emerald-500"></i><h3 class="font-bold text-xl mt-2">La Semilla</h3><p>Siémbralo en conocimiento o ayuda. Crece y da frutos para todos.</p></div><div class="bg-white p-6 rounded-2xl shadow text-center card-hover"><i class="ti ti-compass text-5xl text-indigo-500"></i><h3 class="font-bold text-xl mt-2">La Brújula</h3><p>Te ayuda a llegar a donde quieres, pero tú eres el capitán del rumbo.</p></div></div></div></div>
+
+    <!-- ==================== 06 ==================== -->
+    <div class="slide"><div class="slide-content bg-primary-50/70 p-8 rounded-3xl"><h2 class="text-2xl font-bold">Definición económica del dinero</h2><p class="text-gray-700 mt-3 text-lg">El Dinero es cualquier activo o bien que sea aceptado generalmente como medio de pago por los agentes económicos para sus intercambios. No tiene por qué tener valor intrínseco (como el oro); su valor reside en la <strong>confianza</strong> y el respaldo institucional de los bancos centrales.</p><div class="mt-4 flex gap-3"><span class="bg-white px-3 py-1 rounded-full text-sm shadow">📜 Convención social</span><span class="bg-white px-3 py-1 rounded-full text-sm shadow">🏦 Dinero fiduciario</span><span class="bg-white px-3 py-1 rounded-full text-sm shadow">⚖️ Confianza</span></div></div></div>
+
+    <!-- ==================== 07 ==================== -->
+    <div class="slide"><div class="slide-content"><h2 class="text-3xl font-bold text-center mb-6">Funciones del dinero</h2><div class="grid md:grid-cols-3 gap-6"><div class="bg-white p-5 rounded-xl shadow"><i class="ti ti-exchange text-3xl text-primary-500"></i><h3 class="font-bold text-xl">Medio de pago</h3><p class="text-gray-600">Elimina la necesidad del trueque, facilitando la compra y venta de bienes y servicios de manera eficiente.</p><div class="mt-2 text-xs text-gray-400">Ejemplo: pagas un helado con monedas.</div></div><div class="bg-white p-5 rounded-xl shadow"><i class="ti ti-clock text-3xl text-primary-500"></i><h3 class="font-bold text-xl">Depósito de valor</h3><p class="text-gray-600">Permite transferir poder adquisitivo del presente al futuro. Se puede ahorrar para consumir después.</p><div class="mt-2 text-xs text-gray-400">Ejemplo: guardas dinero hoy para comprar una bicicleta en un año.</div></div><div class="bg-white p-5 rounded-xl shadow"><i class="ti ti-ruler-measure text-3xl text-primary-500"></i><h3 class="font-bold text-xl">Unidad de cuenta</h3><p class="text-gray-600">Es la medida estándar para expresar precios y registrar deudas, permitiendo comparar el valor de los bienes.</p><div class="mt-2 text-xs text-gray-400">Ejemplo: comparas el precio de un teléfono vs una tablet.</div></div></div></div></div>
+
+    <!-- ==================== 08 ==================== -->
+    <div class="slide"><div class="slide-content"><h2 class="text-3xl font-bold text-center">El flujo circular de la economía</h2><p class="text-center text-gray-500 mb-6">El dinero fluye constantemente entre dos actores principales</p><div class="bg-white p-6 rounded-2xl shadow flex flex-wrap justify-around items-center gap-8"><div class="text-center"><i class="ti ti-home text-5xl text-primary-600"></i><p class="font-bold text-xl">Hogares</p><p>Ofrecen trabajo<br>y compran bienes</p></div><i class="ti ti-arrow-left-right text-3xl text-gray-400"></i><div class="text-center"><i class="ti ti-building-factory text-5xl text-primary-600"></i><p class="font-bold text-xl">Empresas</p><p>Pagan salarios<br>y venden productos</p></div></div><p class="text-center text-gray-500 text-sm mt-6">Además participan los bancos (intermediarios) y el Estado (regulador e impuestos).</p></div></div>
+
+    <!-- ==================== 09 ==================== -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold mb-4">Actores en la circulación del dinero</h2><div class="overflow-x-auto"><table class="min-w-full bg-white rounded-2xl shadow-lg"><thead class="bg-primary-100"><tr><th class="p-3 text-left">Actor Económico</th><th class="p-3 text-left">Función en el Flujo</th><th class="p-3 text-left">Tipo de Movimiento</th></tr></thead><tbody><tr class="border-b"><td class="p-3 font-semibold">Familias</td><td>Proveedores de mano de obra</td><td>Gasto en consumo</td></tr><tr class="border-b"><td class="p-3 font-semibold">Empresas</td><td>Productores de valor</td><td>Pago de salarios</td></tr><tr class="border-b"><td class="p-3 font-semibold">Bancos</td><td>Intermediarios financieros</td><td>Crédito e inversión</td></tr><tr><td class="p-3 font-semibold">Estado</td><td>Regulador y redistribuidor</td><td>Impuestos y gasto público</td></tr></tbody></table></div><p class="text-gray-500 text-sm mt-4">Este ciclo mantiene viva la economía. Entenderlo te ayuda a tomar mejores decisiones.</p></div></div>
+
+    <!-- ==================== 10 ==================== -->
+    <div class="slide"><div class="slide-content bg-gradient-to-br from-white to-primary-50 p-7 rounded-2xl shadow"><h2 class="text-2xl font-bold">Evolución del dinero</h2><p class="mt-2">En esta unidad <strong>aprenderás</strong>:</p><ul class="list-disc list-inside mt-3 space-y-2 text-gray-700"><li>🔹 ¿Cómo se llaman las monedas digitales? (Bitcoin, Ethereum, etc.)</li><li>🔹 ¿Qué es una Blockchain?</li><li>🔹 ¿Qué es una Wallet o billetera digital?</li><li>🔹 ¿Cómo realizar operaciones de compra y venta de Criptomonedas?</li></ul><div class="mt-5 flex gap-2"><i class="ti ti-brand-bitcoin text-3xl"></i><i class="ti ti-brand-ethereum text-3xl"></i><i class="ti ti-wallet text-3xl"></i></div></div></div>
+
+    <!-- ==================== 11 ==================== -->
+    <div class="slide"><div class="slide-content text-center"><i class="ti ti-planet text-5xl text-primary-500"></i><h2 class="text-3xl font-bold mt-3">El futuro del dinero</h2><p class="text-gray-700 max-w-2xl mx-auto mt-4">Hacia una economía <strong>programable, descentralizada y global</strong>. El concepto de dinero seguirá evolucionando junto con la tecnología blockchain y las monedas digitales soberanas (CBDC).</p><div class="mt-6 flex justify-center gap-4"><span class="bg-white px-4 py-2 rounded-full shadow text-sm">🔗 Blockchain</span><span class="bg-white px-4 py-2 rounded-full shadow text-sm">🏛️ CBDC</span><span class="bg-white px-4 py-2 rounded-full shadow text-sm">🌐 Descentralización</span></div></div></div>
+
+    <!-- ==================== 12 ==================== -->
+    <div class="slide"><div class="slide-content bg-gradient-to-r from-primary-50 to-white p-8 rounded-3xl shadow-inner"><p class="text-2xl italic text-center">"El dinero no es el fin, es el medio. Es una herramienta poderosa que tú controlas, no al revés. Aprende a usarla sabiamente y construye el futuro que deseas."</p><p class="font-semibold text-center mt-4">— El Dinero: Tu herramienta de libertad</p></div></div>
+
+    <!-- ==================== 13 ==================== -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold text-center mb-6">Línea del tiempo: cómo evolucionó el dinero</h2><div class="grid grid-cols-2 md:grid-cols-4 gap-4"><div class="bg-white p-4 rounded-xl text-center shadow"><i class="ti ti-exchange text-3xl"></i><p class="font-bold mt-2">Trueque</p><p class="text-xs text-gray-500">3 gallinas por 1 caballo</p></div><div class="bg-white p-4 rounded-xl text-center shadow"><i class="ti ti-coin text-3xl"></i><p class="font-bold mt-2">Oro y metales</p><p class="text-xs text-gray-500">Valor intrínseco</p></div><div class="bg-white p-4 rounded-xl text-center shadow"><i class="ti ti-receipt text-3xl"></i><p class="font-bold mt-2">Billetes y monedas</p><p class="text-xs text-gray-500">Respaldados por gobiernos</p></div><div class="bg-white p-4 rounded-xl text-center shadow"><i class="ti ti-device-mobile text-3xl"></i><p class="font-bold mt-2">Dinero digital</p><p class="text-xs text-gray-500">Tarjetas, apps, cripto</p></div></div><p class="text-center text-gray-500 text-sm mt-6">Cada etapa resolvió un problema de la anterior.</p></div></div>
+
+    <!-- ==================== 14 ==================== -->
+    <div class="slide"><div class="slide-content"><h2 class="text-3xl font-bold text-center">El flujo de tu dinero personal</h2><div class="mt-6 p-6 bg-white rounded-2xl shadow"><div class="flex flex-col md:flex-row justify-around gap-6"><div class="text-center"><i class="ti ti-arrow-down-circle text-4xl text-green-500"></i><p class="font-bold text-green-700">Ingresos</p><p>Salario, ingresos extra, regalos, negocios</p></div><div class="text-center"><i class="ti ti-arrow-up-circle text-4xl text-red-500"></i><p class="font-bold text-red-700">Gastos</p><p>Alquiler, comida, transporte, ocio</p></div></div><div class="mt-6 p-4 bg-gray-50 rounded-xl"><p class="font-semibold">✔️ Si ahorras → Oportunidad para tu futuro</p><p class="font-semibold text-red-600">❌ Si gastas más de lo que ganas → Problema que debes resolver</p></div></div></div></div>
+
+    <!-- ==================== 15 ==================== -->
+    <div class="slide"><div class="slide-content text-center"><i class="ti ti-brain text-6xl text-primary-500"></i><h2 class="text-3xl font-bold mt-4">Aprende a decidir</h2><p class="text-gray-600 max-w-md mx-auto mt-3">Cada elección de gasto o ahorro construye tu mañana. La conciencia financiera se entrena.</p><div class="mt-6 flex flex-col items-start gap-3 max-w-sm mx-auto bg-white p-5 rounded-xl shadow"><div class="flex items-center gap-2"><i class="ti ti-checkbox text-green-500"></i><span>Identifica si es <strong>necesidad</strong> o <strong>deseo</strong></span></div><div class="flex items-center gap-2"><i class="ti ti-checkbox text-green-500"></i><span>Pregúntate: ¿me acerca a mis metas?</span></div><div class="flex items-center gap-2"><i class="ti ti-checkbox text-green-500"></i><span>Espera 48 horas antes de compras impulsivas</span></div></div></div></div>
+
+    <!-- ==================== 16 ==================== -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold">Ahorro Inteligente</h2><div class="bg-white p-6 rounded-2xl mt-4 shadow border-l-8 border-primary-500"><p class="font-bold text-lg">La regla del ahorro: <span class="text-primary-600">Ahorra primero, no al final del mes.</span></p><ul class="list-disc list-inside mt-3 space-y-1"><li>✅ Empieza con el <strong>10% de tus ingresos</strong> (o lo que puedas)</li><li>✅ Automatiza transferencias mensuales a una cuenta de ahorro</li><li>✅ Crea tu <strong>fondo de emergencia</strong>: meta de 3 a 6 meses de gastos cubiertos</li></ul><div class="mt-4 bg-primary-50 p-3 rounded-lg"><i class="ti ti-chart-bar"></i> Ejemplo: si gastas $500 al mes, tu fondo de emergencia ideal sería entre $1,500 y $3,000.</div></div></div></div>
+
+    <!-- ==================== 17 ==================== -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold">Haz crecer tu dinero: Inversión</h2><div class="grid md:grid-cols-3 gap-4 mt-4"><div class="bg-white p-4 rounded-xl shadow text-center"><i class="ti ti-chart-line text-3xl text-primary-500"></i><p class="font-bold">01. Invertir</p><p class="text-sm">Tu dinero trabajando para ti, no solo ahorrado.</p></div><div class="bg-white p-4 rounded-xl shadow text-center"><i class="ti ti-percent text-3xl text-primary-500"></i><p class="font-bold">02. Ganar intereses</p><p class="text-sm">Depósitos, bonos, cuentas remuneradas.</p></div><div class="bg-white p-4 rounded-xl shadow text-center"><i class="ti ti-clock-hour-4 text-3xl text-primary-500"></i><p class="font-bold">03. El tiempo multiplica</p><p class="text-sm">Interés compuesto: tus intereses generan más intereses.</p></div></div><div class="mt-6 p-4 bg-amber-50 rounded-xl text-center"><p class="font-semibold">✨ Ejemplo: invertir $100 al 10% anual. En 10 años se convierte en $259. En 20 años → $672. ✨</p></div></div></div>
+
+    <!-- ==================== 18 ==================== -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold text-center">Deuda Inteligente</h2><div class="grid md:grid-cols-2 gap-6 mt-6"><div class="bg-red-50 p-5 rounded-2xl border-l-4 border-red-500"><i class="ti ti-circle-minus text-red-500 text-2xl"></i><h3 class="font-bold text-xl">Deuda Mala</h3><p>Deudas que consumen tu flujo de caja sin generar retorno.</p><ul class="list-disc list-inside mt-2 text-sm"><li>Tarjetas de crédito con intereses altos</li><li>Préstamos para consumo sin plan</li><li>Compras impulsivas con interés</li></ul></div><div class="bg-green-50 p-5 rounded-2xl border-l-4 border-green-500"><i class="ti ti-circle-plus text-green-500 text-2xl"></i><h3 class="font-bold text-xl">Deuda Buena</h3><p>Inversiones financiadas que aumentan tu valor neto o ingresos.</p><ul class="list-disc list-inside mt-2 text-sm"><li>Préstamo para educación (mejora tu futuro laboral)</li><li>Hipoteca para vivienda (construyes patrimonio)</li><li>Financiación para negocio (genera ingresos)</li></ul></div></div><p class="text-center text-sm italic mt-4">“La clave está en usar la deuda con estrategia y propósito.”</p></div></div>
+
+    <!-- ==================== 19 ==================== -->
+    <div class="slide"><div class="slide-content bg-white/70 backdrop-blur-sm p-8 rounded-3xl shadow-xl"><h2 class="text-3xl font-bold text-center">Tu plan de acción financiero</h2><div class="grid md:grid-cols-2 gap-5 mt-8"><div class="flex gap-3 items-start"><i class="ti ti-notes text-2xl text-primary-500"></i><div><p class="font-bold">1. Anota tu dinero</p><p class="text-gray-600">Lleva registro de ingresos y gastos. Saber a dónde va cada centavo es el primer paso.</p></div></div><div class="flex gap-3 items-start"><i class="ti ti-pig-money text-2xl text-primary-500"></i><div><p class="font-bold">2. Ahorra siempre</p><p class="text-gray-600">Trata el ahorro como prioridad, no como lo que sobra. Automatiza tu futuro hoy.</p></div></div><div class="flex gap-3 items-start"><i class="ti ti-book text-2xl text-primary-500"></i><div><p class="font-bold">3. Invierte en aprender</p><p class="text-gray-600">Mejora tus habilidades continuamente. El conocimiento es el activo que genera más intereses.</p></div></div><div class="flex gap-3 items-start"><i class="ti ti-building-skyscraper text-2xl text-primary-500"></i><div><p class="font-bold">4. Construye tu futuro</p><p class="text-gray-600">Tus decisiones de hoy definen tu realidad de mañana. Actúa con visión y propósito.</p></div></div></div></div></div>
+
+    <!-- ==================== 20 ==================== -->
+    <div class="slide"><div class="slide-content text-center"><i class="ti ti-heart-handshake text-5xl text-primary-500 mb-3"></i><h2 class="text-4xl font-bold">Gracias</h2><p class="text-gray-600 text-lg">Escuela de diseño e innovación · Visium Digital</p><div class="mt-8 bg-white/60 inline-block p-6 rounded-2xl shadow"><p><i class="ti ti-mail"></i> visiumdigitalca@gmail.com</p><p><i class="ti ti-phone"></i> (+58) 424 152 907</p><p><i class="ti ti-map-pin"></i> Caracas - Venezuela</p><p><i class="ti ti-world"></i> visium.online</p></div><p class="mt-6 text-gray-400 text-sm">Síguenos para más contenido de finanzas digitales.</p></div></div>
+
+    <!-- ==================== 21 a 30: Regla de Vida Financiera ==================== -->
+    <!-- 21 -->
+    <div class="slide"><div class="slide-content text-center"><i class="ti ti-ruler-measure text-5xl text-primary-500"></i><h1 class="text-4xl font-bold mt-3">Regla de Vida Financiera</h1><p class="text-gray-600 text-xl">Un sistema para no perderte cuando el dinero llegue</p><div class="mt-6"><span class="bg-primary-100 px-4 py-2 rounded-full text-sm">⚖️ Orden</span><span class="bg-primary-100 px-4 py-2 rounded-full text-sm ml-2">📊 Proporciones</span></div></div></div>
+    <!-- 22 -->
+    <div class="slide"><div class="slide-content"><p class="text-xl text-center">Muchos creen que el problema es no ganar suficiente dinero…<br> pero he visto personas ganar mucho… y terminar igual de vacías financieramente.</p><div class="mt-8 bg-amber-50 p-6 rounded-xl text-center"><i class="ti ti-alert-triangle text-3xl text-amber-500"></i><p class="font-bold text-lg">Porque el dinero sin dirección… desaparece.</p><p class="mt-2">El dinero debe tener un <strong>Propósito</strong>.</p></div></div></div>
+    <!-- 23 -->
+    <div class="slide"><div class="slide-content text-center"><i class="ti ti-balance-scale text-5xl text-primary-500"></i><h2 class="text-3xl font-bold mt-2">La Solución: La Regla de Vida</h2><p class="text-gray-600 max-w-2xl mx-auto mt-4">Más que una fórmula matemática. Es un <strong>SISTEMA PARA NO PERDERTE CUANDO EL DINERO LLEGUE</strong>. No importa cuánto ganas… si no sabes dividirlo, el dinero se va.</p></div></div>
+    <!-- 24 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold text-center">Los 4 Pilares de la Regla de Vida</h2><p class="text-center text-gray-500 mb-6">Organiza tu dinero de forma inteligente y con propósito</p><div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center"><div class="bg-primary-100 p-4 rounded-xl"><span class="text-4xl font-bold text-primary-700">70%</span><p class="font-bold mt-1">Vida y Necesidades</p></div><div class="bg-emerald-100 p-4 rounded-xl"><span class="text-4xl font-bold text-emerald-700">10%</span><p class="font-bold mt-1">Inversión</p></div><div class="bg-amber-100 p-4 rounded-xl"><span class="text-4xl font-bold text-amber-700">10%</span><p class="font-bold mt-1">Ahorro</p></div><div class="bg-indigo-100 p-4 rounded-xl"><span class="text-4xl font-bold text-indigo-700">10%</span><p class="font-bold mt-1">Diversión</p></div></div><p class="text-center text-sm text-gray-500 mt-4">Al aplicar estos porcentajes, diriges tu dinero hacia tus metas, asegurando presente y futuro.</p></div></div>
+    <!-- 25 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold flex items-center gap-2"><i class="ti ti-home-heart"></i> 70% – VIDA Y NECESIDADES</h2><p>Lo esencial para vivir y funcionar: <strong>Comida, transporte, servicios, educación, salud</strong>.</p><div class="mt-4 p-4 bg-gray-50 rounded-xl"><p class="font-semibold">🔍 Pregunta clave para diferenciar:</p><p class="italic">¿Puedo vivir sin esto por 3 días?</p><p>→ Si es <strong>SÍ</strong> = Es un DESEO<br>→ Si es <strong>NO</strong> = Es una NECESIDAD</p></div><p class="mt-3 text-primary-600 font-medium">"El objetivo no es gastar todo… es vivir con intención."</p></div></div>
+    <!-- 26 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold flex items-center gap-2"><i class="ti ti-chart-line"></i> 10% – INVERSIÓN</h2><p>Dinero para crecer. No solo bolsa o cripto. También:</p><ul class="list-disc list-inside mt-2 space-y-1"><li>📚 Educación (cursos, libros, talleres)</li><li>🛠️ Herramientas para tu negocio o emprendimiento</li><li>💡 Desarrollo de habilidades (idiomas, programación)</li></ul><div class="mt-5 bg-emerald-50 p-3 rounded-lg"><i class="ti ti-quote"></i> “Si nunca inviertes… siempre tendrás que empezar desde cero.”</div></div></div>
+    <!-- 27 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold flex items-center gap-2"><i class="ti ti-shield-lock"></i> 10% – AHORRO</h2><p>Protección y tranquilidad. Divide ese 10% en:</p><div class="grid grid-cols-2 gap-4 mt-3"><div class="bg-blue-50 p-3 rounded-lg text-center"><span class="font-bold text-2xl">5%</span><p>Ahorros para metas</p></div><div class="bg-amber-50 p-3 rounded-lg text-center"><span class="font-bold text-2xl">5%</span><p>Fondo de Emergencia</p></div></div><p class="mt-3"><strong>Fondo de emergencia:</strong> debe cubrir al menos 6 meses de ingresos. Comienza con el 5% destinado.</p><p class="mt-2 text-gray-600 italic">"El ahorro no te hace rico… pero evita que cualquier problema te destruya."</p></div></div>
+    <!-- 28 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold flex items-center gap-2"><i class="ti ti-mood-happy"></i> 10% – DIVERSIÓN</h2><p>El dinero también debe darte experiencias. Pero con equilibrio.</p><div class="mt-4 p-4 bg-purple-50 rounded-xl"><p class="italic">“No vinimos al mundo solo a pagar cuentas.”</p><p class="font-semibold mt-2">Disfrutar sin destruir tu futuro.</p></div><p class="mt-3">Ejemplos: salidas con amigos, cine, hobbies, pequeños viajes. La clave es que sea <strong>consciente</strong>.</p></div></div>
+    <!-- 29 -->
+    <div class="slide"><div class="slide-content text-center"><i class="ti ti-flame text-6xl text-orange-500"></i><p class="text-3xl font-bold mt-4 max-w-2xl mx-auto">No importa cuánto ganas… si no sabes dividirlo, el dinero se va.</p><p class="text-gray-500 mt-4">LA IDEA FUERTE</p></div></div>
+    <!-- 30 -->
+    <div class="slide"><div class="slide-content text-center bg-white p-8 rounded-3xl shadow-2xl"><h2 class="text-3xl font-bold">Resumen: Tu Camino hacia la Libertad Financiera</h2><p class="mt-4">Ya entendemos el dinero: ✓ cuándo tomar decisiones, ✓ cómo construir libertad.</p><p class="mt-2 font-semibold">La Regla de Vida es tu brújula:</p><div class="flex flex-wrap justify-center gap-3 mt-4"><span class="bg-primary-100 px-3 py-1 rounded-full">70% Vida</span><span class="bg-emerald-100 px-3 py-1 rounded-full">10% Inversión</span><span class="bg-amber-100 px-3 py-1 rounded-full">10% Ahorro</span><span class="bg-indigo-100 px-3 py-1 rounded-full">10% Diversión</span></div><p class="mt-6 italic text-gray-700">"El dinero sin dirección desaparece. El dinero con propósito te libera."</p></div></div>
+
+    <!-- ==================== 31 a 40: Evolución de los Métodos de Pago ==================== -->
+    <!-- 31 -->
+    <div class="slide"><div class="slide-content text-center"><h1 class="text-4xl font-bold bg-gradient-to-r from-primary-700 to-primary-500 bg-clip-text text-transparent">Evolución de los Métodos de Pago</h1><p class="text-xl text-gray-500 mt-3">Un viaje desde el trueque hasta los pagos invisibles del futuro</p><i class="ti ti-history text-6xl mt-6 text-primary-400"></i></div></div>
+    <!-- 32 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold">1. Intercambio Directo: Trueque</h2><p class="mt-2">Intercambio directo de producto por producto sin intermediarios.</p><p class="mt-2"><strong>Limitación principal:</strong> necesitabas que ambas partes quisieran exactamente lo mismo al mismo tiempo. Esto se llama <span class="italic">"doble coincidencia de necesidades"</span>.</p><div class="mt-4 p-4 bg-gray-100 rounded-xl">🐔 3 gallinas por 🐴 1 caballo (ejemplo clásico). Aquí nace el problema que el dinero vino a resolver.</div></div></div>
+    <!-- 33 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold">2. Dinero Físico</h2><div class="grid md:grid-cols-2 gap-4 mt-4"><div><i class="ti ti-coin text-3xl"></i><p class="font-bold">Monedas</p><p>Oro, plata y metales preciosos que representaban valor tangible.</p></div><div><i class="ti ti-receipt text-3xl"></i><p class="font-bold">Billetes</p><p>Dinero fiduciario respaldado por gobiernos con aceptación oficial.</p></div></div><div class="mt-4"><p><span class="font-semibold">Ventaja:</span> aceptación general y portabilidad. <span class="font-semibold">Problema:</span> transporte, seguridad, límites físicos.</p></div></div></div>
+    <!-- 34 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold">3. Sistema Bancario Tradicional</h2><ul class="list-disc list-inside mt-3 space-y-2"><li><strong>Transferencias bancarias</strong> entre cuentas del mismo banco y entre bancos nacionales.</li><li><strong>Sistema SWIFT</strong>: permite transferencias internacionales entre bancos globales.</li></ul><div class="mt-4 p-3 bg-blue-50 rounded-lg">✅ Ventaja: Confiable y regulado. ❌ Problema: Lento, costoso, requiere intermediarios.</div></div></div>
+    <!-- 35 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold">4. Tarjetas y Puntos de Venta (POS)</h2><p>Tarjetas de débito y crédito: pagos en comercios físicos con terminales POS.</p><p class="mt-2"><strong>Evolución tecnológica:</strong> Banda magnética → Chip → Sin contacto (Contactless).</p><div class="mt-4 p-3 bg-gray-100 rounded-xl text-center">🔹 Aquí el dinero deja de verse... pero aún depende del banco.</div></div></div>
+    <!-- 36 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold">5. Pagos Electrónicos Modernos</h2><div class="grid md:grid-cols-2 gap-4 mt-4"><div><i class="ti ti-device-mobile"></i><p class="font-bold">Pago móvil (banca móvil)</p><p>Transferencias desde apps bancarias. Muy popular en LATAM (ej: Nequi, Mercado Pago).</p></div><div><i class="ti ti-qrcode"></i><p class="font-bold">Pagos con QR</p><p>Escaneas código y pagas en comercios pequeños y grandes. Rapidez y accesibilidad.</p></div></div></div></div>
+    <!-- 37 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold">6. Pagos Sin Contacto (Contactless)</h2><p>Tecnología <strong>NFC</strong> (comunicación de corto alcance). Acercas tu dispositivo (tarjeta o teléfono) al terminal. Ya no tocas... solo acercas.</p><div class="mt-4 flex gap-4 justify-center"><div class="bg-white p-3 rounded-xl shadow text-center"><i class="ti ti-brand-apple text-4xl"></i><p>Apple Pay</p></div><div class="bg-white p-3 rounded-xl shadow text-center"><i class="ti ti-brand-google text-4xl"></i><p>Google Pay</p></div></div></div></div>
+    <!-- 38 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold">7. Billeteras Digitales</h2><p>Guardan dinero digital, permiten enviar, recibir y pagar. Ejemplos: <strong>PayPal, Zelle, Binance Pay</strong>.</p><div class="grid grid-cols-2 gap-4 mt-4 text-center"><div><i class="ti ti-wallet text-4xl"></i><p>Rompen fronteras → pagos internacionales sin complicaciones</p></div><div><i class="ti ti-clock-24 text-4xl"></i><p>24/7 → Disponibilidad constante</p></div></div></div></div>
+    <!-- 39 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold">8. Pagos con Criptomonedas</h2><p><strong>Globales</strong> (transacciones instantáneas) y <strong>seguros</strong> (criptografía punta a punta). Ejemplos: Bitcoin, Ethereum, Litecoin.</p><div class="mt-3 p-3 bg-yellow-50 rounded-xl">⚠️ Reto: Volatilidad y adopción limitada, pero el potencial es enorme.</div><p class="mt-3 italic">Aquí el dinero deja de depender de gobiernos. Es descentralizado.</p></div></div>
+    <!-- 40 -->
+    <div class="slide"><div class="slide-content"><h2 class="text-2xl font-bold">9. Pagos Invisibles (El Presente Avanzado)</h2><p>Suscripciones recurrentes, one-click payments (Amazon, apps), pagos integrados en plataformas sociales. <span class="font-semibold">Ya no "pagas"... simplemente sucede.</span></p><h2 class="text-xl font-bold mt-6">10. El Futuro (Ya Empezó)</h2><div class="grid grid-cols-2 gap-3 mt-2"><div><i class="ti ti-fingerprint"></i> Biométricos (huella, rostro)</div><div><i class="ti ti-watch"></i> Wearables (relojes inteligentes)</div><div><i class="ti ti-robot"></i> IA para gestión inteligente</div><div><i class="ti ti-building-bank"></i> CBDC (monedas digitales de bancos centrales)</div></div><p class="mt-4 text-center text-primary-500 font-medium">✨ El futuro del dinero ya está aquí. ✨</p></div></div>
+</div>
+
+<!-- Navegación y contador -->
+<div class="fixed bottom-5 right-5 z-20 flex gap-2"><button id="prevBtn" class="nav-btn bg-white/80 p-3 rounded-full shadow"><i class="ti ti-arrow-left"></i></button><button id="nextBtn" class="nav-btn bg-white/80 p-3 rounded-full shadow"><i class="ti ti-arrow-right"></i></button></div>
+<div id="slideCounter" class="fixed bottom-5 left-5 bg-black/40 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm">Slide 1 / 40</div>
+
+<script>
+    const wrapper = document.getElementById('slidesWrapper');
+    const slides = document.querySelectorAll('.slide');
+    const prev = document.getElementById('prevBtn');
+    const next = document.getElementById('nextBtn');
+    const counter = document.getElementById('slideCounter');
+    let current = 0;
+    const total = 40;
+
+    function updateCounter() { counter.innerText = `Slide ${current+1} / ${total}`; }
+    function goToSlide(idx) { if(idx<0) idx=0; if(idx>=total) idx=total-1; current=idx; wrapper.scrollTo({ left: wrapper.clientWidth * current, behavior: 'smooth' }); updateCounter(); }
+    prev.addEventListener('click', () => goToSlide(current-1));
+    next.addEventListener('click', () => goToSlide(current+1));
+    window.addEventListener('keydown', e => { if(e.key === 'ArrowRight') goToSlide(current+1); if(e.key === 'ArrowLeft') goToSlide(current-1); });
+    const observer = new IntersectionObserver(entries => { entries.forEach(entry => { if(entry.isIntersecting) { current = Array.from(slides).indexOf(entry.target); updateCounter(); } }); }, { threshold: 0.5 });
+    slides.forEach(s => observer.observe(s));
+    window.addEventListener('resize', () => wrapper.scrollTo({ left: wrapper.clientWidth * current, behavior: 'auto' }));
+    updateCounter();
+</script>
+</body>
+</html>

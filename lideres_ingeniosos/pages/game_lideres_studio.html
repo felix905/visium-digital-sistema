@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Líderes Ingeniosos - Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f0f4f8;
+            overflow-x: hidden;
+        }
+
+        .heading-font {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .level-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-card:not(.locked):hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .locked {
+            filter: grayscale(0.8);
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .coin-animation {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+        }
+        
+        #builder-modal { display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.95); flex-direction:column; }
+        #builder-modal.open { display:flex; }
+        #builder-modal iframe { flex:1; width:100%; border:none; }
+
+        select, input, textarea {
+            border-radius: 1rem !important;
+        }
+    </style>
+</head>
+<body class="bg-indigo-50 min-h-screen pb-12">
+
+    <!-- Header -->
+    <nav class="bg-white shadow-md p-4 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-2">
+                <div class="bg-blue-600 text-white p-2 rounded-lg shadow-lg">
+                    <i class="fas fa-rocket text-xl"></i>
+                </div>
+                <h1 class="heading-font text-2xl text-blue-800 tracking-wide uppercase">Líderes Ingeniosos</h1>
+            </div>
+
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center bg-yellow-100 px-4 py-2 rounded-full border-2 border-yellow-400 shadow-sm">
+                    <i class="fas fa-coins text-yellow-500 mr-2 coin-animation text-xl"></i>
+                    <span id="coinCount" class="font-bold text-yellow-700 text-xl tracking-tight">0</span>
+                </div>
+                <div class="w-11 h-11 bg-indigo-600 rounded-full flex items-center justify-center border-2 border-white shadow-md">
+                    <i class="fas fa-user-astronaut text-white text-lg"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto mt-8 px-4">
+        <!-- Progress Section -->
+        <div class="bg-gradient-to-br from-blue-700 to-indigo-900 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden mb-10">
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="max-w-md">
+                    <h2 class="text-4xl heading-font mb-3 tracking-wide">¡Bienvenido, Creador! 🌍</h2>
+                    <p class="text-blue-100 font-medium opacity-90">"Un jugador entra... pero un líder crea." Supera los retos para desbloquear nuevos niveles.</p>
+                </div>
+                <div class="bg-white/10 p-6 rounded-3xl backdrop-blur-xl border border-white/20 w-full md:w-80">
+                    <div class="flex justify-between items-end mb-3 font-black">
+                        <span class="text-xs uppercase text-blue-200">Progreso Total</span>
+                        <span id="progressText" class="text-2xl">0%</span>
+                    </div>
+                    <div class="w-full bg-black/40 rounded-full h-4 overflow-hidden p-1">
+                        <div id="mainProgressBar" class="bg-gradient-to-r from-green-400 to-emerald-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            <i class="fas fa-cubes absolute -right-10 -bottom-10 text-white/5 text-[15rem] transform rotate-12"></i>
+        </div>
+
+        <!-- Levels Grid: 6 niveles, solo el 1 desbloqueado al inicio -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Level 1 Card (desbloqueado) -->
+            <div id="card-1" onclick="openLevel(1)" class="level-card bg-white rounded-[2rem] shadow-xl p-8 border-b-[12px] border-yellow-400">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="bg-yellow-100 text-yellow-700 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Nivel 1</span>
+                    <i id="check-1" class="far fa-circle text-gray-200 text-2xl"></i>
+                </div>
+                <div class="text-center py-4">
+                    <div class="w-24 h-24 bg-yellow-50 rounded-3xl flex items-center justify-center mx-auto mb-6 transform -rotate-3 shadow-inner">
+                        <i class="fas fa-mountain text-yellow-500 text-5xl"></i>
+                    </div>
+                    <h3 class="heading-font text-2xl text-gray-800">Isla de las Ideas</h3>
+                    <p class="text-gray-500 text-sm mt-3 font-semibold">Define tu pasión y construye tu primer prototipo.</p>
+                </div>
+                <button class="w-full mt-6 bg-yellow-400 hover:bg-yellow-500 text-white font-black py-4 rounded-2xl shadow-lg transform active:scale-95 transition-all uppercase tracking-widest">¡COMENZAR!</button>
+            </div>
+
+            <!-- Level 2 (desbloqueado - Taller del Creador) -->
+            <div id="card-2" onclick="openBuilderLab()" class="level-card bg-white rounded-[2rem] shadow-xl p-8 border-b-[12px] border-orange-400 cursor-pointer hover:shadow-2xl transition-all hover:-translate-y-2">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="bg-orange-100 text-orange-700 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Nivel 2</span>
+                    <i id="check-2" class="far fa-circle text-gray-200 text-2xl"></i>
+                </div>
+                <div class="text-center py-4">
+                    <div class="w-24 h-24 bg-orange-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-tools text-orange-500 text-5xl"></i>
+                    </div>
+                    <h3 class="heading-font text-2xl text-gray-800">Taller del Creador</h3>
+                    <p class="text-gray-500 text-sm mt-3 font-semibold">Dale forma y estructura a tu idea.</p>
+                </div>
+                <button class="w-full mt-6 bg-orange-500 text-white font-black py-4 rounded-2xl hover:bg-orange-600 transition-colors shadow-lg">¡COMENZAR!</button>
+            </div>
+
+            <!-- Level 3 (bloqueado) -->
+            <div id="card-3" class="level-card locked bg-white rounded-[2rem] shadow-xl p-8 border-b-[12px] border-green-500">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="bg-green-100 text-green-700 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Nivel 3</span>
+                    <i id="check-3" class="far fa-circle text-gray-200 text-2xl"></i>
+                </div>
+                <div class="text-center py-4">
+                    <div class="w-24 h-24 bg-green-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-city text-green-500 text-5xl"></i>
+                    </div>
+                    <h3 class="heading-font text-2xl text-gray-800">Ciudad del Valor</h3>
+                    <p class="text-gray-500 text-sm mt-3 font-semibold">Descubre cómo tu idea genera valor.</p>
+                </div>
+                <button class="w-full mt-6 bg-gray-300 text-gray-500 font-black py-4 rounded-2xl cursor-not-allowed">BLOQUEADO</button>
+            </div>
+
+            <!-- Level 4 (bloqueado) -->
+            <div id="card-4" class="level-card locked bg-white rounded-[2rem] shadow-xl p-8 border-b-[12px] border-blue-500">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Nivel 4</span>
+                    <i id="check-4" class="far fa-circle text-gray-200 text-2xl"></i>
+                </div>
+                <div class="text-center py-4">
+                    <div class="w-24 h-24 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-clipboard-list text-blue-500 text-5xl"></i>
+                    </div>
+                    <h3 class="heading-font text-2xl text-gray-800">Centro de Planificación</h3>
+                    <p class="text-gray-500 text-sm mt-3 font-semibold">Organiza los pasos para hacer realidad tu idea.</p>
+                </div>
+                <button class="w-full mt-6 bg-gray-300 text-gray-500 font-black py-4 rounded-2xl cursor-not-allowed">BLOQUEADO</button>
+            </div>
+
+            <!-- Level 5 (bloqueado) -->
+            <div id="card-5" class="level-card locked bg-white rounded-[2rem] shadow-xl p-8 border-b-[12px] border-purple-500">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="bg-purple-100 text-purple-700 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Nivel 5</span>
+                    <i id="check-5" class="far fa-circle text-gray-200 text-2xl"></i>
+                </div>
+                <div class="text-center py-4">
+                    <div class="w-24 h-24 bg-purple-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-flask text-purple-500 text-5xl"></i>
+                    </div>
+                    <h3 class="heading-font text-2xl text-gray-800">Laboratorio de Pruebas</h3>
+                    <p class="text-gray-500 text-sm mt-3 font-semibold">Experimenta y mejora tu prototipo.</p>
+                </div>
+                <button class="w-full mt-6 bg-gray-300 text-gray-500 font-black py-4 rounded-2xl cursor-not-allowed">BLOQUEADO</button>
+            </div>
+
+            <!-- Level 6 (bloqueado) -->
+            <div id="card-6" class="level-card locked bg-white rounded-[2rem] shadow-xl p-8 border-b-[12px] border-red-500">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="bg-red-100 text-red-700 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Nivel 6</span>
+                    <i id="check-6" class="far fa-circle text-gray-200 text-2xl"></i>
+                </div>
+                <div class="text-center py-4">
+                    <div class="w-24 h-24 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-microphone-alt text-red-500 text-5xl"></i>
+                    </div>
+                    <h3 class="heading-font text-2xl text-gray-800">Escenario de Líderes</h3>
+                    <p class="text-gray-500 text-sm mt-3 font-semibold">Presenta tu idea ante el mundo.</p>
+                </div>
+                <button class="w-full mt-6 bg-gray-300 text-gray-500 font-black py-4 rounded-2xl cursor-not-allowed">BLOQUEADO</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Backpack (Inventario) -->
+    <section class="max-w-6xl mx-auto mt-12 px-4 mb-20">
+        <div class="bg-white rounded-[2.5rem] p-10 shadow-2xl border-4 border-indigo-100 flex flex-col md:flex-row items-center gap-10">
+            <div class="flex-shrink-0 text-center">
+                <div class="w-24 h-24 bg-indigo-600 text-white rounded-[2rem] flex items-center justify-center shadow-xl mx-auto mb-3">
+                    <i class="fas fa-briefcase text-4xl"></i>
+                </div>
+                <h4 class="heading-font text-gray-800 uppercase text-xs tracking-widest">Tu Inventario</h4>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full">
+                <div class="bg-gray-50 p-6 rounded-3xl border-2 border-dashed border-gray-200">
+                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Nombre del Proyecto</p>
+                    <p id="bagProjectName" class="font-bold text-gray-700 italic">No definido</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-3xl border-2 border-dashed border-gray-200">
+                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Tu Pasión</p>
+                    <p id="bagProjectTheme" class="font-bold text-gray-700 italic">Por descubrir</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-3xl border-2 border-dashed border-gray-200">
+                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Nivel Actual</p>
+                    <p id="bagLevel" class="font-black text-indigo-600">ISLA (NIVEL 1)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal del Nivel 1 (con las dos fases, sin Roblox) -->
+    <div id="levelModal" class="hidden fixed inset-0 z-[100] modal-overlay flex items-center justify-center p-4">
+        <div class="bg-white rounded-[3rem] max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative border-[12px] border-indigo-50">
+            <button onclick="closeModal()" class="absolute top-8 right-8 text-gray-300 hover:text-gray-500 transition-colors">
+                <i class="fas fa-times-circle text-4xl"></i>
+            </button>
+
+            <div class="p-8 md:p-12">
+                <!-- Modal Header -->
+                <div class="mb-10 text-center md:text-left">
+                    <span class="bg-yellow-100 text-yellow-700 px-6 py-2 rounded-full text-xs font-black uppercase tracking-[0.2em]">Isla de las Ideas Ingeniosas</span>
+                    <h3 class="heading-font text-4xl text-gray-800 mt-6 tracking-tight">Misión: Convierte tu Sueño en Realidad</h3>
+                    <p class="text-gray-500 font-medium mt-2">Completa las 2 fases para ganar tus 150 Ingenios.</p>
+                </div>
+
+                <div class="space-y-10">
+                    <!-- Phase 1: Configuration -->
+                    <div class="bg-blue-50 p-8 rounded-[2.5rem] border-2 border-blue-100 shadow-sm">
+                        <h4 class="font-black text-blue-900 uppercase text-xs tracking-widest mb-6 flex items-center">
+                            <i class="fas fa-cog mr-3 text-lg"></i> Fase 1: Tu Identidad como Creador
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label class="block text-xs font-black text-blue-700 mb-3 uppercase ml-2">¿Qué te apasiona?</label>
+                                <select id="modalInterest" onchange="toggleOtherInput()" class="w-full p-5 bg-white border-2 border-blue-200 font-bold text-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-100 transition-all">
+                                    <option value="" disabled selected>Selecciona una categoría...</option>
+                                    <option value="Videojuegos 🎮">Crear Videojuegos 🎮</option>
+                                    <option value="Música 🎵">Producción Musical 🎵</option>
+                                    <option value="Naturaleza 🐾">Salvar el Planeta 🐾</option>
+                                    <option value="Robótica 🚀">Robots y Espacio 🚀</option>
+                                    <option value="Arte 🎨">Diseño y Arte 🎨</option>
+                                    <option value="otro">Otro (¡Escribe el tuyo!)</option>
+                                </select>
+                                <input id="modalInterestOther" type="text" placeholder="¿Cuál es tu pasión secreta?" class="hidden mt-4 w-full p-5 bg-white border-2 border-blue-200 font-bold text-gray-700 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-black text-blue-700 mb-3 uppercase ml-2">Nombre de tu Proyecto</label>
+                                <input id="modalName" type="text" placeholder="Ej: Super World Builder" class="w-full p-5 bg-white border-2 border-blue-200 font-bold text-gray-700 outline-none focus:ring-4 focus:ring-blue-100">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2: Offline Experiment -->
+                    <div class="bg-purple-50 p-8 rounded-[2.5rem] border-2 border-purple-100 shadow-sm relative overflow-hidden">
+                        <h4 class="font-black text-purple-900 uppercase text-xs tracking-widest mb-6 flex items-center">
+                            <i class="fas fa-magic mr-3 text-lg"></i> Fase 2: Laboratorio de Ideas
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                            <div class="bg-white/70 p-6 rounded-3xl border border-purple-200">
+                                <p class="text-purple-800 font-black text-xs uppercase mb-3">Reto 1: Tinta Invisible</p>
+                                <p class="text-sm text-gray-700 font-medium">Escribe tu idea con limón. ¡No se ve! Pero aplica calor (enfoque) y verás la <b>magia de la claridad</b>.</p>
+                            </div>
+                            <div class="bg-white/70 p-6 rounded-3xl border border-purple-200">
+                                <p class="text-purple-800 font-black text-xs uppercase mb-3">Reto 2: Zoom Creativo</p>
+                                <p class="text-sm text-gray-700 font-medium">Toma un objeto común, di 10 usos locos y <b>dibújalo con tu mano no dominante</b>.</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-flask absolute -right-4 -bottom-4 text-purple-200/50 text-8xl"></i>
+                    </div>
+
+                    <!-- Footer Action -->
+                    <div class="pt-6 flex flex-col md:flex-row items-center justify-between gap-8 border-t-2 border-gray-100">
+                        <div class="bg-green-50 px-8 py-4 rounded-3xl border-2 border-green-200 flex items-center shadow-inner">
+                            <i class="fas fa-coins text-yellow-500 text-3xl mr-4 coin-animation"></i>
+                            <div>
+                                <p class="text-[10px] font-black text-green-600 uppercase tracking-tighter">Premio de Misión</p>
+                                <p class="text-2xl font-black text-green-700 leading-none">150</p>
+                            </div>
+                        </div>
+                        <button onclick="completeLevel1()" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-black px-16 py-6 rounded-[2rem] shadow-xl transform active:scale-95 transition-all text-xl uppercase tracking-widest">¡RECLAMAR PREMIO!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal genérico para niveles 2 a 6 -->
+    <div id="genericModal" class="hidden fixed inset-0 z-[100] modal-overlay flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative border-[12px] border-indigo-50">
+            <button onclick="closeGenericModal()" class="absolute top-8 right-8 text-gray-300 hover:text-gray-500 transition-colors">
+                <i class="fas fa-times-circle text-4xl"></i>
+            </button>
+            <div class="p-8 md:p-12">
+                <div id="genericContent">
+                    <!-- Se llena dinámicamente -->
+                </div>
+                <div class="pt-6 flex justify-end">
+                    <button id="genericCompleteBtn" class="bg-green-500 hover:bg-green-600 text-white font-black px-8 py-4 rounded-2xl shadow-xl transition">¡COMPLETAR MISIÓN!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-4 rounded-full font-black shadow-2xl opacity-0 transition-all duration-300 pointer-events-none z-[300] flex items-center">
+        <span id="toastMsg"></span>
+    </div>
+
+    <!-- Modal Builder Lab -->
+    <div id="builder-modal">
+        <div class="flex items-center justify-between px-6 py-4 bg-gray-900 border-b border-gray-800">
+            <span class="text-white font-bold text-lg flex items-center gap-2">
+                <i class="fas fa-tools text-orange-500"></i> Builder Lab - Taller del Creador
+            </span>
+            <button onclick="closeBuilderModal()" class="text-white bg-red-600 hover:bg-red-700 px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors">
+                <i class="fas fa-times"></i> Cerrar
+            </button>
+        </div>
+        <iframe id="builder-frame" src=""></iframe>
+    </div>
+
+    <script>
+        let completedLevels = new Set();
+        let balance = 0;
+        let currentGenericLevel = null;
+
+        // Datos para niveles 2 al 6
+        const levelDetails = {
+            2: { title: "Taller del Creador", mission: "Define los componentes de tu idea. ¿Qué materiales, habilidades o personas necesitas? Haz una lista concreta.", reward: 150 },
+            3: { title: "Ciudad del Valor", mission: "Explica cómo tu proyecto genera valor para otros. ¿Qué problema resuelve? ¿Por qué la gente estaría dispuesta a pagar por ello?", reward: 150 },
+            4: { title: "Centro de Planificación", mission: "Crea un plan de acción con 5 pasos claros para llevar tu idea del papel a la realidad.", reward: 150 },
+            5: { title: "Laboratorio de Pruebas", mission: "Construye un prototipo simple (dibujo, maqueta o código) y pide opinión a dos personas. Anota sus sugerencias.", reward: 150 },
+            6: { title: "Escenario de Líderes", mission: "Prepara un discurso de 2 minutos para presentar tu proyecto. Grábate o practica frente a un espejo.", reward: 200 }
+        };
+
+        window.onload = () => {
+            loadState();
+            updateUI();
+        };
+
+        function toggleOtherInput() {
+            const select = document.getElementById('modalInterest');
+            const otherInput = document.getElementById('modalInterestOther');
+            otherInput.classList.toggle('hidden', select.value !== 'otro');
+        }
+
+        function openLevel(num) {
+            if (num === 1) {
+                document.getElementById('levelModal').classList.remove('hidden');
+            } else if (completedLevels.has(num-1) || num === 1) {
+                // Nivel desbloqueado: mostrar modal genérico
+                currentGenericLevel = num;
+                const data = levelDetails[num];
+                if (data) {
+                    document.getElementById('genericContent').innerHTML = `
+                        <div class="mb-6">
+                            <span class="bg-indigo-100 text-indigo-800 px-4 py-1 rounded-full text-xs font-black uppercase">Nivel ${num}</span>
+                            <h3 class="heading-font text-3xl text-gray-800 mt-4">${data.title}</h3>
+                        </div>
+                        <div class="bg-blue-50 p-6 rounded-2xl border-l-4 border-blue-500 mb-6">
+                            <h4 class="font-bold text-blue-800 flex items-center gap-2"><i class="fas fa-bullseye"></i> Misión</h4>
+                            <p class="text-gray-700 mt-2">${data.mission}</p>
+                        </div>
+                        <div class="bg-green-50 p-6 rounded-2xl border-l-4 border-green-500">
+                            <h4 class="font-bold text-green-800 flex items-center gap-2"><i class="fas fa-coins"></i> Recompensa</h4>
+                            <p class="text-gray-700 mt-2">+${data.reward} Ingenios</p>
+                        </div>
+                    `;
+                    const btn = document.getElementById('genericCompleteBtn');
+                    btn.onclick = () => completeGenericLevel(num, data.reward);
+                    document.getElementById('genericModal').classList.remove('hidden');
+                }
+            } else {
+                showToast("🔒 Completa el nivel anterior para desbloquear este.");
+            }
+        }
+
+        function completeGenericLevel(level, reward) {
+            if (completedLevels.has(level)) return;
+            completedLevels.add(level);
+            balance += reward;
+            showToast(`✅ ¡Nivel ${level} completado! +${reward} Ingenios`);
+            closeGenericModal();
+            updateUI();
+            saveState();
+        }
+
+        function completeLevel1() {
+            const interestSelect = document.getElementById('modalInterest');
+            const interestOther = document.getElementById('modalInterestOther').value;
+            const projectName = document.getElementById('modalName').value;
+            const finalInterest = interestSelect.value === 'otro' ? interestOther : interestSelect.value;
+
+            if (!finalInterest || !projectName) {
+                showToast("⚠️ Define tu pasión y el nombre de tu proyecto");
+                return;
+            }
+
+            if (completedLevels.has(1)) return;
+
+            completedLevels.add(1);
+            balance += 150;
+            
+            document.getElementById('bagProjectName').innerText = projectName;
+            document.getElementById('bagProjectTheme').innerText = finalInterest;
+            document.getElementById('bagLevel').innerText = "TALLER (N2)";
+
+            showToast("🚀 ¡ISLA SUPERADA! +150 INGENIOS");
+            closeModal();
+            updateUI();
+            saveState();
+        }
+
+        function updateUI() {
+            document.getElementById('coinCount').innerText = balance;
+            
+            // Actualizar checks y desbloqueo de niveles
+            for (let i = 1; i <= 6; i++) {
+                const icon = document.getElementById(`check-${i}`);
+                if (icon && completedLevels.has(i)) {
+                    icon.className = "fas fa-check-circle text-green-500 text-3xl";
+                }
+                // Desbloquear siguiente nivel si el actual está completado
+                if (i < 6 && completedLevels.has(i)) {
+                    const nextCard = document.getElementById(`card-${i+1}`);
+                    if (nextCard && nextCard.classList.contains('locked')) {
+                        nextCard.classList.remove('locked');
+                        // Cambiar el botón interno a algo interactivo
+                        const btn = nextCard.querySelector('button');
+                        if (btn) {
+                            btn.innerText = "¡COMENZAR!";
+                            btn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                            btn.classList.add('bg-orange-400', 'hover:bg-orange-500', 'text-white');
+                        }
+                    }
+                }
+            }
+
+            // Barra de progreso (6 niveles)
+            const percent = Math.round((completedLevels.size / 6) * 100);
+            document.getElementById('mainProgressBar').style.width = `${percent}%`;
+            document.getElementById('progressText').innerText = `${percent}%`;
+        }
+
+        function closeModal() {
+            document.getElementById('levelModal').classList.add('hidden');
+        }
+
+        function closeGenericModal() {
+            document.getElementById('genericModal').classList.add('hidden');
+            currentGenericLevel = null;
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.replace('opacity-0', 'opacity-100');
+            setTimeout(() => toast.classList.replace('opacity-100', 'opacity-0'), 3000);
+        }
+
+        function saveState() {
+            const state = {
+                completed: Array.from(completedLevels),
+                balance: balance,
+                name: document.getElementById('bagProjectName').innerText,
+                theme: document.getElementById('bagProjectTheme').innerText
+            };
+            localStorage.setItem('ingenio_studio_v1', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('ingenio_studio_v1');
+            if (saved) {
+                const state = JSON.parse(saved);
+                completedLevels = new Set(state.completed);
+                balance = state.balance || 0;
+                if(state.name && state.name !== "No definido") {
+                    document.getElementById('bagProjectName').innerText = state.name;
+                    document.getElementById('bagProjectTheme').innerText = state.theme;
+                }
+            }
+        }
+
+        function openBuilderLab() {
+            window.open('game_taller_creador.html', '_blank');
+        }
+    </script>
+</body>
+</html>

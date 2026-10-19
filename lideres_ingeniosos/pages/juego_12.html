@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mario Liderazgo - Selección de Personaje</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --mario-sky: #5c94fc;
+            --mario-grass: #22c55e;
+            --mario-pipe: #16a34a;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--mario-sky);
+            margin: 0;
+            overflow: hidden;
+            cursor: url('https://cur.cursors-4u.net/games/gam-4/gam384.cur'), auto;
+        }
+
+        .cursor-mario { cursor: url('https://cur.cursors-4u.net/games/gam-4/gam384.cur'), auto !important; }
+        .cursor-luigi { cursor: url('https://cur.cursors-4u.net/games/gam-4/gam383.cur'), auto !important; }
+        .cursor-peach { cursor: url('https://cur.cursors-4u.net/games/gam-4/gam385.cur'), auto !important; }
+
+        h1, h2, h3, .font-display { font-family: 'Fredoka One', cursive; }
+
+        #charSelectScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: var(--mario-sky);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        .char-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 6px solid transparent;
+        }
+
+        .char-card:hover {
+            transform: scale(1.1) translateY(-10px);
+            border-color: white;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .game-world {
+            height: 100vh;
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 120px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            background: linear-gradient(to bottom, var(--mario-sky) 0%, #8fb3ff 100%);
+            position: relative;
+        }
+
+        .ground {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(45deg, #8b4513 25%, #a0522d 25%, #a0522d 50%, #8b4513 50%, #8b4513 75%, #a0522d 75%, #a0522d 100%);
+            background-size: 40px 40px;
+            border-top: 8px solid #15803d;
+            z-index: 10;
+        }
+
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 50px;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.1);
+        }
+
+        .pipe-container {
+            flex: 0 0 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 5;
+            transition: transform 0.3s;
+        }
+
+        .pipe-head {
+            width: 100px;
+            height: 40px;
+            background: var(--mario-pipe);
+            border: 4px solid #052e16;
+            border-radius: 4px;
+        }
+
+        .pipe-body {
+            width: 80px;
+            height: 100px;
+            background: #15803d;
+            border-left: 4px solid #052e16;
+            border-right: 4px solid #052e16;
+            background: linear-gradient(to right, #16a34a 0%, #16a34a 70%, #15803d 100%);
+        }
+
+        .pipe-label {
+            position: absolute;
+            top: -40px;
+            background: white;
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+        }
+
+        @keyframes pipeDown {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(100px); opacity: 0; }
+        }
+
+        .mario-enter { animation: pipeDown 0.5s forwards; }
+
+        .modal-overlay {
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .game-world::-webkit-scrollbar { display: none; }
+
+        /* Canvas Styles para el Huevo */
+        #eggCanvas {
+            background: white;
+            cursor: crosshair;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="cursor-mario" id="mainBody">
+
+    <!-- PANTALLA DE SELECCIÓN -->
+    <div id="charSelectScreen">
+        <h2 class="text-white text-5xl font-display mb-12 drop-shadow-lg text-center">ESCOGE TU PERSONAJE</h2>
+        <div class="flex flex-wrap justify-center gap-8 px-4">
+            
+            <div onclick="selectCharacter('mario')" class="char-card bg-red-500 p-6 rounded-3xl text-center w-48 shadow-2xl">
+                <div class="text-7xl mb-4 text-white">🔴</div>
+                <p class="text-white font-display text-2xl tracking-widest">MARIO</p>
+                <p class="text-red-200 text-xs font-bold mt-2 uppercase">Líder Valiente</p>
+            </div>
+
+            <div onclick="selectCharacter('luigi')" class="char-card bg-green-500 p-6 rounded-3xl text-center w-48 shadow-2xl">
+                <div class="text-7xl mb-4">🟢</div>
+                <p class="text-white font-display text-2xl tracking-widest">LUIGI</p>
+                <p class="text-green-100 text-xs font-bold mt-2 uppercase">Líder Amigo</p>
+            </div>
+
+            <div onclick="selectCharacter('peach')" class="char-card bg-pink-400 p-6 rounded-3xl text-center w-48 shadow-2xl">
+                <div class="text-7xl mb-4">👑</div>
+                <p class="text-white font-display text-2xl tracking-widest">PEACH</p>
+                <p class="text-pink-100 text-xs font-bold mt-2 uppercase">Líder Sabia</p>
+            </div>
+
+        </div>
+        <p class="text-white/70 mt-12 animate-pulse font-bold">¡Haz clic para empezar tu aventura!</p>
+    </div>
+
+    <!-- HUD -->
+    <div class="fixed top-0 left-0 w-full p-6 flex justify-between items-start z-50 pointer-events-none">
+        <div class="pointer-events-auto bg-white/90 p-4 rounded-2xl shadow-xl border-4 border-yellow-400 flex items-center gap-4">
+            <div id="userAvatar" class="text-4xl bg-white w-12 h-12 flex items-center justify-center rounded-full shadow-inner">🔴</div>
+            <div>
+                <h1 class="text-xl text-red-600 mb-0 font-display uppercase" id="userName">MARIO</h1>
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">💰</span>
+                    <span class="font-display text-2xl text-amber-600" id="coinCounter">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="pointer-events-auto bg-white/90 p-4 rounded-2xl shadow-xl text-center">
+            <p class="font-bold text-slate-500 text-xs uppercase">Siguiente Parada</p>
+            <p class="font-display text-lg text-blue-600" id="statusText">¡Inicia la aventura!</p>
+        </div>
+    </div>
+
+    <!-- Mundo de Juego -->
+    <div class="game-world gap-20 px-40" id="gameWorld">
+        
+        <div class="cloud w-32 h-10 top-20 left-[100px]"></div>
+        <div class="cloud w-40 h-12 top-40 left-[800px]"></div>
+        <div class="cloud w-24 h-8 top-10 left-[1500px]"></div>
+
+        <div class="pipe-container" onclick="handlePipeClick(1, this)">
+            <div class="pipe-label text-red-600">🎯 PROPÓSITO</div>
+            <div class="pipe-head"></div>
+            <div class="pipe-body"></div>
+            <div class="mt-4 text-4xl">⭐</div>
+        </div>
+
+        <div class="pipe-container" onclick="handlePipeClick(2, this)">
+            <div class="pipe-label text-blue-600">🍄 NECESIDAD VS DESEO</div>
+            <div class="pipe-head"></div>
+            <div class="pipe-body"></div>
+            <div class="mt-4 text-4xl">🍕</div>
+        </div>
+
+        <div class="pipe-container" onclick="handlePipeClick(3, this)">
+            <div class="pipe-label text-pink-600">🥚 HUEVO DE PASCUA</div>
+            <div class="pipe-head"></div>
+            <div class="pipe-body"></div>
+            <div class="mt-4 text-4xl">🎨</div>
+        </div>
+
+        <div class="pipe-container" onclick="handlePipeClick(4, this)">
+            <div class="pipe-label text-amber-600">❓ ADIVINANZAS</div>
+            <div class="pipe-head"></div>
+            <div class="pipe-body"></div>
+            <div class="mt-4 text-4xl">💎</div>
+        </div>
+
+        <div class="pipe-container" onclick="handlePipeClick(5, this)">
+            <div class="pipe-label text-purple-600">👑 MISIÓN REAL</div>
+            <div class="pipe-head"></div>
+            <div class="pipe-body"></div>
+            <div class="mt-4 text-4xl">🏰</div>
+        </div>
+
+    </div>
+
+    <div class="ground"></div>
+
+    <!-- Modal de Misión -->
+    <div id="missionModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 modal-overlay">
+        <div class="bg-white w-full max-w-xl rounded-[40px] shadow-2xl overflow-hidden relative border-8 border-green-600">
+            <div class="p-8" id="modalBody"></div>
+            <div class="bg-slate-100 p-6 flex justify-between items-center">
+                <span class="text-sm font-bold text-slate-400 uppercase">Club Líderes</span>
+                <button onclick="completeMission()" class="bg-yellow-400 text-yellow-900 font-display px-8 py-3 rounded-2xl shadow-[0_6px_0_#b45309] hover:translate-y-1 transition-all">
+                    ¡GANAR MONEDAS! 💰
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            coins: 0,
+            currentLevel: 0,
+            character: 'mario',
+            game2Index: 0,
+            drawing: false,
+            brushColor: '#ec4899',
+            game2Items: [
+                {n: "Manzana Saludable", t: "Necesidad", icon: "🍎"},
+                {n: "Champiñón con Vitaminas", t: "Necesidad", icon: "🍄"},
+                {n: "Gorra de Oro de Lujo", t: "Deseo", icon: "🧢"},
+                {n: "Botella de Agua", t: "Necesidad", icon: "💧"},
+                {n: "Juguete de Bowser", t: "Deseo", icon: "🦖"},
+                {n: "Libro de Cuentos", t: "Necesidad", icon: "📖"}
+            ],
+            currentRiddle: 0,
+            riddles: [
+                { p: "Si lo guardas, crece; si lo gastas, desaparece. ¿Qué es?", a: "dinero" },
+                { p: "Es redondo como el sol, brilla como el oro y con 100 de ellas Mario gana una vida. ¿Qué es?", a: "moneda" }
+            ]
+        };
+
+        function selectCharacter(char) {
+            state.character = char;
+            const body = document.getElementById('mainBody');
+            const avatar = document.getElementById('userAvatar');
+            const nameLabel = document.getElementById('userName');
+            body.className = `cursor-${char}`;
+            if(char === 'mario') { avatar.innerText = '🔴'; nameLabel.innerText = 'MARIO'; }
+            if(char === 'luigi') { avatar.innerText = '🟢'; nameLabel.innerText = 'LUIGI'; }
+            if(char === 'peach') { avatar.innerText = '👑'; nameLabel.innerText = 'PEACH'; }
+            document.getElementById('charSelectScreen').style.transform = 'translateY(-100%)';
+        }
+
+        function handlePipeClick(num, element) {
+            element.classList.add('mario-enter');
+            setTimeout(() => {
+                openLevel(num);
+                element.classList.remove('mario-enter');
+            }, 500);
+        }
+
+        function openLevel(num) {
+            state.currentLevel = num;
+            const body = document.getElementById('modalBody');
+            let html = "";
+
+            switch(num) {
+                case 1:
+                    html = `<h2 class="text-4xl font-display text-red-600 text-center mb-6">🎯 Mundo 1: Propósito</h2>
+                            <div class="bg-red-50 p-8 rounded-3xl border-4 border-red-200 text-center">
+                                <p class="text-xl mb-4">Líderes, escriban en el chat de Zoom:</p>
+                                <p class="font-display text-2xl text-red-500 italic">"Mi meta de ahorro es..."</p>
+                            </div>`;
+                    break;
+                case 2:
+                    html = `<h2 class="text-4xl font-display text-blue-600 text-center mb-6">🍄 Mundo 2: Mario vs Bowser</h2>
+                            <div class="bg-blue-50 p-8 rounded-3xl border-4 border-blue-200 text-center">
+                                <div id="itemBox" class="text-6xl mb-4">🍎</div>
+                                <p id="itemName" class="text-2xl font-bold text-blue-800 mb-6">Manzana Saludable</p>
+                                <button onclick="nextItem2()" class="bg-blue-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg">SIGUIENTE OBJETO ➡️</button>
+                            </div>`;
+                    setTimeout(nextItem2, 10);
+                    break;
+                case 3:
+                    html = `<h2 class="text-4xl font-display text-pink-500 text-center mb-4">🥚 Mundo 3: Huevo Récord</h2>
+                            <p class="text-center mb-4 text-slate-500 font-bold">¡Dibuja y decora tu huevo de líder!</p>
+                            <div class="flex flex-col items-center gap-4">
+                                <div class="flex gap-2 mb-2">
+                                    <button onclick="state.brushColor='#ef4444'" class="w-8 h-8 rounded-full bg-red-500 border-2 border-white shadow"></button>
+                                    <button onclick="state.brushColor='#3b82f6'" class="w-8 h-8 rounded-full bg-blue-500 border-2 border-white shadow"></button>
+                                    <button onclick="state.brushColor='#22c55e'" class="w-8 h-8 rounded-full bg-green-500 border-2 border-white shadow"></button>
+                                    <button onclick="state.brushColor='#eab308'" class="w-8 h-8 rounded-full bg-yellow-500 border-2 border-white shadow"></button>
+                                    <button onclick="state.brushColor='#ec4899'" class="w-8 h-8 rounded-full bg-pink-500 border-2 border-white shadow"></button>
+                                    <button onclick="clearCanvas()" class="ml-4 px-3 py-1 bg-slate-200 rounded-lg text-xs font-bold uppercase">Limpiar</button>
+                                </div>
+                                <canvas id="eggCanvas" width="240" height="320" class="border-4 border-pink-200"></canvas>
+                            </div>`;
+                    setTimeout(initCanvas, 10);
+                    break;
+                case 4:
+                    state.currentRiddle = 0;
+                    html = `<div id="riddleArea"></div>`;
+                    setTimeout(renderRiddle, 10);
+                    break;
+                case 5:
+                    html = `<h2 class="text-4xl font-display text-purple-600 text-center mb-6">🏰 El Castillo Final</h2>
+                            <div class="bg-purple-50 p-8 rounded-3xl border-4 border-purple-200 text-center">
+                                <p class="text-lg mb-6 leading-relaxed italic">Pregúntale a Mamá o Papá:</p>
+                                <p class="font-display text-xl text-purple-700">"¿Qué misión extra puedo cumplir hoy?"</p>
+                            </div>`;
+                    break;
+            }
+
+            body.innerHTML = html;
+            document.getElementById('missionModal').classList.remove('hidden');
+        }
+
+        // Lógica de Dibujo Interactiva
+        function initCanvas() {
+            const canvas = document.getElementById('eggCanvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            };
+
+            const startDrawing = (e) => {
+                state.drawing = true;
+                draw(e);
+            };
+
+            const stopDrawing = () => {
+                state.drawing = false;
+                ctx.beginPath();
+            };
+
+            const draw = (e) => {
+                if(!state.drawing) return;
+                const pos = getPos(e);
+                ctx.lineWidth = 8;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = state.brushColor;
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+            };
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            window.addEventListener('mouseup', stopDrawing);
+            
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e); });
+            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function clearCanvas() {
+            const canvas = document.getElementById('eggCanvas');
+            if(canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function nextItem2() {
+            const item = state.game2Items[state.game2Index % state.game2Items.length];
+            const box = document.getElementById('itemBox');
+            const name = document.getElementById('itemName');
+            if(box) {
+                box.innerText = item.icon;
+                name.innerText = item.n;
+                state.game2Index++;
+            }
+        }
+
+        function renderRiddle() {
+            const area = document.getElementById('riddleArea');
+            if(!area) return;
+            const riddle = state.riddles[state.currentRiddle];
+            area.innerHTML = `
+                <h2 class="text-4xl font-display text-amber-600 text-center mb-6">Bóveda de Secretos</h2>
+                <div class="bg-amber-50 p-6 rounded-2xl border-2 border-amber-200 text-center mb-6"><p class="text-xl">"${riddle.p}"</p></div>
+                <input type="text" id="riddleIn" placeholder="Tu respuesta..." class="w-full p-4 border-4 rounded-2xl text-center text-xl font-bold border-amber-300">
+                <button onclick="checkRiddle()" class="w-full mt-4 bg-amber-500 text-white py-4 rounded-2xl font-display text-xl">¿ES LA RESPUESTA? 🔍</button>
+            `;
+        }
+
+        function checkRiddle() {
+            const val = document.getElementById('riddleIn').value.toLowerCase();
+            if(val.includes(state.riddles[state.currentRiddle].a)) {
+                state.currentRiddle++;
+                if(state.currentRiddle < state.riddles.length) renderRiddle();
+                else document.getElementById('riddleArea').innerHTML = "<h2 class='text-center text-3xl font-display text-green-600 uppercase'>¡Bóveda Abierta! 🔓</h2>";
+            } else {
+                alert("¡Casi! Inténtalo de nuevo.");
+            }
+        }
+
+        function completeMission() {
+            state.coins += 100;
+            document.getElementById('coinCounter').innerText = state.coins;
+            document.getElementById('statusText').innerText = "¡Misión completada!";
+            
+            const coin = document.createElement('div');
+            coin.className = "fixed left-1/2 top-1/2 text-5xl z-[200]";
+            coin.style.animation = "coinPop 0.6s ease-out forwards";
+            coin.innerText = "💰";
+            document.body.appendChild(coin);
+            
+            const style = document.createElement('style');
+            style.innerHTML = `@keyframes coinPop { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-150px); opacity: 0; } }`;
+            document.head.appendChild(style);
+
+            setTimeout(() => coin.remove(), 600);
+            document.getElementById('missionModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

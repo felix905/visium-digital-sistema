@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Mundo Ingenioso</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .mario-gradient { background: linear-gradient(135deg, #E52521 0%, #9E1A17 100%); }
+    .green-gradient { background: linear-gradient(135deg, #43B047 0%, #2F7D32 100%); }
+    .yellow-gradient { background: linear-gradient(135deg, #FBD000 0%, #B89800 100%); }
+    .gold-gradient { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+    .blue-gradient { background: linear-gradient(135deg, #0072BB 0%, #5C94FC 100%); }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    
+    @keyframes spin-coin {
+      0% { transform: rotateY(0deg); }
+      100% { transform: rotateY(360deg); }
+    }
+    .spin-coin { animation: spin-coin 3s linear infinite; }
+    
+    @keyframes dice-shake {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-10deg); }
+      75% { transform: rotate(10deg); }
+    }
+    .dice-shake { animation: dice-shake 0.5s ease-in-out; }
+    
+    .tile-completed { opacity: 0.8; filter: saturate(0.8); }
+    .tile-active { box-shadow: 0 0 0 4px #FBD000; transform: scale(1.05); }
+    
+    .bounce-click { transition: transform 0.1s; }
+    .bounce-click:active { transform: scale(0.95); }
+    
+    .coin-particle {
+      position: absolute;
+      animation: coin-float 1s ease-out forwards;
+    }
+    @keyframes coin-float {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-50px) scale(0.5); opacity: 0; }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0072BB] p-4 md:p-8 text-white overflow-x-hidden">
+
+  <!-- Header -->
+  <header class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center mb-8 bg-[#E52521] p-5 rounded-3xl border-b-8 border-[#9E1A17] shadow-2xl relative overflow-hidden">
+    <div class="absolute -top-4 -left-4 opacity-10 rotate-12">
+      <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor"><path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10S2 17.52 2 12zm2 0c0 4.41 3.59 8 8 8s8-3.59 8-8-3.59-8-8-8-8 3.59-8 8zm10 4v-2H8v-2h2V9h2v3h4v2h-2z"/></svg>
+    </div>
+    <div class="flex items-center gap-5 relative z-10">
+      <div class="bg-white p-3 rounded-2xl border-4 border-black shadow-xl transform hover:rotate-6 transition-transform">
+        <span class="text-[#E52521] font-black text-5xl leading-none">M</span>
+      </div>
+      <div>
+        <h1 class="text-3xl md:text-5xl font-black tracking-tighter uppercase italic drop-shadow-lg">
+          SUPER MUNDO INGENIOSO
+        </h1>
+        <div class="flex items-center gap-3">
+          <span class="bg-yellow-400 text-black px-2 py-0.5 rounded text-[10px] font-black uppercase">Official</span>
+          <p class="text-yellow-300 font-bold text-sm tracking-widest">
+            MOVIE EDITION 2024
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col items-end mt-4 md:mt-0 relative z-10">
+      <div class="flex items-center gap-3 bg-black/40 px-6 py-2 rounded-2xl border-2 border-yellow-400 shadow-inner">
+        <div class="relative spin-coin text-yellow-400">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><text x="12" y="16" text-anchor="middle" font-size="12" fill="#B8860B">$</text></svg>
+        </div>
+        <span id="score" class="font-mono text-4xl font-black tabular-nums">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto flex flex-col xl:flex-row gap-10 items-start">
+    
+    <!-- Dice Panel -->
+    <div class="w-full xl:w-64 flex flex-col items-center gap-6 sticky top-8 z-30">
+      <div class="bg-white/10 backdrop-blur-xl p-8 rounded-[3rem] border-4 border-white/20 shadow-2xl text-center w-full relative">
+        <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-yellow-400 text-black font-black px-6 py-1 rounded-full text-xs shadow-lg uppercase border-2 border-black">
+          Lanzador Estelar
+        </div>
+        
+        <h3 class="text-xs font-black uppercase mb-6 tracking-widest text-white/80">Retos Disponibles: <span id="available-count">20</span>/20</h3>
+        
+        <!-- Dice -->
+        <div class="relative h-48 flex items-center justify-center">
+          <button id="dice-btn" onclick="rollDice()" class="relative w-32 h-32 rounded-[2rem] border-4 border-black transition-all duration-300 transform-gpu bg-white shadow-[0_15px_0_#ccc,0_20px_40px_rgba(0,0,0,0.4)] hover:scale-110 active:scale-95 hover:rotate-3">
+            <div id="dice-face" class="flex flex-col items-center justify-center h-full">
+              <div class="grid grid-cols-2 gap-2">
+                <div class="w-4 h-4 bg-red-600 rounded-full shadow-inner animate-pulse"></div>
+                <div class="w-4 h-4 bg-red-600 rounded-full shadow-inner animate-pulse"></div>
+                <div class="w-4 h-4 bg-red-600 rounded-full shadow-inner animate-pulse"></div>
+                <div class="w-4 h-4 bg-red-600 rounded-full shadow-inner animate-pulse"></div>
+              </div>
+            </div>
+            <div class="absolute top-2 left-2 w-8 h-4 bg-white/50 rounded-full rotate-[-45deg]"></div>
+          </button>
+        </div>
+
+        <button id="reset-btn" onclick="resetGame()" class="hidden mt-6 flex items-center justify-center gap-2 w-full bg-[#43B047] hover:bg-[#2F7D32] text-white font-black py-3 rounded-2xl border-b-4 border-[#2F7D32] transition-all">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          REINICIAR MAPA
+        </button>
+        
+        <p id="dice-status" class="mt-6 font-black text-xl italic text-yellow-300 drop-shadow-md">
+          ¡LANZA EL DADO!
+        </p>
+      </div>
+      
+      <!-- Progress Grid -->
+      <div class="bg-blue-900/40 p-4 rounded-2xl border border-white/10 w-full text-center">
+        <div class="text-[10px] font-bold text-white/60 uppercase mb-2">Historial de Saltos</div>
+        <div id="progress-grid" class="flex flex-wrap justify-center gap-1">
+          <!-- Generated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Board -->
+    <main class="flex-1 relative bg-[#5C94FC] p-8 rounded-[4rem] border-8 border-white shadow-[0_30px_80px_rgba(0,0,0,0.5)] overflow-hidden">
+      <!-- Clouds decoration -->
+      <div class="absolute -top-10 -left-10 text-white/10">
+        <svg width="150" height="100" viewBox="0 0 24 24" fill="currentColor"><path d="M18.5 12A5.5 5.5 0 0 0 13 6.5c-.36 0-.71.04-1.05.12A6 6 0 0 0 6.5 5 6 6 0 0 0 .5 11a4 4 0 0 0 4 4h14a4 4 0 0 0 0-8z"/></svg>
+      </div>
+      
+      <div id="board" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5 relative z-10">
+        <!-- Tiles generated by JS -->
+      </div>
+
+      <!-- Task Modal -->
+      <div id="task-modal" class="hidden mt-10 animate-in zoom-in slide-in-from-bottom-20 duration-500">
+        <div class="bg-white rounded-[3.5rem] border-b-[16px] border-gray-300 shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden relative text-slate-900 border-t-4 border-white">
+          <div id="task-banner" class="h-6 w-full bg-[#43B047]"></div>
+          
+          <div id="task-content" class="p-10">
+            <!-- Dynamic content -->
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer Legend -->
+  <footer class="max-w-4xl mx-auto mt-16 flex flex-wrap justify-center gap-8 pb-24 opacity-80">
+    <div class="flex items-center gap-4 bg-black/30 backdrop-blur-md px-8 py-3 rounded-2xl border-b-4 border-white/5 text-xs font-black uppercase tracking-[0.2em]">
+      <div class="w-5 h-5 bg-[#43B047] rounded-lg shadow-[0_2px_0_white]"></div> Lectura
+    </div>
+    <div class="flex items-center gap-4 bg-black/30 backdrop-blur-md px-8 py-3 rounded-2xl border-b-4 border-white/5 text-xs font-black uppercase tracking-[0.2em]">
+      <div class="w-5 h-5 bg-[#FBD000] rounded-lg shadow-[0_2px_0_white]"></div> Retos
+    </div>
+    <div class="flex items-center gap-4 bg-black/30 backdrop-blur-md px-8 py-3 rounded-2xl border-b-4 border-white/5 text-xs font-black uppercase tracking-[0.2em] text-[#E52521]">
+      <div class="w-5 h-5 bg-[#E52521] rounded-lg shadow-[0_2px_0_white]"></div> Mega Reto
+    </div>
+  </footer>
+
+  <script>
+    // Game Data
+    const snippets = [
+      "Una idea es un tesoro en tu mente. Si la escribes en un papel y trabajas en ella, puedes convertirla en un gran invento para el mundo.",
+      "El ahorro es como una semilla que plantas hoy. Si eres paciente y no te la comes, mañana tendrás un árbol lleno de frutos y oportunidades.",
+      "Los gastos hormiga son pequeñas monedas que se escapan sin darnos cuenta. Si cuidas tus monedas, tus billetes se cuidarán solos.",
+      "Un líder sabe que el dinero es una herramienta. Gastar es usarla una vez, pero invertir es hacer que la herramienta trabaje para ti.",
+      "El presupuesto es el mapa de tu tesoro. Te dice hacia dónde debe ir tu dinero en lugar de preguntarte a dónde se fue al final del mes.",
+      "La generosidad también es parte del liderazgo. Compartir un poco de lo que logras hace que tu comunidad sea más fuerte y feliz.",
+      "Los valores son la brújula de un líder: la honestidad, el respeto y la responsabilidad te guiarán siempre por el camino del éxito verdadero.",
+      "La ciencia nos enseña a entender el mundo, y las finanzas a gestionarlo. Un líder que sabe de ciencia puede inventar soluciones, y si sabe de finanzas, puede hacer que esas soluciones lleguen a miles de personas.",
+      "Pablito clavó un clavito en la calva de un calvito. En la calva de un calvito, Pablito clavó un clavito."
+    ];
+
+    const boardConfig = [
+      { id: 1, type: 'start', label: 'BROOKLYN', char: "MARIO", task: "ENTRENAMIENTO EN BROOKLYN: Si tienes 3 manzanas y Yoshi te da 2 naranjas, ¿qué propiedad de la suma usas si dices que 3+2 es lo mismo que 2+3? (Propiedad Conmutativa) 🍎+🍊", color: '#E52521' },
+      { id: 2, type: 'green', char: "LUIGI", task: 'MANSIÓN OSCURA: Un sustantivo es una palabra que nombra personas, animales, cosas o lugares. ¡Busca 2 sustantivos en este texto para iluminar el camino de Luigi! 👤🐾', snippet: 0, icon: 'mic' },
+      { id: 3, type: 'yellow', char: "PEACH", task: 'DISCURSO REAL: ¿Cuál es el sustantivo principal de este texto? 🔍', snippet: 1, icon: 'search' },
+      { id: 4, type: 'gold', char: "TOAD", task: 'REINO CHAMPIÑÓN: ¡Haz clic rápido para recolectar el botín de Toad! 💰', isGame: true, icon: 'coins' },
+      { id: 5, type: 'red', char: "BOWSER JR", task: 'ATAQUE DE BOWSER: Explica qué es un gasto hormiga antes de que las tropas de Bowser roben tus monedas 🎤', snippet: 2, icon: 'lightbulb' },
+      { id: 6, type: 'green', char: "YOSHI", task: 'ISLA YOSHI: Coloca un lápiz entre tus labios y lee rápido este texto sin que se caiga ✏️⚡', snippet: 3, icon: 'zap' },
+      { id: 7, type: 'yellow', char: "DAISY", task: 'FLORES DE DAISY: Dibuja el "mapa del tesoro" del Reino de Daisy 🎨', snippet: 4, icon: 'palette' },
+      { id: 8, type: 'red', char: "ROSALINA", task: 'ABRAZO ESTELAR: Ve donde mamá o papá y comparte algo valioso para ti (un dulce, un juguete o un abrazo estelar) ❤️', snippet: 5, icon: 'heart' },
+      { id: 9, type: 'green', char: "DONKEY KONG", task: 'JUNGLA KONG: ¿Cuáles son los 3 valores que menciona el texto? 💡', snippet: 6, icon: 'star' },
+      { id: 10, type: 'gold', char: "WARIO", task: 'EL SELLO DEL LÍDER: Dibuja el escudo oficial de los Líderes Ingeniosos en tu libreta secreta 🛡️✨', icon: 'trending' },
+      { id: 11, type: 'yellow', char: "WALUIGI", task: 'CAMBIO DE PLANES: ¿Qué pasa si el ahorro crece tanto que compras un castillo? 🔄', snippet: 1, icon: 'piggy' },
+      { id: 12, type: 'red', char: "DR MARIO", task: 'CIENCIA MÉDICA: Explica cómo la ciencia y el dinero ayudan al mundo como el Dr. Mario 🔬💵', snippet: 7, icon: 'flask' },
+      { id: 13, type: 'green', char: "TOADETTE", task: 'VOZ DE TOADETTE: menciona un sustantivo propio del texto con voz de locutor 🎙️', snippet: 3, icon: 'mic' },
+      { id: 14, type: 'yellow', char: "KOOPA", task: 'CAPARAZÓN RÁPIDO: Haz un resumen sobre el presupuesto en 5 segundos ⏱️', snippet: 4, icon: 'zap' },
+      { id: 15, type: 'gold', char: "BIRDIO", task: 'RELAX BIRDIO: Inhala aire por la nariz en 4 segundos, mantenlo y exhala. ¡Repite 3 veces! 🌬️', icon: 'wind' },
+      { id: 16, type: 'red', char: "BOO", task: 'MANSIÓN GHOST: ¿Qué sustantivo representa algo que se puede tocar (objeto real)? ✍️', snippet: 5, icon: 'palette' },
+      { id: 17, type: 'green', char: "SHY GUY", task: 'BAILE SHY GUY: Lee saltando y busca un sustantivo en plural 🦶', snippet: 2, icon: 'zap' },
+      { id: 18, type: 'yellow', char: "LAKITU", task: 'VISTA DE NUBE: ¿Cuál es la idea principal de este mensaje? 👤', snippet: 0, icon: 'lightbulb' },
+      { id: 19, type: 'gold', char: "STAR MARIO", task: '¡SUPER TRABALENGUAS! Lee esto lo más rápido que puedas sin equivocarte: Pablito clavó un clavito en la calva de un calvito.🌟', snippet: 8, icon: 'star' },
+      { id: 20, type: 'finish', label: 'THE CASTLE', char: "BOWSER", icon: 'trophy' }
+    ];
+
+    let activeTile = null;
+    let completedTiles = [];
+    let score = 0;
+    let bonusGameActive = false;
+    let bonusClicks = 0;
+    let isRolling = false;
+    let diceResult = null;
+    let availableNumbers = Array.from({ length: 20 }, (_, i) => i + 1);
+
+    // Initialize
+    function init() {
+      renderBoard();
+      renderProgressGrid();
+    }
+
+    function renderProgressGrid() {
+      const grid = document.getElementById('progress-grid');
+      grid.innerHTML = boardConfig.map(t => `
+        <div class="w-5 h-5 rounded-sm text-[8px] flex items-center justify-center font-black ${completedTiles.includes(t.id) ? 'bg-yellow-400 text-black' : 'bg-white/10 text-white/30'}">
+          ${t.id}
+        </div>
+      `).join('');
+    }
+
+    function renderBoard() {
+      const board = document.getElementById('board');
+      board.innerHTML = boardConfig.map(tile => {
+        const isCompleted = completedTiles.includes(tile.id);
+        const isActive = activeTile?.id === tile.id;
+        
+        let bgClass = '';
+        let borderClass = '';
+        if (tile.id === 1) { bgClass = 'bg-[#E52521]'; borderClass = 'border-[#9E1A17]'; }
+        else if (tile.id === 20) { bgClass = 'bg-stone-800'; borderClass = 'border-black'; }
+        else if (tile.type === 'green') { bgClass = 'bg-[#43B047]'; borderClass = 'border-[#2F7D32]'; }
+        else if (tile.type === 'yellow') { bgClass = 'bg-[#FBD000]'; borderClass = 'border-[#B89800]'; }
+        else if (tile.type === 'red') { bgClass = 'bg-[#E52521]'; borderClass = 'border-[#9E1A17]'; }
+        else { bgClass = 'bg-[#FBD000]'; borderClass = 'border-[#B89800]'; }
+
+        return `
+          <button onclick="handleTileClick(${tile.id})" 
+            class="aspect-square rounded-[2rem] border-b-[10px] flex flex-col items-center justify-between p-1.5 transition-all duration-300 relative overflow-hidden group ${bgClass} ${borderClass}
+            ${isActive ? 'ring-8 ring-yellow-400 scale-105 brightness-110 z-20 shadow-2xl' : 'shadow-xl hover:brightness-110'}
+            ${isCompleted ? 'opacity-80 saturate-[0.8]' : ''}">
+            
+            <div class="flex justify-between w-full items-center px-3 py-1 relative z-10">
+              <span class="text-xs font-black px-2 py-0.5 rounded-lg border border-white/20 shadow-sm ${isCompleted ? 'bg-yellow-400 text-black' : 'bg-black/40 text-white'}">
+                ${tile.id}
+              </span>
+              ${isCompleted ? '<div class="animate-bounce">⭐</div>' : ''}
+            </div>
+            
+            <div class="relative z-10 transform group-hover:scale-110 transition-transform duration-300">
+              <div class="bg-white/95 rounded-2xl p-1.5 px-4 border-2 border-black/10 shadow-lg">
+                <div class="text-black font-black text-[10px] uppercase tracking-tighter leading-none">${tile.char}</div>
+              </div>
+            </div>
+
+            <div class="w-full relative z-10 pb-2">
+              <span class="text-[11px] font-black uppercase text-center block w-full text-white drop-shadow-md tracking-widest truncate px-2">
+                ${tile.label || tile.char}
+              </span>
+            </div>
+
+            ${isCompleted ? `
+              <div class="absolute inset-0 flex items-center justify-center bg-green-500/20 backdrop-blur-[1px]">
+                <div class="w-12 h-12 rounded-full bg-green-500 border-4 border-white flex items-center justify-center shadow-xl rotate-[-12deg]">
+                  🏆
+                </div>
+              </div>
+            ` : ''}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function rollDice() {
+      if (isRolling || availableNumbers.length === 0) return;
+      
+      isRolling = true;
+      const btn = document.getElementById('dice-btn');
+      const face = document.getElementById('dice-face');
+      const status = document.getElementById('dice-status');
+      
+      btn.classList.add('dice-shake');
+      status.textContent = 'SALTANDO...';
+      
+      setTimeout(() => {
+        const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+        const result = availableNumbers[randomIndex];
+        availableNumbers = availableNumbers.filter(num => num !== result);
+        
+        diceResult = result;
+        isRolling = false;
+        btn.classList.remove('dice-shake');
+        
+        face.innerHTML = `<span class="text-5xl font-black text-blue-600 drop-shadow-sm">${result}</span>`;
+        status.textContent = `NIVEL ${result}`;
+        
+        document.getElementById('available-count').textContent = availableNumbers.length;
+        
+        if (availableNumbers.length === 0) {
+          document.getElementById('reset-btn').classList.remove('hidden');
+        }
+        
+        handleTileClick(result);
+      }, 800);
+    }
+
+    function resetGame() {
+      availableNumbers = Array.from({ length: 20 }, (_, i) => i + 1);
+      completedTiles = [];
+      score = 0;
+      activeTile = null;
+      diceResult = null;
+      
+      document.getElementById('score').textContent = '0';
+      document.getElementById('available-count').textContent = '20';
+      document.getElementById('dice-status').textContent = '¡LANZA EL DADO!';
+      document.getElementById('dice-face').innerHTML = `
+        <div class="grid grid-cols-2 gap-2">
+          ${Array(4).fill('<div class="w-4 h-4 bg-red-600 rounded-full shadow-inner animate-pulse"></div>').join('')}
+        </div>
+      `;
+      document.getElementById('reset-btn').classList.add('hidden');
+      document.getElementById('task-modal').classList.add('hidden');
+      
+      renderBoard();
+      renderProgressGrid();
+    }
+
+    function handleTileClick(tileId) {
+      const tile = boardConfig.find(t => t.id === tileId);
+      if (!tile) return;
+      
+      activeTile = tile;
+      
+      if (!completedTiles.includes(tile.id)) {
+        completedTiles.push(tile.id);
+        score += 100;
+        document.getElementById('score').textContent = score;
+      }
+      
+      renderBoard();
+      renderProgressGrid();
+      showTaskModal(tile);
+    }
+
+    function showTaskModal(tile) {
+      const modal = document.getElementById('task-modal');
+      const banner = document.getElementById('task-banner');
+      const content = document.getElementById('task-content');
+      
+      // Set banner color
+      let bannerColor = '#E52521';
+      if (tile.type === 'green') bannerColor = '#43B047';
+      else if (tile.type === 'yellow') bannerColor = '#FBD000';
+      banner.style.backgroundColor = bannerColor;
+      
+      modal.classList.remove('hidden');
+      
+      if (tile.type === 'finish') {
+        content.innerHTML = `
+          <div class="text-center py-4">
+            <div class="relative inline-block mb-8">
+              <div class="text-yellow-500 text-9xl mx-auto animate-bounce">🏆</div>
+              <div class="absolute top-0 -right-8 text-yellow-400 animate-spin">⭐</div>
+              <div class="absolute bottom-0 -left-8 text-yellow-400 animate-pulse">⭐</div>
+            </div>
+            <h2 class="text-6xl font-black mb-6 uppercase text-[#E52521] italic tracking-tighter drop-shadow-md">¡LEGADO DE LÍDER!</h2>
+            <div class="bg-stone-100 p-10 rounded-[3rem] border-4 border-dashed border-stone-400 relative">
+              <div class="absolute -top-5 left-1/2 -translate-x-1/2 bg-stone-800 text-white px-8 py-2 rounded-full font-black text-sm uppercase">Misión del Maestro Constructor</div>
+              <p class="text-2xl font-bold text-stone-700 leading-relaxed max-w-2xl mx-auto">
+                "¡Felicidades, Líder Ingenioso! Has recorrido todo el mapa. Para tu graduación: 
+                <span class="block text-red-600 font-black text-3xl mt-6 uppercase bg-white p-4 rounded-2xl shadow-inner border-2 border-red-100">¡CONSTRUYE TU PROPIO TROFEO FÍSICO!</span> 
+                Usa materiales reciclados o tus juguetes favoritos. ¡Sube al podio y celebra!"
+              </p>
+            </div>
+            <button onclick="closeModal()" class="mt-8 bg-[#43B047] text-white font-black px-12 py-4 rounded-3xl border-b-8 border-[#2F7D32] active:translate-y-2 active:border-b-0 transition-all text-xl">¡LO LOGRÉ!</button>
+          </div>
+        `;
+      } else if (tile.isGame) {
+        content.innerHTML = `
+          <div class="text-center py-6">
+            <div class="relative inline-flex mb-8">
+              <div class="bg-yellow-400 p-10 rounded-[2.5rem] border-8 border-yellow-600 shadow-2xl animate-pulse relative z-10 text-yellow-700 text-7xl">
+                💰
+              </div>
+            </div>
+            <h2 class="text-5xl font-black mb-4 text-[#FBD000] italic uppercase tracking-tighter">¡FIESTA DE MONEDAS!</h2>
+            <p class="mb-10 font-bold text-slate-500 text-xl">¡Toad necesita tu energía! ¡Pulsa sin parar!</p>
+            
+            <div id="bonus-game">
+              <button onclick="startBonusGame()" class="group relative bg-[#E52521] hover:bg-[#9E1A17] text-white font-black px-20 py-8 rounded-[2rem] text-4xl shadow-[0_12px_0_#9E1A17] active:translate-y-2 active:shadow-none transition-all uppercase tracking-tighter overflow-hidden">
+                <span class="relative z-10">¡EMPEZAR!</span>
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        const snippet = tile.snippet !== undefined ? snippets[tile.snippet] : null;
+        const isCompleted = completedTiles.includes(tile.id);
+        
+        content.innerHTML = `
+          <div class="flex flex-col lg:flex-row gap-12 items-center lg:items-start">
+            <div class="flex-1">
+              <div class="flex items-center gap-6 mb-8">
+                <div class="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-gray-400 to-gray-600 border-4 border-[#E52521] shadow-2xl transform -rotate-3 flex items-center justify-center text-4xl">
+                  ${getEmojiForIcon(tile.icon)}
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="bg-[#E52521] text-white px-5 py-1.5 rounded-xl font-black text-sm uppercase shadow-sm">
+                      NIVEL ${tile.id}
+                    </span>
+                    ${isCompleted ? '<span class="text-green-600 font-black text-xs uppercase">✔ Completado</span>' : ''}
+                  </div>
+                  <h3 class="text-slate-400 font-black tracking-widest uppercase text-xs mt-3 flex items-center gap-2">
+                    👤 Misión de ${tile.char}
+                  </h3>
+                </div>
+              </div>
+              
+              <h2 class="text-3xl md:text-4xl font-black mb-10 leading-tight text-slate-800 uppercase italic tracking-tight border-l-8 border-yellow-400 pl-6">
+                ${tile.task}
+              </h2>
+
+              ${snippet ? `
+                <div class="bg-gradient-to-br from-[#EBF5FF] to-white p-10 rounded-[3rem] border-4 border-white shadow-[inset_0_2px_10px_rgba(0,0,0,0.05)] italic font-bold text-2xl text-blue-900 relative">
+                  <div class="absolute -top-5 left-12 bg-[#5C94FC] text-white text-xs font-black px-6 py-2 rounded-full uppercase shadow-lg border-2 border-white">📜 Pergamino de Sabiduría</div>
+                  <div class="relative z-10">"${snippet}"</div>
+                </div>
+              ` : ''}
+            </div>
+            
+            <div class="bg-slate-50 p-10 rounded-[4rem] flex flex-col items-center justify-center min-w-[280px] border-4 border-white shadow-2xl self-stretch relative overflow-hidden group">
+              <div class="absolute -bottom-10 -right-10 opacity-5 group-hover:opacity-10 transition-opacity text-9xl">⭐</div>
+              
+              <div class="w-24 h-24 bg-[#43B047] rounded-[2rem] flex items-center justify-center text-white mb-8 shadow-[0_10px_0_#2F7D32] border-4 border-white transform hover:scale-110 transition-transform text-4xl">
+                ▶
+              </div>
+              
+              <button onclick="closeModal()" class="w-full bg-[#43B047] hover:bg-[#2F7D32] text-white font-black px-12 py-5 rounded-3xl border-b-[12px] border-[#2F7D32] transition-all active:translate-y-3 active:border-b-0 shadow-2xl text-2xl uppercase tracking-tighter">
+                ¡LO LOGRÉ!
+              </button>
+              
+              <div class="mt-8 flex items-center gap-2 bg-yellow-400/20 px-6 py-2 rounded-full">
+                <span class="text-yellow-600 text-lg">🪙</span>
+                <p class="text-xs font-black text-yellow-700 uppercase tracking-widest">+100 MONEDAS</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Scroll to modal
+      setTimeout(() => {
+        modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+
+    function getEmojiForIcon(icon) {
+      const emojis = {
+        'mic': '🎤', 'search': '🔍', 'coins': '💰', 'lightbulb': '💡',
+        'zap': '⚡', 'palette': '🎨', 'heart': '❤️', 'star': '⭐',
+        'trending': '📈', 'piggy': '🐷', 'flask': '🧪', 'wind': '💨'
+      };
+      return emojis[icon] || '🎮';
+    }
+
+    function startBonusGame() {
+      bonusGameActive = true;
+      bonusClicks = 0;
+      
+      const bonusDiv = document.getElementById('bonus-game');
+      bonusDiv.innerHTML = `
+        <div class="flex flex-col items-center">
+          <button onclick="doBonusClick()" class="bg-[#FBD000] w-48 h-48 rounded-[3rem] flex items-center justify-center shadow-[0_15px_0_#B89800] border-8 border-white active:translate-y-4 active:shadow-none transition-all hover:brightness-110 bounce-click">
+            <span class="text-[10rem] font-black text-white drop-shadow-lg">?</span>
+          </button>
+          <div class="mt-10 flex items-center gap-4 bg-black/5 px-8 py-2 rounded-full">
+            <span class="text-yellow-500 text-4xl">🪙</span>
+            <p id="bonus-count" class="text-8xl font-black text-yellow-500 italic">0</p>
+          </div>
+          <p class="mt-4 text-slate-400 font-bold">¡Toca rápido! Tienes 5 segundos</p>
+        </div>
+      `;
+      
+      setTimeout(() => {
+        bonusGameActive = false;
+        const bonusScore = bonusClicks * 20;
+        score += bonusScore;
+        document.getElementById('score').textContent = score;
+        
+        bonusDiv.innerHTML = `
+          <div class="text-center">
+            <p class="text-4xl font-black text-[#43B047] mb-4">¡+${bonusScore} MONEDAS!</p>
+            <button onclick="closeModal()" class="bg-[#43B047] text-white font-black px-8 py-3 rounded-2xl">Continuar</button>
+          </div>
+        `;
+      }, 5000);
+    }
+
+    function doBonusClick() {
+      if (!bonusGameActive) return;
+      bonusClicks++;
+      document.getElementById('bonus-count').textContent = bonusClicks;
+      
+      // Create floating coin effect
+      const btn = event.target.closest('button');
+      const coin = document.createElement('div');
+      coin.className = 'coin-particle text-4xl';
+      coin.textContent = '🪙';
+      coin.style.left = '50%';
+      coin.style.top = '50%';
+      btn.appendChild(coin);
+      setTimeout(() => coin.remove(), 1000);
+    }
+
+    function closeModal() {
+      document.getElementById('task-modal').classList.add('hidden');
+    }
+
+    // Initialize on load
+    window.onload = init;
+  </script>
+</body>
+</html>

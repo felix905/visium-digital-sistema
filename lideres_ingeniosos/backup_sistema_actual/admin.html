@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel del Maestro · Líderes Ingeniosos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="stylesheet" href="../styles/btn.css">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    body { background: #f0ebff; min-height: 100vh; }
+
+    .card {
+      background: white;
+      border-radius: 2rem;
+      transition: all .3s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 4px 20px rgba(124,58,237,.08);
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(124,58,237,.15); }
+    .card.is-locked {
+      opacity: .5;
+      filter: grayscale(1);
+      box-shadow: none;
+    }
+    .card.is-locked:hover { transform: none; box-shadow: none; }
+
+    .game-icon {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+      margin: 0 auto 12px;
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+      position: relative;
+    }
+    .card:hover .game-icon { transform: scale(1.1); }
+
+    .toggle-wrap {
+      position: relative; display: inline-flex;
+      align-items: center; cursor: pointer;
+    }
+    .toggle-input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      width: 52px; height: 28px; border-radius: 9999px;
+      background: #d1d5db; transition: background .25s;
+      position: relative;
+    }
+    .toggle-input:checked + .toggle-track { background: #7c3aed; }
+    .toggle-thumb {
+      position: absolute; top: 3px; left: 3px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: white; transition: transform .25s;
+      box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    }
+    .toggle-input:checked ~ .toggle-thumb { transform: translateX(24px); }
+
+    .locked-overlay {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: rgba(0,0,0,.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    .class-pill {
+      cursor: pointer; transition: all .2s;
+      padding: .4rem 1.1rem; border-radius: 9999px;
+      font-size: .8rem; font-weight: 700; border: 2px solid transparent;
+    }
+    .class-pill.active { background: #7c3aed; color: white; }
+    .class-pill:not(.active) { background: white; color: #7c3aed; border-color: #c4b5fd; }
+    .class-pill:not(.active):hover { background: #f5f3ff; }
+
+    .save-btn {
+      background: #7c3aed; color: white;
+      border-radius: 9999px; font-weight: 800;
+      padding: .65rem 2rem; font-size: .95rem;
+      transition: all .2s; box-shadow: 0 4px 14px rgba(124,58,237,.4);
+    }
+    .save-btn:hover { background: #6d28d9; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(124,58,237,.4); }
+    .save-btn:active { transform: translateY(0); }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    .card { animation: fadeUp .4s ease both; }
+  </style>
+</head>
+<body class="p-5 pb-12">
+
+  <!-- HEADER -->
+  <div class="max-w-5xl mx-auto">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <div class="flex items-center gap-3">
+        <img src="img/logo.svg" alt="Logo" class="h-12">
+        <div>
+          <p class="text-purple-400 text-xs font-bold uppercase tracking-widest">Panel del Maestro</p>
+          <h1 class="text-2xl font-black text-gray-800">Control de Juegos</h1>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="app.html" class="btn-3d btn-blue btn-lg flex items-center gap-2" title="Volver a la app">
+          <i class="ti ti-arrow-left"></i> Volver a la app
+        </a>
+        <button onclick="saveConfig()" class="btn-3d btn-purple btn-lg flex items-center gap-2">
+          <i class="ti ti-device-floppy"></i> Guardar cambios
+        </button>
+        <a href="login.html" class="text-gray-400 hover:text-red-500 transition text-xl" title="Salir">
+          <i class="ti ti-logout"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- ACCIONES RÁPIDAS -->
+    <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+      <div class="flex gap-2">
+        <button onclick="toggleAll(true)" class="btn-3d btn-green btn-sm flex items-center gap-1">
+          <i class="ti ti-lock-open"></i> Activar todos
+        </button>
+        <button onclick="toggleAll(false)" class="btn-3d btn-red btn-sm flex items-center gap-1">
+          <i class="ti ti-lock"></i> Bloquear todos
+        </button>
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-gray-400 font-semibold">Juegos activos</p>
+        <p id="active-count" class="text-3xl font-black text-purple-600">0 / 7</p>
+      </div>
+    </div>
+
+    <!-- GRID DE JUEGOS -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" id="games-grid"></div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-purple-700 text-white px-6 py-3 rounded-2xl shadow-2xl font-bold text-sm transform translate-y-20 transition-all duration-300 z-50 flex items-center gap-2">
+      <i class="ti ti-circle-check text-lg"></i> <span id="toast-msg">Guardado</span>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_CODE = "admin123";
+    const STORAGE_KEY = "li_games_config";
+
+    const games = [
+      { id: "game_exploradores",    label: "Exploradores de Venezuela", emoji: "🗺️", color: "from-blue-400 to-cyan-300" },
+      { id: "game_mision_ingeniosa",label: "Misión Ingeniosa",          emoji: "🎰", color: "from-violet-500 to-purple-400" },
+      { id: "game_club_lideres",    label: "Club de Líderes",           emoji: "🚀", color: "from-indigo-500 to-blue-400" },
+      { id: "game_clasificacion",   label: "Clasificación de Palabras", emoji: "🎯", color: "from-cyan-500 to-teal-400" },
+      { id: "game_ruleta",          label: "Ruleta del Conocimiento",   emoji: "🎡", color: "from-rose-500 to-pink-400" },
+      { id: "game_tinta_invisible", label: "Tinta Invisible",           emoji: "🧪", color: "from-emerald-500 to-green-400" },
+      { id: "game_retos_familiares",label: "Retos Familiares",          emoji: "🏆", color: "from-amber-500 to-orange-400" },
+    ];
+
+    let config = {};
+
+    function loadConfig() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      config = raw ? JSON.parse(raw) : {};
+      if (!config["all"]) {
+        config["all"] = {};
+        games.forEach(g => config["all"][g.id] = true);
+      }
+    }
+
+    function saveConfig() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+      showToast("✅ Cambios guardados");
+    }
+
+    function toggleGame(id, val) {
+      config["all"][id] = val;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config)); // guarda al instante
+      updateActiveCount();
+      const card = document.getElementById("card-" + id);
+      const overlay = document.getElementById("overlay-" + id);
+      const status = document.getElementById("status-" + id);
+      card.classList.toggle("is-locked", !val);
+      overlay.classList.toggle("hidden", val);
+      status.innerText = val ? "Activo" : "Bloqueado";
+      status.className = `text-[10px] font-semibold mt-2 ${val ? "text-green-600" : "text-red-400"}`;
+    }
+
+    function toggleAll(val) {
+      games.forEach(g => {
+        config["all"][g.id] = val;
+        const card = document.getElementById("card-" + g.id);
+        const overlay = document.getElementById("overlay-" + g.id);
+        const inp = document.getElementById("toggle-" + g.id);
+        const status = document.getElementById("status-" + g.id);
+        if (card) card.classList.toggle("is-locked", !val);
+        if (overlay) overlay.classList.toggle("hidden", val);
+        if (inp) inp.checked = val;
+        if (status) {
+          status.innerText = val ? "Activo" : "Bloqueado";
+          status.className = `text-[10px] font-semibold mt-2 ${val ? "text-green-600" : "text-red-400"}`;
+        }
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config)); // guarda al instante
+      updateActiveCount();
+    }
+
+    function updateActiveCount() {
+      const count = games.filter(g => config["all"][g.id]).length;
+      document.getElementById("active-count").innerText = count + " / " + games.length;
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById("games-grid");
+      grid.innerHTML = "";
+      games.forEach((g, i) => {
+        const active = config["all"][g.id];
+        const div = document.createElement("div");
+        div.id = "card-" + g.id;
+        div.className = "card p-5 text-center" + (active ? "" : " is-locked");
+        div.style.animationDelay = (i * 0.07) + "s";
+        div.innerHTML = `
+          <div class="game-icon bg-gradient-to-br ${g.color} relative" id="icon-${g.id}">
+            ${g.emoji}
+            <div id="overlay-${g.id}" class="locked-overlay ${active ? 'hidden' : ''}">🔒</div>
+          </div>
+          <p class="text-xs font-bold text-gray-700 leading-tight mb-3">${g.label}</p>
+          <label class="toggle-wrap justify-center">
+            <input type="checkbox" id="toggle-${g.id}" class="toggle-input" ${active ? 'checked' : ''}
+              onchange="toggleGame('${g.id}', this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+          <p class="text-[10px] font-semibold mt-2 ${active ? 'text-green-600' : 'text-red-400'}" id="status-${g.id}">
+            ${active ? 'Activo' : 'Bloqueado'}
+          </p>
+        `;
+        grid.appendChild(div);
+      });
+      updateActiveCount();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      document.getElementById("toast-msg").innerText = msg;
+      t.classList.remove("translate-y-20");
+      setTimeout(() => t.classList.add("translate-y-20"), 2800);
+    }
+
+    // Auth check
+    const adminUser = sessionStorage.getItem("li_admin");
+    if (!adminUser) {
+      // Simple inline auth
+      const code = prompt("🔐 Código de administrador:");
+      if (code !== ADMIN_CODE) {
+        alert("Acceso denegado");
+        window.location.href = "login.html";
+      } else {
+        sessionStorage.setItem("li_admin", "1");
+      }
+    }
+
+    loadConfig();
+    renderGrid();
+  </script>
+</body>
+</html>
+

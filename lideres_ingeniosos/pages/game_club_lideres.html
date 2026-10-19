@@ -1,0 +1,320 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Líderes Ingeniosos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        .bg-gradient-soft {
+            background: linear-gradient(135deg, #f6f8fb 0%, #e9effd 100%);
+        }
+        .drop-zone-active {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+    </style>
+  <link rel="stylesheet" href="../styles/btn.css">
+</head>
+<body class="bg-gradient-soft min-h-screen font-sans text-gray-800 p-4">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-blue-700 mb-2">🚀 Club de Líderes Ingeniosos</h1>
+            <p class="text-lg text-gray-600 italic">"¡Bienvenidos al primer día de su gran aventura!"</p>
+        </header>
+
+        <!-- Tabs Navigation -->
+        <div class="flex flex-wrap justify-center gap-3 mb-8">
+            <button onclick="showTab('sara')" id="btn-sara" class="btn-3d btn-blue btn-pill">El Desafío de Sara</button>
+            <button onclick="showTab('andres')" id="btn-andres" class="btn-3d btn-white btn-pill">El Desafío de Andrés</button>
+            <button onclick="showTab('avatar')" id="btn-avatar" class="btn-3d btn-white btn-pill" style="color:#059669;box-shadow:0 6px 0 #065f46;">Mi Personaje</button>
+        </div>
+
+        <!-- SARA'S SECTION -->
+        <div id="section-sara" class="space-y-8">
+            <div class="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-pink-400">
+                <h2 class="text-2xl font-bold text-pink-600 mb-4"><i class="fas fa-brain mr-2"></i> Misión 1: Memoria de Sistemas (Nombre y Función)</h2>
+                <div id="memory-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto"></div>
+                <div class="mt-6 text-center">
+                    <button onclick="initMemoryGame()" class="btn-3d btn-pink btn-sm">Reiniciar Memoria</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-yellow-400">
+                <h2 class="text-2xl font-bold text-yellow-600 mb-4"><i class="fas fa-pen-nib mr-2"></i> Misión 2: Detective de Tildes</h2>
+                <div class="flex flex-wrap gap-4 mb-8 justify-center" id="words-container"></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="p-6 border-2 border-dashed border-blue-300 rounded-xl bg-blue-50 text-center" ondrop="drop(event, 'aguda')" ondragover="allowDrop(event)">
+                        <h3 class="font-bold text-blue-600">AGUDAS</h3>
+                        <div id="aguda-list" class="flex flex-col gap-2 min-h-[50px]"></div>
+                    </div>
+                    <div class="p-6 border-2 border-dashed border-green-300 rounded-xl bg-green-50 text-center" ondrop="drop(event, 'grave')" ondragover="allowDrop(event)">
+                        <h3 class="font-bold text-green-600">GRAVES</h3>
+                        <div id="grave-list" class="flex flex-col gap-2 min-h-[50px]"></div>
+                    </div>
+                    <div class="p-6 border-2 border-dashed border-purple-300 rounded-xl bg-purple-50 text-center" ondrop="drop(event, 'esdrújula')" ondragover="allowDrop(event)">
+                        <h3 class="font-bold text-purple-600">ESDRÚJULAS</h3>
+                        <div id="esdrújula-list" class="flex flex-col gap-2 min-h-[50px]"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANDRES'S SECTION -->
+        <div id="section-andres" class="hidden space-y-8">
+            <div class="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-indigo-400">
+                <h2 class="text-2xl font-bold text-indigo-600 mb-4 text-center">🎯 El Atrapa-Signos de Andrés</h2>
+                <p class="text-center text-gray-600 mb-6">¿Qué signo falta en esta frase? ¡Haz clic en el correcto!</p>
+                
+                <div id="game-andres-container" class="bg-indigo-50 p-8 rounded-xl text-center">
+                    <div id="phrase-display" class="text-2xl font-bold mb-8 text-gray-700"></div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <button onclick="checkAndres('.') " class="btn-3d btn-rose" style="font-size:1.5rem">.</button>
+                        <button onclick="checkAndres(',')" class="btn-3d btn-orange" style="font-size:1.5rem">,</button>
+                        <button onclick="checkAndres('?')" class="btn-3d btn-blue" style="font-size:1.5rem">¿?</button>
+                        <button onclick="checkAndres('!')" class="btn-3d btn-amber" style="font-size:1.5rem">¡!</button>
+                    </div>
+                </div>
+                <div class="mt-6 text-center">
+                    <p id="andres-score" class="text-lg font-bold text-indigo-500">Puntos: 0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AVATAR SECTION -->
+        <div id="section-avatar" class="hidden space-y-8">
+            <div class="bg-white p-8 rounded-2xl shadow-xl border-t-4 border-green-400">
+                <h2 class="text-3xl font-bold text-green-700 mb-6 text-center"><i class="fas fa-user-astronaut mr-2"></i> Mi Personaje Ingenioso</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Materiales -->
+                    <div class="bg-green-50 p-6 rounded-xl border border-green-200">
+                        <h3 class="font-bold text-green-800 mb-4 uppercase tracking-wider"><i class="fas fa-toolbox mr-2"></i> Materiales Necesarios</h3>
+                        <ul class="space-y-2 text-gray-700">
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Hojas blancas</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Cartulina de construcción</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Colores y Marcadores</li>
+                            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> Pega (Pegamento)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Datos del Personaje -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Nombre del Personaje:</label>
+                            <input type="text" placeholder="Ej: Super Ahorro" class="w-full p-2 border-2 border-green-200 rounded-lg focus:border-green-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Relación con las Ciencias:</label>
+                            <textarea placeholder="¿Qué invento o sistema usa?" class="w-full p-2 border-2 border-green-200 rounded-lg focus:border-green-500 outline-none h-20"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Relación con los Valores:</label>
+                            <input type="text" placeholder="Honestidad, Perseverancia..." class="w-full p-2 border-2 border-green-200 rounded-lg focus:border-green-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Relación con las Finanzas:</label>
+                            <input type="text" placeholder="¿Cómo ayuda a ahorrar?" class="w-full p-2 border-2 border-green-200 rounded-lg focus:border-green-500 outline-none">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 p-6 bg-gray-100 rounded-xl text-center border-2 border-dashed border-gray-300">
+                    <p class="text-gray-500">Dibuja aquí a tu personaje después de completar tu ficha</p>
+                    <div class="h-40 flex items-center justify-center">
+                         <i class="fas fa-palette text-6xl text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="feedback-toast" class="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-full shadow-2xl transform translate-y-20 transition-transform duration-300 z-50">
+            ¡Excelente trabajo! ✨
+        </div>
+    </div>
+
+    <script>
+        // --- NAVIGATION ---
+        function showTab(user) {
+            const sections = ['sara', 'andres', 'avatar'];
+            sections.forEach(s => {
+                document.getElementById(`section-${s}`).classList.add('hidden');
+                const btn = document.getElementById(`btn-${s}`);
+                btn.className = "px-6 py-2 rounded-full font-bold transition-all border-2 " + 
+                    (s === 'avatar' ? 'border-green-600 text-green-600 bg-white' : 'border-blue-600 text-blue-600 bg-white');
+            });
+
+            document.getElementById(`section-${user}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${user}`);
+            activeBtn.className = `px-6 py-2 rounded-full font-bold transition-all shadow-lg text-white ${user === 'avatar' ? 'bg-green-600 border-green-600' : 'bg-blue-600 border-blue-600'}`;
+            
+            if(user === 'andres') initAndresGame();
+        }
+
+        // --- SARA: MEMORY (Updated to Name & Function) ---
+        const memoryData = [
+            { val: 'Sistema Respiratorio', pair: 1 }, { val: 'Lleva oxígeno a la sangre', pair: 1 },
+            { val: 'Sistema Circulatorio', pair: 2 }, { val: 'Transporta nutrientes y sangre', pair: 2 },
+            { val: 'Sistema Digestivo', pair: 3 }, { val: 'Obtiene energía de alimentos', pair: 3 },
+            { val: 'Sistema Óseo', pair: 4 }, { val: 'Sostiene y protege los órganos', pair: 4 }
+        ];
+
+        let flippedCards = [];
+        let matchedPairs = 0;
+
+        function initMemoryGame() {
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+            flippedCards = [];
+            matchedPairs = 0;
+            const shuffled = [...memoryData].sort(() => Math.random() - 0.5);
+            shuffled.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'card h-28 w-full relative';
+                card.innerHTML = `
+                    <div class="card-inner w-full h-full relative border-2 border-pink-200 rounded-xl" onclick="flipCard(this, ${item.pair})">
+                        <div class="card-front bg-pink-100 text-3xl text-pink-400 font-bold">L.I.</div>
+                        <div class="card-back bg-white text-xs p-2 text-center font-bold flex items-center justify-center">${item.val}</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(element, pairId) {
+            const card = element.parentElement;
+            if (card.classList.contains('flipped') || flippedCards.length >= 2) return;
+            card.classList.add('flipped');
+            flippedCards.push({ element, pairId });
+            if (flippedCards.length === 2) {
+                if (flippedCards[0].pairId === flippedCards[1].pairId) {
+                    matchedPairs++;
+                    flippedCards = [];
+                    if (matchedPairs === memoryData.length / 2) showToast('¡Maestra de Sistemas!');
+                } else {
+                    setTimeout(() => {
+                        flippedCards.forEach(c => c.element.parentElement.classList.remove('flipped'));
+                        flippedCards = [];
+                    }, 1200);
+                }
+            }
+        }
+
+        // --- SARA: TILDES ---
+        const words = [
+            { text: 'ACCIÓN', type: 'aguda' }, { text: 'COMPÁS', type: 'aguda' },
+            { text: 'LÍDER', type: 'grave' }, { text: 'AZÚCAR', type: 'grave' },
+            { text: 'SÉPTIMO', type: 'esdrújula' }, { text: 'PÁGINA', type: 'esdrújula' }
+        ];
+
+        function initTildeGame() {
+            const container = document.getElementById('words-container');
+            container.innerHTML = '';
+            words.sort(() => Math.random() - 0.5).forEach((word, idx) => {
+                const div = document.createElement('div');
+                div.className = 'bg-white px-4 py-2 border-2 border-gray-200 rounded-lg cursor-grab shadow font-bold';
+                div.draggable = true;
+                div.innerText = word.text;
+                div.id = `word-${idx}`;
+                div.dataset.type = word.type;
+                div.ondragstart = (e) => e.dataTransfer.setData('text', e.target.id);
+                container.appendChild(div);
+            });
+        }
+
+        function allowDrop(e) { e.preventDefault(); }
+        function drop(e, targetType) {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text');
+            const el = document.getElementById(id);
+            if (el.dataset.type === targetType) {
+                document.getElementById(`${targetType}-list`).appendChild(el);
+                el.draggable = false;
+                el.className = "bg-green-100 px-4 py-1 rounded text-green-700 text-sm font-bold w-full text-center";
+                showToast('¡Correcto!');
+            } else {
+                showToast('¡Intenta de nuevo!');
+            }
+        }
+
+        // --- ANDRÉS: GAME ---
+        const andresPhrases = [
+            { text: 'Hola Andrés, ¿cómo estás_?', correct: '?' },
+            { text: 'El ahorro es importante para el futuro_', correct: '.' },
+            { text: '¡Qué alegría verte hoy_', correct: '!' },
+            { text: 'Sara, trae los colores_ la pega y las hojas.', correct: ',' },
+            { text: '¿Cuántas monedas tienes en tu alcancía_', correct: '?' },
+            { text: '¡Ganaste el reto del día_', correct: '!' }
+        ];
+
+        let currentAndresIndex = 0;
+        let andresScore = 0;
+
+        function initAndresGame() {
+            currentAndresIndex = Math.floor(Math.random() * andresPhrases.length);
+            updateAndresPhrase();
+        }
+
+        function updateAndresPhrase() {
+            const p = andresPhrases[currentAndresIndex];
+            document.getElementById('phrase-display').innerText = p.text.replace('_', ' ___ ');
+        }
+
+        function checkAndres(sign) {
+            const p = andresPhrases[currentAndresIndex];
+            if (p.correct === sign) {
+                andresScore += 10;
+                showToast('¡Punto para Andrés!');
+                document.getElementById('andres-score').innerText = `Puntos: ${andresScore}`;
+                nextAndres();
+            } else {
+                showToast('Casi... ¡Prueba otro signo!');
+            }
+        }
+
+        function nextAndres() {
+            currentAndresIndex = (currentAndresIndex + 1) % andresPhrases.length;
+            setTimeout(updateAndresPhrase, 500);
+        }
+
+        // --- GENERAL ---
+        function showToast(msg) {
+            const toast = document.getElementById('feedback-toast');
+            toast.innerText = msg;
+            toast.classList.remove('translate-y-20');
+            setTimeout(() => toast.classList.add('translate-y-20'), 2500);
+        }
+
+        window.onload = () => {
+            initMemoryGame();
+            initTildeGame();
+        };
+    </script>
+</body>
+</html>

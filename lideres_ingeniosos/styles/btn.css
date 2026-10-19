@@ -1,0 +1,158 @@
+/* ============================================================
+   BTN 3D — Estilo Duolingo/Lingokids
+   Uso: agrega la clase .btn-3d + .btn-purple / .btn-green / etc.
+   ============================================================ */
+
+.btn-3d {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  font-weight: 800;
+  border-radius: 1rem;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: transform .12s ease, box-shadow .12s ease;
+  user-select: none;
+  letter-spacing: .01em;
+  padding: .65rem 1.4rem;
+  font-size: .9rem;
+  outline: none;
+  text-decoration: none;
+}
+
+/* Press effect */
+.btn-3d:active {
+  transform: translateY(4px) !important;
+  box-shadow: none !important;
+}
+
+/* ---- PURPLE (primary) ---- */
+.btn-purple {
+  background: #7c3aed;
+  color: white;
+  box-shadow: 0 6px 0 #4c1d95;
+}
+.btn-purple:hover { background: #6d28d9; transform: translateY(-2px); box-shadow: 0 8px 0 #4c1d95; }
+
+/* ---- VIOLET ---- */
+.btn-violet {
+  background: #8b5cf6;
+  color: white;
+  box-shadow: 0 6px 0 #5b21b6;
+}
+.btn-violet:hover { background: #7c3aed; transform: translateY(-2px); box-shadow: 0 8px 0 #5b21b6; }
+
+/* ---- GREEN ---- */
+.btn-green {
+  background: #10b981;
+  color: white;
+  box-shadow: 0 6px 0 #065f46;
+}
+.btn-green:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 8px 0 #065f46; }
+
+/* ---- EMERALD ---- */
+.btn-emerald {
+  background: #34d399;
+  color: white;
+  box-shadow: 0 6px 0 #065f46;
+}
+.btn-emerald:hover { background: #10b981; transform: translateY(-2px); box-shadow: 0 8px 0 #065f46; }
+
+/* ---- BLUE ---- */
+.btn-blue {
+  background: #3b82f6;
+  color: white;
+  box-shadow: 0 6px 0 #1e40af;
+}
+.btn-blue:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 8px 0 #1e40af; }
+
+/* ---- INDIGO ---- */
+.btn-indigo {
+  background: #6366f1;
+  color: white;
+  box-shadow: 0 6px 0 #3730a3;
+}
+.btn-indigo:hover { background: #4f46e5; transform: translateY(-2px); box-shadow: 0 8px 0 #3730a3; }
+
+/* ---- PINK ---- */
+.btn-pink {
+  background: #ec4899;
+  color: white;
+  box-shadow: 0 6px 0 #9d174d;
+}
+.btn-pink:hover { background: #db2777; transform: translateY(-2px); box-shadow: 0 8px 0 #9d174d; }
+
+/* ---- ROSE ---- */
+.btn-rose {
+  background: #f43f5e;
+  color: white;
+  box-shadow: 0 6px 0 #9f1239;
+}
+.btn-rose:hover { background: #e11d48; transform: translateY(-2px); box-shadow: 0 8px 0 #9f1239; }
+
+/* ---- ORANGE ---- */
+.btn-orange {
+  background: #f97316;
+  color: white;
+  box-shadow: 0 6px 0 #9a3412;
+}
+.btn-orange:hover { background: #ea580c; transform: translateY(-2px); box-shadow: 0 8px 0 #9a3412; }
+
+/* ---- AMBER / YELLOW ---- */
+.btn-amber {
+  background: #f59e0b;
+  color: white;
+  box-shadow: 0 6px 0 #92400e;
+}
+.btn-amber:hover { background: #d97706; transform: translateY(-2px); box-shadow: 0 8px 0 #92400e; }
+
+/* ---- CYAN ---- */
+.btn-cyan {
+  background: #06b6d4;
+  color: white;
+  box-shadow: 0 6px 0 #164e63;
+}
+.btn-cyan:hover { background: #0891b2; transform: translateY(-2px); box-shadow: 0 8px 0 #164e63; }
+
+/* ---- GRAY (secondary/neutral) ---- */
+.btn-gray {
+  background: #e5e7eb;
+  color: #374151;
+  box-shadow: 0 6px 0 #9ca3af;
+}
+.btn-gray:hover { background: #d1d5db; transform: translateY(-2px); box-shadow: 0 8px 0 #9ca3af; }
+
+/* ---- WHITE (on dark bg) ---- */
+.btn-white {
+  background: white;
+  color: #7c3aed;
+  box-shadow: 0 6px 0 #c4b5fd;
+}
+.btn-white:hover { background: #f5f3ff; transform: translateY(-2px); box-shadow: 0 8px 0 #c4b5fd; }
+
+/* ---- RED ---- */
+.btn-red {
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 6px 0 #991b1b;
+}
+.btn-red:hover { background: #dc2626; transform: translateY(-2px); box-shadow: 0 8px 0 #991b1b; }
+
+/* ---- SIZES ---- */
+.btn-sm  { padding: .4rem .9rem;  font-size: .78rem; border-radius: .75rem; }
+.btn-lg  { padding: .85rem 2rem;  font-size: 1.05rem; border-radius: 1.25rem; }
+.btn-xl  { padding: 1rem 2.5rem;  font-size: 1.2rem;  border-radius: 1.5rem; }
+.btn-full { width: 100%; }
+
+/* ---- PILL (fully rounded) ---- */
+.btn-pill { border-radius: 9999px !important; }
+
+/* ---- DISABLED ---- */
+.btn-3d:disabled, .btn-3d.disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 0 4px 0 rgba(0,0,0,.15) !important;
+}

@@ -1,0 +1,410 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misión: Clasificación de Palabras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #f0ebff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header-banner {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 60%, #8b5cf6 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .header-banner::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 160px; height: 160px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+        .header-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -30px; left: -30px;
+            width: 120px; height: 120px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }
+
+        .card {
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 4px 20px rgba(139,92,246,0.12);
+            overflow: hidden;
+        }
+        .card-bar-purple { background: linear-gradient(90deg, #7c3aed, #a855f7); height: 6px; }
+
+        #game-area {
+            position: relative;
+            height: 400px;
+            overflow: hidden;
+            background: #ede9fe;
+            background-image: radial-gradient(rgba(124,58,237,0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+            border-radius: 1.5rem;
+            border: 2px solid #c4b5fd;
+        }
+
+        .word-bubble {
+            position: absolute;
+            padding: 10px 22px;
+            background: white;
+            color: #4c1d95;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-family: 'Nunito', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 5px 0 rgba(124,58,237,0.2);
+            transition: transform 0.1s, background-color 0.3s;
+            user-select: none;
+            z-index: 10;
+            white-space: nowrap;
+            border: 3px solid #7c3aed;
+        }
+
+        .selected-word {
+            position: absolute;
+            z-index: 100;
+            pointer-events: none;
+            transform: translate(-50%, -50%) scale(1.4) !important;
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.5);
+            background: #ede9fe !important;
+            border-color: #7c3aed !important;
+        }
+
+        .drop-zone {
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 800;
+            font-size: 0.7rem;
+            border-radius: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            color: white;
+        }
+        .drop-zone:hover { transform: translateY(-4px); box-shadow: 0 8px 0 rgba(0,0,0,.15); }
+
+        .zone-penta { background: linear-gradient(135deg, #be123c, #e11d48); box-shadow: 0 5px 0 #9f1239; }
+        .zone-palin { background: linear-gradient(135deg, #6d28d9, #7c3aed); box-shadow: 0 5px 0 #5b21b6; }
+        .zone-bifro { background: linear-gradient(135deg, #0e7490, #0891b2); box-shadow: 0 5px 0 #0e6e87; }
+        .zone-homof { background: linear-gradient(135deg, #a16207, #ca8a04); box-shadow: 0 5px 0 #854d0e; }
+        .zone-homog { background: linear-gradient(135deg, #15803d, #16a34a); box-shadow: 0 5px 0 #14532d; }
+
+        .pill-badge {
+            background: white;
+            border-radius: 9999px;
+            box-shadow: 0 4px 12px rgba(139,92,246,0.12);
+            padding: 8px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background: #7c3aed;
+            color: white;
+            font-weight: 900;
+            border-radius: 9999px;
+            box-shadow: 0 5px 0 #5b21b6;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Nunito', sans-serif;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #5b21b6; }
+        .btn-primary:active { transform: translateY(3px); box-shadow: 0 2px 0 #5b21b6; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out infinite; }
+    </style>
+  <link rel="stylesheet" href="../styles/btn.css">
+</head>
+<body>
+
+    <!-- Back Button -->
+    <div class="fixed top-4 left-4 z-50">
+      <button onclick="try{window.parent.closeGame()}catch(e){history.back()}"
+        style="background:#7c3aed;color:white;border:none;padding:8px 18px;border-radius:9999px;font-weight:800;font-size:0.85rem;cursor:pointer;box-shadow:0 4px 12px rgba(124,58,237,0.4);font-family:'Nunito',sans-serif">
+        ← Volver
+      </button>
+    </div>
+
+    <!-- Header Banner -->
+    <div class="header-banner px-6 py-8 mb-8">
+        <div class="max-w-4xl mx-auto flex flex-col items-center gap-3 relative z-10">
+            <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-5xl mb-1">🎯</div>
+            <h1 class="text-white font-black text-3xl md:text-4xl tracking-tight text-center">Misión: Clasificación</h1>
+            <p class="text-purple-100 font-bold text-sm uppercase tracking-widest">Arcade de Palabras Ingeniosas</p>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-4 pb-12 space-y-6">
+
+        <!-- Stats row -->
+        <div class="flex justify-center gap-4 flex-wrap">
+            <div class="pill-badge">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Puntos</span>
+                <span id="score" class="text-3xl font-black text-purple-600 leading-none">0</span>
+            </div>
+            <div class="pill-badge">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Racha</span>
+                <span id="streak" class="text-3xl font-black text-emerald-500 leading-none">0</span>
+            </div>
+            <div class="pill-badge">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tiempo</span>
+                <span id="timer" class="text-3xl font-black text-rose-500 leading-none">60</span>
+            </div>
+        </div>
+
+        <!-- Game card -->
+        <div class="card">
+            <div class="card-bar-purple"></div>
+            <div class="p-6">
+                <div id="game-area" class="w-full mb-6"></div>
+
+                <div class="grid grid-cols-5 gap-2 mb-5">
+                    <div onclick="classifyWord('PENTAVOCÁLICA')" class="drop-zone zone-penta">
+                        <span class="font-black text-[11px]">PENTA</span>
+                        <span class="opacity-80 text-[9px] mt-1">A-E-I-O-U</span>
+                    </div>
+                    <div onclick="classifyWord('PALÍNDROMO')" class="drop-zone zone-palin">
+                        <span class="font-black text-[11px]">PALÍN</span>
+                        <span class="opacity-80 text-[9px] mt-1">A=A</span>
+                    </div>
+                    <div onclick="classifyWord('BIFRONTE')" class="drop-zone zone-bifro">
+                        <span class="font-black text-[11px]">BIFRONTE</span>
+                        <span class="opacity-80 text-[9px] mt-1">ROMA/AMOR</span>
+                    </div>
+                    <div onclick="classifyWord('HOMÓFONA')" class="drop-zone zone-homof">
+                        <span class="font-black text-[11px]">HOMÓFONA</span>
+                        <span class="opacity-80 text-[9px] mt-1">HOLA/OLA</span>
+                    </div>
+                    <div onclick="classifyWord('HOMÓGRAFA')" class="drop-zone zone-homog">
+                        <span class="font-black text-[11px]">HOMÓGRAFA</span>
+                        <span class="opacity-80 text-[9px] mt-1">SAL/SAL</span>
+                    </div>
+                </div>
+
+                <button onclick="resetGame()" class="btn-primary w-full py-3 text-sm">
+                    🔄 Reiniciar Juego
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const classificationWords = [
+            { text: "MURCIÉLAGO", category: "PENTAVOCÁLICA" }, 
+            { text: "EUFORIA", category: "PENTAVOCÁLICA" }, 
+            { text: "ORQUÍDEA", category: "PENTAVOCÁLICA" },
+            { text: "ADULTERIO", category: "PENTAVOCÁLICA" }, 
+            { text: "EDUCATIVO", category: "PENTAVOCÁLICA" }, 
+            { text: "ESTUARIO", category: "PENTAVOCÁLICA" },
+            { text: "RECONOCER", category: "PALÍNDROMO" }, 
+            { text: "SOMOS", category: "PALÍNDROMO" }, 
+            { text: "RADAR", category: "PALÍNDROMO" },
+            { text: "ANILINA", category: "PALÍNDROMO" }, 
+            { text: "SOMETEMOS", category: "PALÍNDROMO" }, 
+            { text: "ARENERA", category: "PALÍNDROMO" },
+            { text: "ROMA", category: "BIFRONTE" }, 
+            { text: "AMOR", category: "BIFRONTE" }, 
+            { text: "RATA", category: "BIFRONTE" }, 
+            { text: "ATAR", category: "BIFRONTE" },
+            { text: "OÍR", category: "BIFRONTE" }, 
+            { text: "RÍO", category: "BIFRONTE" }, 
+            { text: "SOL", category: "BIFRONTE" }, 
+            { text: "LOS", category: "BIFRONTE" },
+            { text: "HOLA", category: "HOMÓFONA" }, 
+            { text: "OLA", category: "HOMÓFONA" }, 
+            { text: "VAYA", category: "HOMÓFONA" }, 
+            { text: "BAYA", category: "HOMÓFONA" },
+            { text: "BELLO", category: "HOMÓFONA" }, 
+            { text: "VELLO", category: "HOMÓFONA" }, 
+            { text: "BOTAR", category: "HOMÓFONA" }, 
+            { text: "VOTAR", category: "HOMÓFONA" },
+            { text: "LLAMA", category: "HOMÓGRAFA" }, 
+            { text: "BANCO", category: "HOMÓGRAFA" }, 
+            { text: "SAL", category: "HOMÓGRAFA" },
+            { text: "VINO", category: "HOMÓGRAFA" }, 
+            { text: "NADA", category: "HOMÓGRAFA" }, 
+            { text: "CARA", category: "HOMÓGRAFA" }
+        ];
+
+        let gameActive = false;
+        let currentWord = null;
+        let gameScore = 0;
+        let gameStreak = 0;
+        let timeLeft = 60;
+        let timerInterval = null;
+        const gameArea = document.getElementById('game-area');
+
+        function startClassificationGame() {
+            if (gameActive) return;
+            gameActive = true;
+            gameScore = 0;
+            gameStreak = 0;
+            timeLeft = 60;
+            updateScore();
+            spawnWord();
+            startGameTimer();
+        }
+
+        function spawnWord() {
+            if (!gameActive || currentWord) return;
+
+            const data = classificationWords[Math.floor(Math.random() * classificationWords.length)];
+            const bubble = document.createElement('div');
+            bubble.className = 'word-bubble';
+            bubble.innerText = data.text;
+            
+            const maxX = gameArea.offsetWidth - 150;
+            const x = Math.max(20, Math.min(maxX, Math.random() * maxX));
+            bubble.style.left = `${x}px`;
+            bubble.style.top = `-60px`;
+
+            bubble.onclick = () => selectWord(bubble, data);
+            gameArea.appendChild(bubble);
+
+            let pos = -60;
+            const speed = 1.2 + (gameScore / 2000); 
+
+            const fall = setInterval(() => {
+                if (!gameActive) { 
+                    clearInterval(fall); 
+                    if (bubble.parentNode) bubble.remove(); 
+                    return; 
+                }
+                if (currentWord && currentWord.el === bubble) { 
+                    clearInterval(fall); 
+                    return; 
+                }
+
+                pos += speed;
+                bubble.style.top = `${pos}px`;
+
+                if (pos > gameArea.offsetHeight) {
+                    clearInterval(fall);
+                    if (bubble.parentNode) bubble.remove();
+                    if (!currentWord) {
+                        gameStreak = 0;
+                        gameScore = Math.max(0, gameScore - 50);
+                        updateScore();
+                        showFeedback("¡SE ESCAPÓ!", "text-orange-500");
+                        setTimeout(spawnWord, 1000);
+                    }
+                }
+            }, 20);
+        }
+
+        function selectWord(el, data) {
+            if (currentWord || !gameActive) return;
+            currentWord = { el, data };
+            el.classList.add('selected-word');
+            el.style.left = '50%';
+            el.style.top = '50%';
+        }
+
+        function classifyWord(category) {
+            if (!currentWord || !gameActive) return;
+
+            const isCorrect = currentWord.data.category === category;
+            
+            if (isCorrect) {
+                gameStreak++;
+                gameScore += 100 + (gameStreak * 10);
+                showFeedback("¡BIEN!", "text-green-500");
+            } else {
+                gameStreak = 0;
+                gameScore = Math.max(0, gameScore - 80);
+                showFeedback("¡ERROR!", "text-red-500");
+            }
+
+            currentWord.el.remove();
+            currentWord = null;
+            updateScore();
+            setTimeout(spawnWord, 500);
+        }
+
+        function showFeedback(text, color) {
+            const fb = document.getElementById('feedback-message');
+            if (!fb) {
+                const newFb = document.createElement('div');
+                newFb.id = 'feedback-message';
+                newFb.className = `font-game absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 ${color} text-6xl hidden`;
+                gameArea.appendChild(newFb);
+            }
+            const fbEl = document.getElementById('feedback-message') || gameArea.querySelector('#feedback-message');
+            fbEl.innerText = text;
+            fbEl.className = `absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 ${color} text-5xl font-black`;
+            fbEl.classList.remove('hidden');
+            setTimeout(() => fbEl.classList.add('hidden'), 800);
+        }
+
+        function updateScore() {
+            document.getElementById('score').innerText = gameScore;
+            document.getElementById('streak').innerText = gameStreak;
+            document.getElementById('timer').innerText = timeLeft;
+        }
+
+        function startGameTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!gameActive) { 
+                    clearInterval(timerInterval); 
+                    return; 
+                }
+                timeLeft--;
+                updateScore();
+                if (timeLeft <= 0) {
+                    gameActive = false;
+                    showFeedback("¡TIEMPO!", "text-yellow-500");
+                }
+            }, 1000);
+        }
+
+        function resetGame() {
+            gameActive = false;
+            if (currentWord) {
+                currentWord.el.remove();
+                currentWord = null;
+            }
+            document.querySelectorAll('#game-area .word-bubble').forEach(el => el.remove());
+            gameScore = 0;
+            gameStreak = 0;
+            timeLeft = 60;
+            updateScore();
+            if (timerInterval) clearInterval(timerInterval);
+            startClassificationGame();
+        }
+
+        window.onload = () => {
+            setTimeout(() => {
+                if (!gameActive) {
+                    startClassificationGame();
+                }
+            }, 500);
+        };
+    </script>
+</body>
+</html>
+
+
