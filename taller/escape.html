@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta Financiera · Visium Digital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter + Orbitron + Roboto Mono) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;800;900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857'
+                        },
+                        cyber: {
+                            bg: '#050b14',
+                            card: '#0c1626',
+                            border: '#1e3a5f',
+                            neon: '#00f5d4',
+                            blue: '#3a86ff',
+                            pink: '#ff007f',
+                            yellow: '#fee440',
+                            alert: '#ff0055'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Estilos del juego */
+        .neon-border {
+            box-shadow: 0 0 15px rgba(0, 245, 212, 0.2);
+            border-color: #00f5d4;
+        }
+
+        .neon-border-red {
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+            border-color: #ff0055;
+        }
+
+        .keypad-btn {
+            background: linear-gradient(145deg, #0f1c2e, #09121f);
+            border: 1px solid #1e3a5f;
+            transition: all 0.15s ease;
+        }
+
+        .keypad-btn:hover {
+            border-color: #00f5d4;
+            background: rgba(0, 245, 212, 0.15);
+            box-shadow: 0 0 10px rgba(0, 245, 212, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .keypad-btn:active {
+            transform: translateY(1px);
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #00f5d4;
+            color: #00f5d4;
+            background-color: rgba(0, 245, 212, 0.08);
+        }
+
+        @keyframes pulse-fast {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .animate-pulse-fast {
+            animation: pulse-fast 0.8s infinite;
+        }
+
+        @keyframes bounce-short {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .animate-bounce-short {
+            animation: bounce-short 1.2s infinite;
+        }
+
+        /* Fondo del módulo del juego */
+        .game-module {
+            background-color: #050b14;
+            color: #e2e8f0;
+            font-family: 'Roboto Mono', monospace;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 bg-slate-50 font-sans text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- HEADER con logo -->
+    <header class="sticky top-0 z-50 pt-2 pb-3">
+        <div class="container mx-auto px-4">
+            <nav class="flex items-center justify-between text-sm font-normal bg-white/80 py-3 pl-2 pr-4 backdrop-blur-md rounded-xl shadow-sm border border-gray-100">
+                <a href="index.html" class="flex items-center">
+                    <img src="img/logo_v.svg" alt="Visium Digital" class="ml-3 h-7" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'font-bold text-emerald-600 text-lg\'>Visium Digital</span>'">
+                </a>
+                <div class="hidden md:block text-right">
+                    <div class="text-sm font-normal text-gray-800 leading-tight">Escuela de diseño</div>
+                    <div class="text-sm font-normal text-gray-800 leading-tight">e innovación</div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL: JUEGO EMBEBIDO -->
+    <section class="container mx-auto px-4 mt-6">
+        <div class="game-module border border-slate-800 shadow-xl p-3 sm:p-6">
+
+            <!-- HEADER BAR DEL JUEGO -->
+            <header class="max-w-7xl mx-auto w-full mb-6 bg-cyber-card border border-cyber-border rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-cyber-neon/10 border border-cyber-neon flex items-center justify-center text-cyber-neon text-xl font-bold">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-orbitron font-extrabold text-white text-base sm:text-lg tracking-wider">
+                            FUNDACIÓN PROPÓSITO
+                        </h1>
+                        <p class="text-xs text-cyber-neon font-mono">ESCAPE ROOM FINANCIERO — BÓVEDA CIBERNÉTICA</p>
+                    </div>
+                </div>
+
+                <!-- TABS & CONTROLS -->
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                    <!-- TABS -->
+                    <button id="tab-terminal-btn" onclick="switchTab('terminal')" class="px-4 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2 tab-active">
+                        <i class="fa-solid fa-terminal"></i> TERMINAL CLAVE
+                    </button>
+                    <button id="tab-data-btn" onclick="switchTab('data')" class="px-4 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2 text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-layer-group"></i> REGISTRO DESORDENADO
+                    </button>
+
+                    <!-- LEVEL SELECTOR -->
+                    <div class="flex items-center bg-slate-900 border border-cyber-border rounded-xl p-1 font-mono text-xs ml-2">
+                        <button id="lvl-1-btn" onclick="startLevel(1)" class="px-3 py-1 rounded-lg bg-cyber-neon text-black font-bold transition">NIVEL 1</button>
+                        <button id="lvl-2-btn" onclick="startLevel(2)" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white transition">NIVEL 2</button>
+                    </div>
+
+                    <!-- STATUS BADGE -->
+                    <div id="status-badge" class="flex items-center space-x-2 bg-red-950/60 border border-cyber-alert text-cyber-alert px-3 py-1.5 rounded-xl text-xs font-mono">
+                        <span class="w-2 h-2 rounded-full bg-cyber-alert animate-ping"></span>
+                        <span id="status-text">ESTADO: BLOQUEADO (N1)</span>
+                    </div>
+
+                    <!-- AUDIO TOGGLE -->
+                    <button id="sound-btn" onclick="toggleSound()" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-cyber-neon hover:border-cyber-neon text-xs font-mono flex items-center gap-1.5 transition">
+                        <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                        <span id="sound-text">AUDIO ON</span>
+                    </button>
+
+                    <!-- TEACHER GUIDE MODAL TRIGGER -->
+                    <button onclick="toggleAdminModal()" class="px-3 py-1.5 rounded-xl bg-cyber-yellow/10 border border-cyber-yellow/40 text-cyber-yellow hover:bg-cyber-yellow hover:text-black text-xs font-mono font-bold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-graduation-cap"></i> PROFESOR
+                    </button>
+                </div>
+            </header>
+
+            <!-- MAIN CONTENT CONTAINER DEL JUEGO -->
+            <main class="max-w-7xl mx-auto w-full flex-grow">
+
+                <!-- VIEW 1: TERMINAL KEYPAD VIEW -->
+                <div id="view-terminal" class="space-y-6 transition-all duration-300">
+                    <!-- HEADER BANNER -->
+                    <div class="text-center space-y-2">
+                        <h2 class="font-orbitron text-xl sm:text-2xl lg:text-3xl font-black tracking-wide text-white">
+                            SISTEMA DE SEGURIDAD BLOCKCHAIN DE LA FUNDACIÓN PROPÓSITO
+                        </h2>
+                        <div class="inline-block bg-cyber-neon/10 border border-cyber-neon/40 px-4 py-1.5 rounded-full">
+                            <p id="level-title-tag" class="font-mono text-cyber-neon text-xs sm:text-sm font-bold tracking-wider uppercase flex items-center gap-2 justify-center">
+                                <i class="fa-solid fa-key text-cyber-yellow"></i> INGRESE CLAVE DE ACCESO - NIVEL 1
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- MAIN GRID: RIDDLE CARD & KEYPAD -->
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+                        <!-- RIDDLE BOX (LEFT - 7 COLS) -->
+                        <div class="lg:col-span-7 bg-cyber-card border border-cyber-border rounded-2xl p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden neon-border">
+                            <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-cyber-neon/5 rounded-full blur-2xl pointer-events-none"></div>
+
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                                    <span id="riddle-header-tag" class="font-mono text-xs text-cyber-yellow flex items-center gap-2 font-bold">
+                                        <i class="fa-solid fa-scroll"></i> ADIVINANZA DEL FLUJO MONETARIO
+                                    </span>
+                                    <span id="riddle-level-num" class="text-xs font-mono text-slate-400">DESAFÍO #01</span>
+                                </div>
+
+                                <!-- DYNAMIC POETIC RIDDLE -->
+                                <div class="bg-black/60 border border-slate-800 rounded-xl p-4 sm:p-5 space-y-3 font-mono text-sm leading-relaxed text-slate-300">
+                                    <p id="riddle-text" class="text-cyber-neon font-semibold text-sm sm:text-base italic leading-relaxed">
+                                        <i class="fa-solid fa-quote-left mr-2 text-cyber-yellow"></i>
+                                        "Soy el secreto del sabio que sabe administrar:<br>
+                                        Todo lo que llega a tus manos primero debes sumar.<br>
+                                        Réstale con cuidado todo lo que tuviste que gastar,<br>
+                                        y no olvides apartar la semilla que al futuro va a sembrar.<br><br>
+                                        El saldo libre que te queda para prosperar,<br>
+                                        es la clave de cuatro dígitos que la bóveda abrirá."
+                                    </p>
+                                    <div class="pt-2 border-t border-slate-800/80 text-xs text-slate-400 flex items-start gap-2">
+                                        <i class="fa-solid fa-compass text-cyber-yellow mt-0.5"></i>
+                                        <span>Ve a la pestaña <strong class="text-cyber-blue cursor-pointer underline" onclick="switchTab('data')">'REGISTRO DESORDENADO'</strong>, clasifica los valores en su lugar correspondiente y realiza las operaciones para hallar la clave.</span>
+                                    </div>
+                                </div>
+
+                                <!-- HINT & DIRECT QUICK NAVIGATION -->
+                                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                                    <div class="flex items-center gap-2 text-xs text-slate-400 font-mono">
+                                        <i class="fa-solid fa-circle-info text-cyber-blue"></i>
+                                        <span>Ingresa la clave resultante de 4 dígitos en el teclado numérico.</span>
+                                    </div>
+                                    <button onclick="switchTab('data')" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-cyber-blue/10 border border-cyber-blue/40 text-cyber-blue hover:bg-cyber-blue hover:text-black font-mono text-xs font-bold transition flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-layer-group"></i> Clasificar Operaciones
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- RECENT LOGS DISPLAY -->
+                            <div class="mt-4 pt-3 border-t border-slate-800/80 font-mono text-xs text-slate-500">
+                                <div class="flex items-center justify-between">
+                                    <span>REGISTRO DE INTENTOS:</span>
+                                    <span id="attempt-count" class="text-cyber-yellow">0 INTENTOS</span>
+                                </div>
+                                <div id="terminal-log" class="h-16 overflow-y-auto mt-1 text-[11px] space-y-1 text-slate-400 bg-black/40 p-2 rounded-xl border border-slate-900">
+                                    <p class="text-cyber-blue">[SISTEMA]: En espera de código. Clasifique las operaciones financieras para descifrar la clave...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- KEYPAD & TIMER (RIGHT - 5 COLS) -->
+                        <div class="lg:col-span-5 bg-cyber-card border border-cyber-border rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4">
+
+                            <!-- DISPLAY & TIMER HUD -->
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between text-xs font-mono">
+                                    <span class="text-slate-400 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-stopwatch text-cyber-yellow"></i> RELOJ CUENTAGOTAS:
+                                    </span>
+                                    <span id="timer-display" class="font-bold text-cyber-yellow text-sm">03.0s</span>
+                                </div>
+
+                                <!-- PROGRESS TIMER BAR -->
+                                <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                                    <div id="timer-bar" class="h-full bg-cyber-yellow w-full transition-all duration-100"></div>
+                                </div>
+
+                                <!-- PIN DISPLAY SCREEN -->
+                                <div class="bg-black border-2 border-slate-800 rounded-xl p-4 flex items-center justify-between relative overflow-hidden">
+                                    <span class="text-xs font-mono text-slate-600 uppercase">PIN:</span>
+                                    <div id="pin-display" class="font-orbitron font-black text-2xl sm:text-3xl tracking-widest text-cyber-neon">
+                                        ----
+                                    </div>
+                                    <button onclick="clearPin()" class="text-slate-500 hover:text-cyber-alert text-xs font-mono px-2 py-1 rounded border border-slate-800 hover:border-cyber-alert transition">
+                                        CLEAR
+                                    </button>
+                                </div>
+
+                                <!-- FEEDBACK MESSAGE -->
+                                <div id="keypad-feedback" class="text-center font-mono text-xs min-h-[20px] text-slate-400 font-semibold">
+                                    Escriba o use el teclado numérico.
+                                </div>
+                            </div>
+
+                            <!-- KEYPAD BUTTONS GRID -->
+                            <div class="grid grid-cols-3 gap-3 font-orbitron">
+                                <button onclick="pressKey('1')" class="keypad-btn py-3 sm:py-4 rounded-xl text-lg font-extrabold text-white">1</button>
+                                <button onclick="pressKey('2')" class="keypad-btn py-3 sm:py-4 rounded-xl text-lg font-extrabold text-white">2</button>
+                                <button onclick="pressKey('3')" class="keypad-btn py-3 sm:py-4 rounded-xl text-lg font-extrabold text-white">3</button>
+                                <button onclick="pressKey('4')" class="keypad-btn py-3 sm:py-4 rounded-xl text-lg font-extrabold text-white">4</button>
+                                <button onclick="pressKey('5')" class="keypad-btn py-3 sm:py-4 rounded-xl text-lg font-extrabold text-white">5</button>
+                                <button onclick="pressKey('6')" class="keypad-btn py-3 sm:py-4 rounded-xl text-lg font-extrabold text-white">6</button>
+                                <button onclick="pressKey('7')" class="keypad-btn py-3 sm:py-4 rounded-xl text-lg font-extrabold text-white">7</button>
+                                <button onclick="pressKey('8')" class="keypad-btn py-3 sm:py-4 rounded-xl text-lg font-extrabold text-white">8</button>
+                                <button onclick="pressKey('9')" class="keypad-btn py-3 sm:py-4 rounded-xl text-lg font-extrabold text-white">9</button>
+                                <button onclick="clearPin()" class="keypad-btn py-3 sm:py-4 rounded-xl text-sm font-bold text-cyber-alert">C</button>
+                                <button onclick="pressKey('0')" class="keypad-btn py-3 sm:py-4 rounded-xl text-lg font-extrabold text-white">0</button>
+                                <button onclick="submitPin()" class="keypad-btn py-3 sm:py-4 rounded-xl text-sm font-bold text-cyber-neon bg-cyber-neon/10 border-cyber-neon/50">OK</button>
+                            </div>
+
+                            <div class="text-[11px] text-slate-500 font-mono text-center pt-1">
+                                <i class="fa-solid fa-keyboard mr-1"></i> Puedes usar los números de tu teclado físico.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- VIEW 2: DISORDERED DATA & CLASSIFICATION WORKSPACE -->
+                <div id="view-data" class="space-y-6 hidden transition-all duration-300">
+
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                        <div>
+                            <h2 class="font-orbitron text-lg sm:text-2xl font-black text-white flex items-center gap-2">
+                                <i class="fa-solid fa-folder-open text-cyber-yellow"></i> REGISTRO DESORDENADO DE OPERACIONES
+                            </h2>
+                            <p class="text-xs font-mono text-slate-400">
+                                Clasifique cada concepto en su categoría adecuada. En el Nivel 2, diferencie entre Gastos de Necesidad Real y Deseos Impulsivos.
+                            </p>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="resetClassification()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-rotate-right"></i> Reiniciar
+                            </button>
+                            <button onclick="switchTab('terminal')" class="px-4 py-1.5 rounded-xl bg-cyber-neon text-black font-mono font-bold text-xs hover:bg-emerald-300 transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-key"></i> Ir a Teclado
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- UNASSIGNED CARDS CONTAINER -->
+                    <div class="bg-cyber-card border border-cyber-border rounded-2xl p-4 sm:p-5 space-y-3">
+                        <div class="flex items-center justify-between text-xs font-mono border-b border-slate-800 pb-2">
+                            <span class="text-cyber-yellow font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-box-open"></i> TARJETAS PENDIENTES DE CLASIFICAR
+                            </span>
+                            <span id="unassigned-count" class="text-slate-400">0 pendientes</span>
+                        </div>
+                        <div id="unassigned-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <!-- Cards injected dynamically via JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- CATEGORY TARGET BUCKETS -->
+                    <div id="buckets-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 font-mono">
+
+                        <!-- BUCKET 1: INGRESOS -->
+                        <div class="bg-emerald-950/20 border-2 border-emerald-500/30 rounded-2xl p-4 flex flex-col justify-between space-y-3">
+                            <div class="flex items-center justify-between border-b border-emerald-500/20 pb-2">
+                                <span class="text-xs font-bold text-emerald-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-wallet"></i> INGRESOS
+                                </span>
+                                <span id="badge-ingresos" class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30">0 items</span>
+                            </div>
+                            <div id="bucket-ingresos" class="space-y-2 min-h-[140px] flex flex-col justify-start">
+                                <p class="text-xs text-slate-500 italic text-center py-6">Mueve tarjetas de Ingreso</p>
+                            </div>
+                        </div>
+
+                        <!-- BUCKET 2: GASTOS NECESIDADES -->
+                        <div class="bg-rose-950/20 border-2 border-rose-500/30 rounded-2xl p-4 flex flex-col justify-between space-y-3">
+                            <div class="flex items-center justify-between border-b border-rose-500/20 pb-2">
+                                <span class="text-xs font-bold text-rose-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-cart-arrow-down"></i> GASTOS (NECESIDAD)
+                                </span>
+                                <span id="badge-gastos" class="text-[10px] bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded border border-rose-500/30">0 items</span>
+                            </div>
+                            <div id="bucket-gastos" class="space-y-2 min-h-[140px] flex flex-col justify-start">
+                                <p class="text-xs text-slate-500 italic text-center py-6">Mueve tarjetas de Gasto Necesario</p>
+                            </div>
+                        </div>
+
+                        <!-- BUCKET 3: DIVERSIÓN Y OCIO (HASTA 10%) -->
+                        <div class="bg-pink-950/20 border-2 border-pink-500/30 rounded-2xl p-4 flex flex-col justify-between space-y-3">
+                            <div class="flex items-center justify-between border-b border-pink-500/20 pb-2">
+                                <span class="text-xs font-bold text-pink-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-gamepad"></i> DIVERSIÓN (10%)
+                                </span>
+                                <span id="badge-diversion" class="text-[10px] bg-pink-500/10 text-pink-400 px-2 py-0.5 rounded border border-pink-500/30">0 items</span>
+                            </div>
+                            <div id="bucket-diversion" class="space-y-2 min-h-[140px] flex flex-col justify-start">
+                                <p class="text-xs text-slate-500 italic text-center py-6">Gastos de Ocio (ej. Netflix)</p>
+                            </div>
+                        </div>
+
+                        <!-- BUCKET 4: INVERSIÓN (ACTIVO EN NIVEL 2) -->
+                        <div id="bucket-inversion-wrapper" class="bg-purple-950/20 border-2 border-purple-500/30 rounded-2xl p-4 flex flex-col justify-between space-y-3">
+                            <div class="flex items-center justify-between border-b border-purple-500/20 pb-2">
+                                <span class="text-xs font-bold text-purple-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-chart-line"></i> INVERSIÓN
+                                </span>
+                                <span id="badge-inversion" class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/30">0 items</span>
+                            </div>
+                            <div id="bucket-inversion" class="space-y-2 min-h-[140px] flex flex-col justify-start">
+                                <p class="text-xs text-slate-500 italic text-center py-6">Partidas de inversión (Nivel 2)</p>
+                            </div>
+                        </div>
+
+                        <!-- BUCKET 5: AHORRO PROGRAMADO -->
+                        <div class="bg-cyber-blue/10 border-2 border-cyber-blue/30 rounded-2xl p-4 flex flex-col justify-between space-y-3">
+                            <div class="flex items-center justify-between border-b border-cyber-blue/20 pb-2">
+                                <span class="text-xs font-bold text-cyber-blue flex items-center gap-2">
+                                    <i class="fa-solid fa-piggy-bank"></i> AHORRO
+                                </span>
+                                <span id="badge-ahorro" class="text-[10px] bg-cyber-blue/20 text-cyber-blue px-2 py-0.5 rounded border border-cyber-blue/30">0 items</span>
+                            </div>
+                            <div id="bucket-ahorro" class="space-y-2 min-h-[140px] flex flex-col justify-start">
+                                <p class="text-xs text-slate-500 italic text-center py-6">Tarjeta de Ahorro</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- STUDENT SCRATCHPAD WORKSPACE -->
+                    <div class="bg-black/60 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3 font-mono text-xs">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span class="text-cyber-yellow font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-calculator"></i> BLOC DE CÁLCULO DEL ESTUDIANTE (OPERACIONES MANUALES)
+                            </span>
+                            <span class="text-slate-500">Calcula tus sumas y tu saldo final antes de probar la clave</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 pt-1">
+                            <div>
+                                <label class="block text-slate-400 text-[11px] mb-1">Suma Ingresos ($):</label>
+                                <input type="number" id="calc-input-ingresos" placeholder="Ej: 1900" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-emerald-400 font-bold focus:border-emerald-400 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 text-[11px] mb-1">Suma Gastos Necesidad ($):</label>
+                                <input type="number" id="calc-input-gastos" placeholder="Ej: 500" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-rose-400 font-bold focus:border-rose-400 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 text-[11px] mb-1">Diversión ($ - max 10%):</label>
+                                <input type="number" id="calc-input-diversion" placeholder="Ej: 10" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-pink-400 font-bold focus:border-pink-400 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 text-[11px] mb-1">Inversión / Ahorro ($):</label>
+                                <input type="number" id="calc-input-ahorro" placeholder="Ej: 50" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-cyber-blue font-bold focus:border-cyber-blue outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-slate-400 text-[11px] mb-1">Resultado / Clave Estimada:</label>
+                                <input type="text" id="calc-input-resultado" placeholder="Clave final..." class="w-full bg-slate-900 border border-cyber-yellow/50 rounded-xl px-3 py-2 text-cyber-yellow font-bold focus:border-cyber-yellow outline-none" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+            <!-- MODAL 1: SUCCESS UNLOCKED MODAL -->
+            <div id="modal-success" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+                <div class="bg-cyber-card border-2 border-cyber-neon rounded-2xl p-6 sm:p-8 max-w-md w-full text-center space-y-6 neon-border relative overflow-hidden">
+                    <div class="w-16 h-16 bg-cyber-neon/20 border border-cyber-neon rounded-full flex items-center justify-center text-cyber-neon text-3xl mx-auto shadow-[0_0_20px_rgba(0,245,212,0.6)]">
+                        <i class="fa-solid fa-lock-open"></i>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h3 class="font-orbitron text-2xl font-black text-white tracking-wider">¡SISTEMA DESBLOQUEADO!</h3>
+                        <p id="success-modal-msg" class="text-xs font-mono text-slate-300">
+                            Has ingresado la clave de acceso correcta y validado el flujo financiero.
+                        </p>
+                    </div>
+
+                    <div class="bg-black/60 p-4 rounded-xl border border-slate-800 text-left font-mono text-xs space-y-2">
+                        <p class="text-cyber-yellow font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check text-cyber-neon"></i> BÓVEDA FINANCIERA ABIERTA
+                        </p>
+                        <p class="text-slate-300">
+                            Demostraste un excelente dominio clasificando ingresos, separando necesidades de deseos e invirtiendo responsablemente.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <button id="next-level-btn" onclick="goToNextLevelOrClose()" class="w-full py-3 rounded-xl bg-cyber-neon text-black font-orbitron font-extrabold text-sm hover:bg-emerald-300 transition shadow-[0_0_15px_rgba(0,245,212,0.4)] flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-forward"></i> CONTINUAR AL NIVEL 2
+                        </button>
+                        <button onclick="closeSuccessModal()" class="w-full py-2.5 rounded-xl bg-slate-800 text-slate-300 font-mono text-xs hover:bg-slate-700 transition">
+                            Cerrar y Revisar Terminal
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL 2: TEACHER / ADMIN GUIDE -->
+            <div id="modal-admin" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+                <div class="bg-cyber-card border border-cyber-yellow/50 rounded-2xl p-6 max-w-lg w-full space-y-4 text-left font-mono text-xs max-h-[90vh] overflow-y-auto">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h3 class="font-orbitron text-base font-bold text-cyber-yellow flex items-center gap-2">
+                            <i class="fa-solid fa-graduation-cap"></i> GUÍA PROFESOR (SOLUCIONARIO DE NIVELES)
+                        </h3>
+                        <button onclick="toggleAdminModal()" class="text-slate-400 hover:text-white text-base">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-3 text-slate-300 leading-relaxed">
+                        <!-- NIVEL 1 -->
+                        <div class="bg-black/60 p-3 rounded-xl border border-slate-800 space-y-1">
+                            <p class="text-cyber-neon font-bold">NIVEL 1 — SOLUCIÓN (CLAVE: 1340)</p>
+                            <p>• Ingresos: $1200 + $500 + $200 = <strong>$1900</strong></p>
+                            <p>• Gastos Necesidades: Mercado ($300) + Luz/Agua ($150) + Cine ($50) = <strong>$500</strong></p>
+                            <p>• Diversión Permitida (hasta 10%): Suscripción Netflix = <strong>$10</strong></p>
+                            <p>• Ahorro: <strong>$50</strong></p>
+                            <p class="text-cyber-yellow font-bold pt-1">Operación N1: 1900 − 500 (Gastos) − 10 (Diversión) − 50 (Ahorro) = 1340</p>
+                        </div>
+
+                        <!-- NIVEL 2 -->
+                        <div class="bg-black/60 p-3 rounded-xl border border-cyber-alert/50 space-y-2">
+                            <p class="text-cyber-alert font-bold">NIVEL 2 — SOLUCIÓN (COMPRAS IMPULSIVAS - CLAVE: 1120)</p>
+                            <p class="text-slate-400"><strong>Regla del Presupuesto Nivel 2:</strong> 60% Necesidades | 30% Inversión | 10% Diversión | 10% Ahorro.</p>
+                            <p>• <strong>Ingresos Totales:</strong> $1200 + $500 + $200 = <strong>$1900</strong></p>
+                            <p>• <strong>Gastos NECESIDADES REALES:</strong> Mercado ($300) + Luz/Agua ($150) + Reparación Techo ($60) = <strong>$510</strong></p>
+                            <p>• <strong>Inversión:</strong> Acciones Apple ($20) + Curso Programación ($200) = <strong>$220</strong></p>
+                            <p>• <strong>Diversión Aceptada (hasta 10%):</strong> Suscripción Netflix = <strong>$10</strong> (se puede incluir o controlar dentro de Ocio, excluyendo excesos impulsivos como Zapatos $120, Almuerzo Gourmet $60, etc.)</p>
+                            <p>• <strong>Ahorro Programado:</strong> <strong>$50</strong></p>
+                            <p class="text-cyber-yellow font-bold pt-1">Operación N2: 1900 − 510 (Necesidades) − 220 (Inversión) − 50 (Ahorro) = 1120</p>
+                        </div>
+                    </div>
+
+                    <button onclick="toggleAdminModal()" class="w-full py-2.5 rounded-xl bg-slate-800 text-white hover:bg-slate-700 transition font-bold">
+                        ENTENDIDO / CERRAR
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODAL 3: LEVEL 2 EMERGENCY ALARM ALERT MODAL -->
+            <div id="modal-level2-alarm" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 hidden">
+                <div class="bg-cyber-card border-4 border-cyber-alert rounded-2xl p-6 sm:p-8 max-w-xl w-full text-center space-y-6 neon-border-red relative overflow-hidden animate-bounce-short">
+
+                    <div class="w-20 h-20 bg-cyber-alert/20 border-2 border-cyber-alert rounded-full flex items-center justify-center text-cyber-alert text-4xl mx-auto shadow-[0_0_25px_rgba(255,0,85,0.8)] animate-pulse">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+
+                    <div class="space-y-2">
+                        <span class="px-3 py-1 bg-cyber-alert/20 text-cyber-alert border border-cyber-alert rounded-full text-xs font-mono font-bold uppercase tracking-widest">
+                            ⚠️ ALERTA CIBERNÉTICA — NIVEL 2
+                        </span>
+                        <h3 class="font-orbitron text-2xl sm:text-3xl font-black text-white tracking-wider text-cyber-alert">
+                            ¡INTENTO DE COMPRAS IMPULSIVAS DETECTADO!
+                        </h3>
+                    </div>
+
+                    <div class="bg-black/80 border border-cyber-alert/40 p-4 rounded-xl text-left font-mono text-xs sm:text-sm space-y-3 text-slate-200 leading-relaxed">
+                        <p class="text-cyber-yellow font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-bullhorn text-cyber-alert"></i> ATENCIÓN ESTUDIANTE:
+                        </p>
+                        <p class="text-white font-semibold">
+                            "Has llegado al Nivel 2 y hay un <span class="text-cyber-alert underline font-bold">INTENTO DE COMPRAS IMPULSIVAS</span>. RECALCULE EL FLUJO EXCLUYENDO GASTOS QUE NO SON NECESIDADES REALES y CONSIDERANDO la regla estratégica del presupuesto: 60% Gastos de Necesidades, 30% Inversión, 10% Diversión y 10% Ahorro."
+                        </p>
+                        <div class="pt-2 border-t border-slate-800 text-xs text-slate-400 space-y-1">
+                            <p>• Etiqueta cada gasto como <strong class="text-emerald-400">[Necesidad]</strong> o <strong class="text-cyber-pink">[Deseo]</strong>.</p>
+                            <p>• Elimina/excluye los Deseos e Impulsos para proteger tu salud financiera y descifrar la nueva clave de acceso.</p>
+                        </div>
+                    </div>
+
+                    <button onclick="closeLevel2AlarmModal()" class="w-full py-3.5 rounded-xl bg-cyber-alert text-white font-orbitron font-black text-sm hover:bg-rose-600 transition shadow-[0_0_20px_rgba(255,0,85,0.6)] flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-shield-cat"></i> RECALCULAR Y RESTABLECER CÓDIGO
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="mt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 border-t border-gray-300">
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Visium Digital</h3>
+                    <p class="text-gray-600 text-sm">Escuela de diseño e innovación</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Contactos</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-brand-whatsapp"></i> (+58) 424 152 9071
+                        </li>
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-mail"></i> visiumdigitalca@gmail.com
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Síguenos</h3>
+                    <div class="flex space-x-3">
+                        <a href="https://www.instagram.com/visium.digital.c.a/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-instagram text-xl"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/visium-digital/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-500">© 2026 Visium Digital</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC DEL JUEGO -->
+    <script>
+
+        // FINANCIAL DATA ITEMS FOR LEVEL 1 AND LEVEL 2
+        const financialItems = [
+            // LEVEL 1 & 2 BASE ITEMS
+            { id: 1, level: 1, name: 'Ingresos por servicios', type: 'ingreso', amount: 1200, icon: 'fa-briefcase', currentCategory: 'unassigned' },
+            { id: 2, level: 1, name: 'Honorarios', type: 'ingreso', amount: 500, icon: 'fa-hand-holding-dollar', currentCategory: 'unassigned' },
+            { id: 3, level: 1, name: 'Venta de artículos', type: 'ingreso', amount: 200, icon: 'fa-store', currentCategory: 'unassigned' },
+            { id: 4, level: 1, name: 'Gastos de mercado', type: 'gasto', subType: 'necesidad', amount: 300, icon: 'fa-basket-shopping', currentCategory: 'unassigned' },
+            { id: 5, level: 1, name: 'Salida de cine', type: 'gasto', subType: 'deseo', amount: 50, icon: 'fa-film', currentCategory: 'unassigned' },
+            { id: 6, level: 1, name: 'Servicios (Luz/Agua)', type: 'gasto', subType: 'necesidad', amount: 150, icon: 'fa-bolt', currentCategory: 'unassigned' },
+            { id: 7, level: 1, name: 'Suscripción Netflix', type: 'gasto', subType: 'deseo', amount: 10, icon: 'fa-tv', currentCategory: 'unassigned' },
+            { id: 8, level: 1, name: 'Ahorro programado', type: 'ahorro', amount: 50, icon: 'fa-piggy-bank', currentCategory: 'unassigned' },
+
+            // LEVEL 2 ADDITIONAL ITEMS
+            { id: 9, level: 2, name: 'Acciones de Apple', type: 'inversion', amount: 20, icon: 'fa-chart-pie', currentCategory: 'unassigned' },
+            { id: 10, level: 2, name: 'Suscripción Video Juegos', type: 'gasto', subType: 'deseo', amount: 20, icon: 'fa-gamepad', currentCategory: 'unassigned' },
+            { id: 11, level: 2, name: 'Reparación del techo', type: 'gasto', subType: 'necesidad', amount: 60, icon: 'fa-hammer', currentCategory: 'unassigned' },
+            { id: 12, level: 2, name: 'Zapatos última Colección', type: 'gasto', subType: 'deseo', amount: 120, icon: 'fa-shoe-prints', currentCategory: 'unassigned' },
+            { id: 13, level: 2, name: 'Curso programación', type: 'inversion', amount: 200, icon: 'fa-laptop-code', currentCategory: 'unassigned' },
+            { id: 14, level: 2, name: 'Almuerzo gourmet', type: 'gasto', subType: 'deseo', amount: 60, icon: 'fa-utensils', currentCategory: 'unassigned' }
+        ];
+
+        // PASSCODES FOR LEVELS
+        // Level 1: 1900 - 500 - 10 - 50 = 1340
+        // Level 2: 1900 - 510 (Needs) - 220 (Investments) - 50 (Savings) = 1120
+        let currentLevel = 1;
+        const PASSCODES = {
+            1: '1340',
+            2: '1120'
+        };
+
+        let currentPin = '';
+        let attempts = 0;
+        let soundEnabled = true;
+
+        // 3-SECOND TIMER VARIABLES
+        let keypadTimer = null;
+        let timerTimeLeft = 3.0;
+        let isTimerRunning = false;
+
+        // WEB AUDIO SYNTHESIZER FOR SOUND EFFECTS
+        let audioCtx = null;
+        let alarmInterval = null;
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                }
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudioContext();
+                if (!audioCtx) return;
+
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                } else if (type === 'tick') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.03);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'alarm') {
+                    let toggle = false;
+                    clearInterval(alarmInterval);
+                    let count = 0;
+                    alarmInterval = setInterval(() => {
+                        if (count > 10 || !soundEnabled) {
+                            clearInterval(alarmInterval);
+                            return;
+                        }
+                        const sirenOsc = audioCtx.createOscillator();
+                        const sirenGain = audioCtx.createGain();
+                        sirenOsc.type = 'sawtooth';
+                        sirenOsc.frequency.setValueAtTime(toggle ? 950 : 650, audioCtx.currentTime);
+                        sirenGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                        sirenGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.18);
+                        sirenOsc.connect(sirenGain);
+                        sirenGain.connect(audioCtx.destination);
+                        sirenOsc.start();
+                        sirenOsc.stop(audioCtx.currentTime + 0.18);
+                        toggle = !toggle;
+                        count++;
+                    }, 200);
+                } else if (type === 'success') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, idx) => {
+                        const subOsc = audioCtx.createOscillator();
+                        const subGain = audioCtx.createGain();
+                        subOsc.type = 'triangle';
+                        subOsc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
+                        subGain.gain.setValueAtTime(0.1, audioCtx.currentTime + idx * 0.08);
+                        subGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.08 + 0.25);
+                        subOsc.connect(subGain);
+                        subGain.connect(audioCtx.destination);
+                        subOsc.start(audioCtx.currentTime + idx * 0.08);
+                        subOsc.stop(audioCtx.currentTime + idx * 0.08 + 0.25);
+                    });
+                }
+            } catch (e) {
+                console.log('Audio notification:', e);
+            }
+        }
+
+        function startKeypadTimer() {
+            if (isTimerRunning) return;
+            isTimerRunning = true;
+            timerTimeLeft = 3.0;
+
+            const timerDisplay = document.getElementById('timer-display');
+            const timerBar = document.getElementById('timer-bar');
+
+            keypadTimer = setInterval(() => {
+                timerTimeLeft -= 0.1;
+                if (timerTimeLeft <= 0) {
+                    timerTimeLeft = 0;
+                    stopKeypadTimer();
+                    handleTimerTimeout();
+                } else {
+                    playSound('tick');
+                }
+
+                if (timerDisplay) timerDisplay.innerText = `${timerTimeLeft.toFixed(1)}s`;
+                if (timerBar) timerBar.style.width = `${(timerTimeLeft / 3.0) * 100}%`;
+            }, 100);
+        }
+
+        function stopKeypadTimer() {
+            clearInterval(keypadTimer);
+            isTimerRunning = false;
+            const timerDisplay = document.getElementById('timer-display');
+            const timerBar = document.getElementById('timer-bar');
+            if (timerDisplay) timerDisplay.innerText = '03.0s';
+            if (timerBar) timerBar.style.width = '100%';
+        }
+
+        function handleTimerTimeout() {
+            playSound('error');
+            setFeedback('⌛ ¡TIEMPO AGOTADO (3s)! Reiniciando PIN.', 'text-cyber-alert font-bold');
+            addLogEntry('TIEMPO EXSPIRADO: No se completó el PIN en 3.0s.', true);
+            clearPin();
+        }
+
+        function pressKey(num) {
+            playSound('click');
+            if (currentPin.length < 4) {
+                if (currentPin.length === 0) {
+                    startKeypadTimer();
+                }
+                currentPin += num;
+                updatePinDisplay();
+            }
+
+            if (currentPin.length === 4) {
+                submitPin();
+            }
+        }
+
+        function clearPin() {
+            playSound('click');
+            stopKeypadTimer();
+            currentPin = '';
+            updatePinDisplay();
+            setFeedback('Escriba o use el teclado numérico.', 'text-slate-400');
+        }
+
+        function updatePinDisplay() {
+            const display = document.getElementById('pin-display');
+            if (display) {
+                display.innerText = currentPin.padEnd(4, '-');
+            }
+        }
+
+        function setFeedback(msg, colorClass) {
+            const fb = document.getElementById('keypad-feedback');
+            if (fb) {
+                fb.className = `text-center font-mono text-xs min-h-[20px] ${colorClass}`;
+                fb.innerText = msg;
+            }
+        }
+
+        function addLogEntry(text, isError = false) {
+            const logContainer = document.getElementById('terminal-log');
+            if (logContainer) {
+                const p = document.createElement('p');
+                p.className = isError ? 'text-cyber-alert' : 'text-cyber-neon';
+                p.innerText = `[${new Date().toLocaleTimeString()}]: ${text}`;
+                logContainer.prepend(p);
+            }
+        }
+
+        function startLevel(levelNum) {
+            currentLevel = levelNum;
+            const lvl1Btn = document.getElementById('lvl-1-btn');
+            const lvl2Btn = document.getElementById('lvl-2-btn');
+            const titleTag = document.getElementById('level-title-tag');
+            const riddleText = document.getElementById('riddle-text');
+            const riddleLevelNum = document.getElementById('riddle-level-num');
+            const statusText = document.getElementById('status-text');
+
+            if (levelNum === 1) {
+                if (lvl1Btn) lvl1Btn.className = "px-3 py-1 rounded-lg bg-cyber-neon text-black font-bold transition";
+                if (lvl2Btn) lvl2Btn.className = "px-3 py-1 rounded-lg text-slate-400 hover:text-white transition";
+                if (titleTag) titleTag.innerHTML = `<i class="fa-solid fa-key text-cyber-yellow"></i> INGRESE CLAVE DE ACCESO - NIVEL 1`;
+                if (riddleLevelNum) riddleLevelNum.innerText = "DESAFÍO #01";
+                if (riddleText) {
+                    riddleText.innerHTML = `
+                        <i class="fa-solid fa-quote-left mr-2 text-cyber-yellow"></i>
+                        "Soy el secreto del sabio que sabe administrar:<br>
+                        Todo lo que llega a tus manos primero debes sumar.<br>
+                        Réstale con cuidado todo lo que tuviste que gastar,<br>
+                        y no olvides apartar la semilla que al futuro va a sembrar.<br><br>
+                        El saldo libre que te queda para prosperar,<br>
+                        es la clave de cuatro dígitos que la bóveda abrirá."
+                    `;
+                }
+                if (statusText) statusText.innerText = "ESTADO: BLOQUEADO (N1)";
+            } else {
+                if (lvl2Btn) lvl2Btn.className = "px-3 py-1 rounded-lg bg-cyber-alert text-white font-bold transition";
+                if (lvl1Btn) lvl1Btn.className = "px-3 py-1 rounded-lg text-slate-400 hover:text-white transition";
+                if (titleTag) titleTag.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-cyber-alert"></i> INGRESE CLAVE DE ACCESO - NIVEL 2 (COMPRAS IMPULSIVAS)`;
+                if (riddleLevelNum) riddleLevelNum.innerText = "DESAFÍO #02";
+                if (riddleText) {
+                    riddleText.innerHTML = `
+                        <i class="fa-solid fa-quote-left mr-2 text-cyber-alert"></i>
+                        "En el Nivel 2, los deseos y tentaciones han intentado la bóveda penetrar.<br>
+                        Identifica lo que es NECESIDAD REAL y lo que es solo impulso para gastar.<br>
+                        Suma tus Ingresos, resta tus Gastos Necesarios sin titubear,<br>
+                        descuenta la Inversión que al futuro va a impulsar, y la cuota de Ahorro apartar.<br><br>
+                        Excluye todo gasto superfluo y el saldo exacto de 4 dígitos te salvará."
+                    `;
+                }
+                if (statusText) statusText.innerText = "ESTADO: BLOQUEADO (N2)";
+
+                // PLAY ALARM SOUND AND TRIGGER ALARM MODAL FOR LEVEL 2
+                playSound('alarm');
+                const alarmModal = document.getElementById('modal-level2-alarm');
+                if (alarmModal) alarmModal.classList.remove('hidden');
+            }
+
+            clearPin();
+            resetClassification();
+        }
+
+        function closeLevel2AlarmModal() {
+            playSound('click');
+            clearInterval(alarmInterval);
+            const alarmModal = document.getElementById('modal-level2-alarm');
+            if (alarmModal) alarmModal.classList.add('hidden');
+            switchTab('data');
+        }
+
+        function submitPin() {
+            if (currentPin.length < 4) {
+                playSound('error');
+                setFeedback('⚠️ Ingrese 4 dígitos completos.', 'text-cyber-yellow');
+                return;
+            }
+
+            stopKeypadTimer();
+            attempts++;
+            const attemptCnt = document.getElementById('attempt-count');
+            if (attemptCnt) attemptCnt.innerText = `${attempts} INTENTOS`;
+
+            const targetPasscode = PASSCODES[currentLevel];
+
+            if (currentPin === targetPasscode) {
+                playSound('success');
+                setFeedback('✔ CLAVE CORRECTA. DESBLOQUEANDO...', 'text-cyber-neon font-bold');
+                addLogEntry(`ÉXITO: Clave ${currentPin} validada correctamente en el Nivel ${currentLevel}.`);
+
+                // Show modal success
+                const successModal = document.getElementById('modal-success');
+                if (successModal) successModal.classList.remove('hidden');
+
+                const statusBadge = document.getElementById('status-badge');
+                if (statusBadge) statusBadge.className = "flex items-center space-x-2 bg-emerald-950/60 border border-cyber-neon text-cyber-neon px-3 py-1.5 rounded-xl text-xs font-mono";
+
+                const statusText = document.getElementById('status-text');
+                if (statusText) statusText.innerText = `ESTADO: DESBLOQUEADO (N${currentLevel})`;
+
+                const successMsg = document.getElementById('success-modal-msg');
+                if (successMsg) {
+                    successMsg.innerText = currentLevel === 1
+                        ? '¡Nivel 1 Superado! Has clasificado el flujo monetario inicial y descontado el ahorro.'
+                        : '¡Nivel 2 Superado! Has filtrado las compras impulsivas e invertido inteligentemente.';
+                }
+
+                const nextLvlBtn = document.getElementById('next-level-btn');
+                if (nextLvlBtn) {
+                    if (currentLevel === 1) {
+                        nextLvlBtn.innerHTML = `<i class="fa-solid fa-forward"></i> CONTINUAR AL NIVEL 2`;
+                    } else {
+                        nextLvlBtn.innerHTML = `<i class="fa-solid fa-trophy"></i> ESCAPE ROOM COMPLETADO`;
+                    }
+                }
+
+            } else if (currentLevel === 1 && currentPin === '1390') {
+                playSound('error');
+                setFeedback('⚠️ ¡Casi! Revisa la adivinanza y no olvides restar el Ahorro Programado ($50).', 'text-cyber-yellow font-bold');
+                addLogEntry(`ALERTA: Clave ${currentPin} omitió restar la semilla de ahorro.`, true);
+                currentPin = '';
+                updatePinDisplay();
+            } else if (currentLevel === 2 && currentPin === '1380') {
+                playSound('error');
+                setFeedback('⚠️ ¡ALERTA! Incluiste gastos impulsivos (Deseos). EXCLUYE los Deseos e incluye Inversión.', 'text-cyber-alert font-bold');
+                addLogEntry(`ALERTA N2: Clave ${currentPin} incluyó compras impulsivas sin filtrar.`, true);
+                currentPin = '';
+                updatePinDisplay();
+            } else {
+                playSound('error');
+                setFeedback('❌ CLAVE INCORRECTA. Revisa tu clasificación y tus sumas.', 'text-cyber-alert font-bold');
+                addLogEntry(`ERROR: Clave ${currentPin} fallida en Nivel ${currentLevel}. Intento #${attempts}.`, true);
+                currentPin = '';
+                updatePinDisplay();
+            }
+        }
+
+        function goToNextLevelOrClose() {
+            closeSuccessModal();
+            if (currentLevel === 1) {
+                startLevel(2);
+            }
+        }
+
+        function closeSuccessModal() {
+            playSound('click');
+            const modal = document.getElementById('modal-success');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function toggleExpenseSubType(itemId) {
+            playSound('click');
+            const item = financialItems.find(i => i.id === itemId);
+            if (item && item.type === 'gasto') {
+                item.subType = item.subType === 'necesidad' ? 'deseo' : 'necesidad';
+                renderClassificationWorkspace();
+            }
+        }
+
+        function moveCard(id, targetCategory) {
+            playSound('click');
+            const item = financialItems.find(i => i.id === id);
+            if (item) {
+                item.currentCategory = targetCategory;
+                renderClassificationWorkspace();
+            }
+        }
+
+        function resetClassification() {
+            playSound('click');
+            financialItems.forEach(i => i.currentCategory = 'unassigned');
+
+            const calcIng = document.getElementById('calc-input-ingresos');
+            const calcGas = document.getElementById('calc-input-gastos');
+            const calcDiv = document.getElementById('calc-input-diversion');
+            const calcAho = document.getElementById('calc-input-ahorro');
+            const calcRes = document.getElementById('calc-input-resultado');
+
+            if (calcIng) calcIng.value = '';
+            if (calcGas) calcGas.value = '';
+            if (calcDiv) calcDiv.value = '';
+            if (calcAho) calcAho.value = '';
+            if (calcRes) calcRes.value = '';
+
+            renderClassificationWorkspace();
+        }
+
+        function renderClassificationWorkspace() {
+            const unassignedGrid = document.getElementById('unassigned-grid');
+            const bucketIngresos = document.getElementById('bucket-ingresos');
+            const bucketGastos = document.getElementById('bucket-gastos');
+            const bucketDiversion = document.getElementById('bucket-diversion');
+            const bucketInversion = document.getElementById('bucket-inversion');
+            const bucketAhorro = document.getElementById('bucket-ahorro');
+
+            if (!unassignedGrid || !bucketIngresos || !bucketGastos || !bucketAhorro) return;
+
+            unassignedGrid.innerHTML = '';
+            bucketIngresos.innerHTML = '';
+            bucketGastos.innerHTML = '';
+            if (bucketDiversion) bucketDiversion.innerHTML = '';
+            if (bucketInversion) bucketInversion.innerHTML = '';
+            bucketAhorro.innerHTML = '';
+
+            // Filter items by level
+            const activeItems = financialItems.filter(item => item.level <= currentLevel);
+
+            let unassignedCount = 0;
+            let countIngresos = 0;
+            let countGastos = 0;
+            let countDiversion = 0;
+            let countInversion = 0;
+            let countAhorro = 0;
+
+            activeItems.forEach(item => {
+                let subTypeBtnHtml = '';
+                if (item.type === 'gasto') {
+                    const isNeed = item.subType === 'necesidad';
+                    subTypeBtnHtml = `
+                        <button onclick="toggleExpenseSubType(${item.id})" title="Alternar Deseo vs Necesidad" class="px-1.5 py-0.5 rounded text-[9px] font-bold border transition ${isNeed ? 'bg-emerald-950 border-emerald-500 text-emerald-400' : 'bg-rose-950 border-rose-500 text-rose-400'}">
+                            ${isNeed ? '✔ NECESIDAD' : '★ DESEO'}
+                        </button>
+                    `;
+                }
+
+                if (item.currentCategory === 'unassigned') {
+                    unassignedCount++;
+                    const card = document.createElement('div');
+                    card.className = "bg-slate-900 border border-slate-700 p-2.5 rounded-xl flex items-center justify-between text-xs transition hover:border-cyber-yellow group";
+                    card.innerHTML = `
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid ${item.icon} text-slate-400 group-hover:text-cyber-yellow"></i>
+                            <span class="text-white font-bold">${item.name}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            ${subTypeBtnHtml}
+                            <span class="font-mono text-cyber-yellow font-bold">$${item.amount}</span>
+                            <div class="flex space-x-1">
+                                <button onclick="moveCard(${item.id}, 'ingresos')" title="Ingreso" class="px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-500/40 text-emerald-400 text-[10px] hover:bg-emerald-500 hover:text-black">ING</button>
+                                <button onclick="moveCard(${item.id}, 'gastos')" title="Gasto Necesidad" class="px-1.5 py-0.5 rounded bg-rose-950 border border-rose-500/40 text-rose-400 text-[10px] hover:bg-rose-500 hover:text-black">GAS</button>
+                                <button onclick="moveCard(${item.id}, 'diversion')" title="Diversión (10%)" class="px-1.5 py-0.5 rounded bg-pink-950 border border-pink-500/40 text-pink-400 text-[10px] hover:bg-pink-500 hover:text-black">DIV</button>
+                                ${currentLevel === 2 ? `<button onclick="moveCard(${item.id}, 'inversion')" title="Inversión" class="px-1.5 py-0.5 rounded bg-purple-950 border border-purple-500/40 text-purple-400 text-[10px] hover:bg-purple-500 hover:text-black">INV</button>` : ''}
+                                <button onclick="moveCard(${item.id}, 'ahorro')" title="Ahorro" class="px-1.5 py-0.5 rounded bg-blue-950 border border-cyber-blue/40 text-cyber-blue text-[10px] hover:bg-cyber-blue hover:text-black">AHO</button>
+                            </div>
+                        </div>
+                    `;
+                    unassignedGrid.appendChild(card);
+                } else {
+                    const card = document.createElement('div');
+                    card.className = "bg-black/60 border border-slate-800 p-2 rounded-xl flex items-center justify-between text-xs";
+                    card.innerHTML = `
+                        <div class="flex items-center space-x-1.5">
+                            <i class="fa-solid ${item.icon} text-slate-400"></i>
+                            <span class="text-slate-200 font-bold">${item.name}</span>
+                        </div>
+                        <div class="flex items-center space-x-1.5">
+                            ${subTypeBtnHtml}
+                            <span class="font-mono text-white font-bold">$${item.amount}</span>
+                            <button onclick="moveCard(${item.id}, 'unassigned')" class="text-slate-500 hover:text-rose-400 text-xs px-1" title="Quitar">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    if (item.currentCategory === 'ingresos') {
+                        countIngresos++;
+                        bucketIngresos.appendChild(card);
+                    } else if (item.currentCategory === 'gastos') {
+                        countGastos++;
+                        bucketGastos.appendChild(card);
+                    } else if (item.currentCategory === 'diversion' && bucketDiversion) {
+                        countDiversion++;
+                        bucketDiversion.appendChild(card);
+                    } else if (item.currentCategory === 'inversion' && bucketInversion) {
+                        countInversion++;
+                        bucketInversion.appendChild(card);
+                    } else if (item.currentCategory === 'ahorro') {
+                        countAhorro++;
+                        bucketAhorro.appendChild(card);
+                    }
+                }
+            });
+
+            if (unassignedCount === 0) {
+                unassignedGrid.innerHTML = `<p class="text-xs text-cyber-neon font-mono italic text-center py-2 col-span-full"><i class="fa-solid fa-circle-check mr-1"></i> ¡Todas las tarjetas clasificadas! Revisa Necesidades vs Diversión e ingresa el código en la terminal.</p>`;
+            }
+
+            if (countIngresos === 0) bucketIngresos.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-6">Mueve tarjetas de Ingreso</p>`;
+            if (countGastos === 0) bucketGastos.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-6">Mueve tarjetas de Gasto Necesario</p>`;
+            if (bucketDiversion && countDiversion === 0) bucketDiversion.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-6">Mueve tarjetas de Diversión (ej. Netflix)</p>`;
+            if (bucketInversion && countInversion === 0) bucketInversion.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-6">Mueve tarjetas de Inversión</p>`;
+            if (countAhorro === 0) bucketAhorro.innerHTML = `<p class="text-xs text-slate-500 italic text-center py-6">Mueve tarjeta de Ahorro</p>`;
+
+            const unassignedCnt = document.getElementById('unassigned-count');
+            if (unassignedCnt) unassignedCnt.innerText = `${unassignedCount} / ${activeItems.length} pendientes`;
+
+            const bIng = document.getElementById('badge-ingresos');
+            if (bIng) bIng.innerText = `${countIngresos} items`;
+
+            const bGas = document.getElementById('badge-gastos');
+            if (bGas) bGas.innerText = `${countGastos} items`;
+
+            const bDiv = document.getElementById('badge-diversion');
+            if (bDiv) bDiv.innerText = `${countDiversion} items`;
+
+            const bInv = document.getElementById('badge-inversion');
+            if (bInv) bInv.innerText = `${countInversion} items`;
+
+            const bAho = document.getElementById('badge-ahorro');
+            if (bAho) bAho.innerText = `${countAhorro} items`;
+        }
+
+        function switchTab(tabName) {
+            playSound('click');
+            const viewTerminal = document.getElementById('view-terminal');
+            const viewData = document.getElementById('view-data');
+            const tabTerminalBtn = document.getElementById('tab-terminal-btn');
+            const tabDataBtn = document.getElementById('tab-data-btn');
+
+            if (tabName === 'terminal') {
+                if (viewTerminal) viewTerminal.classList.remove('hidden');
+                if (viewData) viewData.classList.add('hidden');
+                if (tabTerminalBtn) tabTerminalBtn.className = "px-4 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2 tab-active";
+                if (tabDataBtn) tabDataBtn.className = "px-4 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2 text-slate-400 hover:text-white";
+            } else {
+                if (viewData) viewData.classList.remove('hidden');
+                if (viewTerminal) viewTerminal.classList.add('hidden');
+                if (tabDataBtn) tabDataBtn.className = "px-4 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2 tab-active";
+                if (tabTerminalBtn) tabTerminalBtn.className = "px-4 py-2 rounded-xl text-xs font-mono font-bold transition flex items-center gap-2 text-slate-400 hover:text-white";
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const soundText = document.getElementById('sound-text');
+            const soundIcon = document.getElementById('sound-icon');
+            if (soundText) soundText.innerText = soundEnabled ? 'AUDIO ON' : 'AUDIO OFF';
+            if (soundIcon) soundIcon.className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+        }
+
+        function toggleAdminModal() {
+            playSound('click');
+            const modal = document.getElementById('modal-admin');
+            if (modal) modal.classList.toggle('hidden');
+        }
+
+        // PHYSICAL KEYBOARD LISTENER
+        document.addEventListener('keydown', (e) => {
+            const viewTerminal = document.getElementById('view-terminal');
+            if (viewTerminal && !viewTerminal.classList.contains('hidden')) {
+                if (e.key >= '0' && e.key <= '9') {
+                    pressKey(e.key);
+                } else if (e.key === 'Backspace') {
+                    clearPin();
+                } else if (e.key === 'Enter') {
+                    submitPin();
+                }
+            }
+        });
+
+        // CALCULATOR SCRATCHPAD HELPER
+        ['calc-input-ingresos', 'calc-input-gastos', 'calc-input-diversion', 'calc-input-ahorro'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', () => {
+                    const ing = parseFloat(document.getElementById('calc-input-ingresos').value) || 0;
+                    const gas = parseFloat(document.getElementById('calc-input-gastos').value) || 0;
+                    const div = parseFloat(document.getElementById('calc-input-diversion').value) || 0;
+                    const aho = parseFloat(document.getElementById('calc-input-ahorro').value) || 0;
+                    const res = ing - gas - div - aho;
+                    const calcRes = document.getElementById('calc-input-resultado');
+                    if (calcRes) calcRes.value = isNaN(res) ? '' : `$${res}`;
+                });
+            }
+        });
+
+        // INITIALIZE APPLICATION ON WINDOW LOAD
+        window.onload = function() {
+            renderClassificationWorkspace();
+            updatePinDisplay();
+        };
+    </script>
+</body>
+</html>
