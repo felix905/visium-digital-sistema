@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fintech Board Game · Visium Digital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { 500: '#10b981', 600: '#059669', 700: '#047857' } }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-size: 16px; }
+        .card-soft {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+        }
+        @keyframes diceSpin {
+            0% { transform: rotate(0deg) scale(0.8); }
+            50% { transform: rotate(180deg) scale(1.15); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        .rolling { animation: diceSpin 0.4s infinite linear; }
+        .dice {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.35);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .ti { line-height: 1; }
+    </style>
+
+    <!-- Audio FX -->
+    <script>
+        const AudioFX = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    const AC = window.AudioContext || window.webkitAudioContext;
+                    if (AC) this.ctx = new AC();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+            },
+            playSuccess() {
+                this.init(); if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.08);
+                    gain.gain.setValueAtTime(0, now + i * 0.08);
+                    gain.gain.linearRampToValueAtTime(0.2, now + i * 0.08 + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.35);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(now + i * 0.08);
+                    osc.stop(now + i * 0.08 + 0.35);
+                });
+            },
+            playFailure() {
+                this.init(); if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(160, now);
+                osc.frequency.exponentialRampToValueAtTime(80, now + 0.4);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(now); osc.stop(now + 0.45);
+            }
+        };
+    </script>
+</head>
+<body class="min-h-screen p-4 bg-slate-50 font-sans text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- HEADER con logo -->
+    <header class="sticky top-0 z-50 pt-2 pb-3">
+        <div class="container mx-auto px-4">
+            <nav class="flex items-center justify-between text-sm font-normal bg-white/80 py-3 pl-2 pr-4 backdrop-blur-md rounded-xl shadow-sm border border-gray-100">
+                <a href="index.html" class="flex items-center">
+                    <img src="img/logo_v.svg" alt="Visium Digital" class="ml-3 h-7" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'font-bold text-emerald-600 text-lg\'>Visium Digital</span>'">
+                </a>
+                <div class="hidden md:block text-right">
+                    <div class="text-sm font-normal text-gray-800 leading-tight">Escuela de diseño</div>
+                    <div class="text-sm font-normal text-gray-800 leading-tight">e innovación</div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container mx-auto px-4 py-4">
+
+        <!-- BARRA SUPERIOR: TURNO + NUEVA PARTIDA -->
+        <div class="card-soft rounded-xl p-3 mb-5 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+                    <i class="ti ti-school text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base text-slate-800 flex items-center gap-2">
+                        Fintech Board Game
+                        <span class="text-xs bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-200 font-semibold">Evaluación Dinámica</span>
+                    </h1>
+                    <p class="text-sm text-slate-500">Sistema de desafíos educativos | $20 = 1 Punto para nota final</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 flex-wrap">
+                <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200">
+                    <span class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Turno:</span>
+                    <span id="currentTurnTeamText" class="font-bold text-sm text-sky-600 flex items-center gap-1.5">
+                        <span id="currentTurnColorDot" class="w-3 h-3 rounded-full bg-sky-500 inline-block"></span>
+                        <span id="currentTurnName">Equipo Azul</span>
+                    </span>
+                </div>
+
+                <button id="btnNewGame" onclick="openNewGameModal()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg text-sm transition shadow-sm hover:shadow-md flex items-center gap-2">
+                    <i class="ti ti-refresh"></i> Nueva Partida
+                </button>
+            </div>
+        </div>
+
+        <!-- GRID PRINCIPAL -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+            <!-- COLUMNA IZQUIERDA: CONTROL, SCORE, CHART, LOG (4 cols) -->
+            <div class="lg:col-span-4 flex flex-col gap-4">
+
+                <!-- DADO + SCOREBOARD -->
+                <div class="card-soft rounded-2xl p-4 space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                        <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center">
+                            <i class="ti ti-dice-5 text-emerald-500 mr-2 text-base"></i> Control & Puntuación
+                        </h2>
+                        <span id="roundCounter" class="text-xs text-slate-500">Ronda: <span class="text-slate-800 font-bold">1</span></span>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                        <!-- DADO -->
+                        <div class="col-span-5 flex flex-col items-center justify-center bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <div id="diceElement" class="dice !w-12 !h-12 !text-xl !rounded-xl mb-2">
+                                <i class="ti ti-dice text-gray-400"></i>
+                            </div>
+                            <button id="btnRollDice" onclick="rollDice()" class="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm transition active:scale-95 flex items-center justify-center gap-1">
+                                <i class="ti ti-dice"></i> Lanzar
+                            </button>
+                            <span id="diceResultText" class="text-[10px] text-slate-500 mt-1 text-center truncate w-full">Presiona lanzar</span>
+                        </div>
+
+                        <!-- SCOREBOARD COMPACTO -->
+                        <div class="col-span-7 flex flex-col gap-1.5" id="teamsContainer"></div>
+                    </div>
+
+                    <!-- TURNO ACTIVO -->
+                    <div id="activeTeamBanner" class="p-2.5 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div id="activeTeamAvatar" class="w-9 h-9 rounded-lg bg-sky-500 flex items-center justify-center font-bold text-white text-xs shadow-sm">E1</div>
+                            <div>
+                                <div class="text-[10px] text-slate-500 font-medium">Turno de</div>
+                                <div id="activeTeamName" class="font-bold text-slate-800 text-sm truncate max-w-[90px]">Equipo Azul</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-slate-500">Aciertos / Puntos</div>
+                            <div class="flex items-center gap-1.5 justify-end">
+                                <span id="activeTeamCorrects" class="font-extrabold text-emerald-600 text-sm">0</span>
+                                <span id="activeTeamPoints" class="px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-300 rounded text-[11px] font-bold">50 pts</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRÁFICO -->
+                <div class="card-soft rounded-2xl p-4">
+                    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center">
+                        <i class="ti ti-chart-line text-blue-500 mr-2 text-base"></i> Evolución de Puntuación ($)
+                    </h2>
+                    <div class="h-36 w-full">
+                        <canvas id="patrimonyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- LOG -->
+                <div class="card-soft rounded-2xl p-4 flex-1 flex flex-col min-h-[180px]">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="ti ti-list-check text-sky-500 text-base"></i> Registro de Desafíos
+                        </h2>
+                        <button onclick="clearAuditLog()" class="text-xs text-slate-400 hover:text-slate-600 transition">
+                            <i class="ti ti-trash mr-1"></i> Limpiar
+                        </button>
+                    </div>
+                    <div id="auditLog" class="flex-1 overflow-y-auto max-h-48 space-y-1.5 pr-1 text-xs text-slate-600"></div>
+                </div>
+
+            </div>
+
+            <!-- COLUMNA DERECHA: TABLERO (8 cols) -->
+            <div class="lg:col-span-8 flex flex-col gap-6">
+
+                <div class="card-soft rounded-2xl p-5 flex flex-col h-full">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                        <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                            <i class="ti ti-layout-grid text-indigo-500 text-base"></i> Tablero de Desafíos Financieros (30 casillas)
+                        </h2>
+
+                        <div class="flex flex-wrap items-center gap-3 text-xs text-slate-600">
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Verdes (Apuestas)</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Azules (Inversión)</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span> Naranjas (Gastos)</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Amarillas (Mercado)</span>
+                        </div>
+                    </div>
+
+                    <div id="boardGrid" class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200 flex-1"></div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 border-t border-gray-300">
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Visium Digital</h3>
+                    <p class="text-gray-600 text-sm">Escuela de diseño e innovación</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Contactos</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-brand-whatsapp"></i> (+58) 424 152 9071
+                        </li>
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-mail"></i> visiumdigitalca@gmail.com
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Síguenos</h3>
+                    <div class="flex space-x-3">
+                        <a href="https://www.instagram.com/visium.digital.c.a/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-instagram text-xl"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/visium-digital/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-500">© 2025 Visium Digital · Fintech Board Game · Equivalencia: $20 = 1 Punto de Nota Final</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================= MODALES ================= -->
+
+    <!-- MODAL: CASILLA VERDE (APUESTA) -->
+    <div id="modalGreenChallenge" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="card-soft rounded-2xl max-w-xl w-full p-6 shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-xl">
+                        <i class="ti ti-dice-5 text-2xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs uppercase font-bold text-emerald-600 tracking-wider">¡Casilla Verde!</span>
+                        <h3 class="text-xl font-extrabold text-slate-800">Desafío con Apuesta de Capital</h3>
+                    </div>
+                </div>
+                <div id="modalTeamTag" class="px-3 py-1 bg-sky-50 text-sky-700 border border-sky-200 text-xs font-bold rounded-lg">Equipo Azul</div>
+            </div>
+
+            <!-- STEP 1: APUESTA -->
+            <div id="challengeStepWager" class="space-y-5">
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    El equipo debe decidir cuántos dólares/puntos arriesgar antes de descubrir la pregunta del desafío.
+                </p>
+
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-between items-center">
+                    <div>
+                        <div class="text-xs text-slate-500">Capital Actual / Puntos</div>
+                        <div class="flex items-center gap-2">
+                            <span id="wagerTeamBalance" class="text-2xl font-black text-emerald-600">$1,000</span>
+                            <span id="wagerTeamPoints" class="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-300 font-bold">(50 pts)</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-slate-500">Premio / Castigo</div>
+                        <div class="text-xs font-medium text-slate-600">
+                            <span class="text-emerald-600 font-bold">+10%</span> al acertar | <span class="text-rose-600 font-bold">-20%</span> al fallar
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Monto a Apostar ($):</label>
+                    <input type="number" id="inputWagerAmount" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 font-bold text-lg focus:outline-none focus:border-emerald-500" placeholder="Ej. 200">
+                    <div class="grid grid-cols-4 gap-2 mt-3">
+                        <button onclick="setWagerPercent(10)" class="py-1.5 bg-slate-100 hover:bg-slate-200 text-xs font-bold rounded-lg text-slate-600 border border-slate-200">10%</button>
+                        <button onclick="setWagerPercent(25)" class="py-1.5 bg-slate-100 hover:bg-slate-200 text-xs font-bold rounded-lg text-slate-600 border border-slate-200">25%</button>
+                        <button onclick="setWagerPercent(50)" class="py-1.5 bg-slate-100 hover:bg-slate-200 text-xs font-bold rounded-lg text-slate-600 border border-slate-200">50%</button>
+                        <button onclick="setWagerPercent(100)" class="py-1.5 bg-rose-50 hover:bg-rose-100 text-xs font-bold rounded-lg text-rose-700 border border-rose-200">100% ALL-IN</button>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="proceedToQuestion()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-sm hover:shadow-md transition">
+                        Confirmar Apuesta y Revelar Desafío <i class="ti ti-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: PREGUNTA -->
+            <div id="challengeStepQuestion" class="space-y-4 hidden">
+                <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
+                    <div class="flex justify-between items-center text-xs text-emerald-700 font-bold mb-1">
+                        <span>APUESTA EN JUEGO: <span id="confirmedWagerText" class="text-slate-800">$0</span></span>
+                        <span>MODO: DESAFÍO VERDE</span>
+                    </div>
+                    <div class="text-xs text-slate-600">
+                        Ganancia: <span id="potentialGainText" class="text-emerald-600 font-bold">+$0</span> | Pérdida: <span id="potentialLossText" class="text-rose-600 font-bold">-$0</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <span class="text-xs font-bold text-amber-600 uppercase tracking-wider block mb-1">Pregunta del Desafío:</span>
+                    <p id="challengeQuestionText" class="text-sm font-semibold text-slate-800 leading-relaxed mb-3">Cargando desafío...</p>
+                    <div id="greenOptionsContainer" class="space-y-2 pt-2 border-t border-slate-200"></div>
+                </div>
+
+                <div class="border-t border-slate-200 pt-3">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">Evaluación Directa del Facilitador:</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="resolveChallenge(true)" class="py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-sm transition flex flex-col items-center justify-center">
+                            <span class="text-xs"><i class="ti ti-circle-check mr-1"></i> Correcto / Logrado</span>
+                            <span id="labelGainPoints" class="text-[10px] opacity-90 font-normal">Suma +10% de lo apostado</span>
+                        </button>
+                        <button onclick="resolveChallenge(false)" class="py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl shadow-sm transition flex flex-col items-center justify-center">
+                            <span class="text-xs"><i class="ti ti-circle-x mr-1"></i> Incorrecto / Fallado</span>
+                            <span id="labelLossPoints" class="text-[10px] opacity-90 font-normal">Resta -20% de lo apostado</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DESAFÍO GENÉRICO -->
+    <div id="modalGenericTile" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="card-soft rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <div class="text-center mb-3">
+                <div id="genericModalIcon" class="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl mb-1.5 shadow-sm">
+                    <i class="ti ti-coins"></i>
+                </div>
+                <span id="genericModalType" class="text-xs font-bold uppercase tracking-wider text-sky-600">Desafío de Casilla</span>
+                <h3 id="genericModalTitle" class="text-lg font-extrabold text-slate-800">Título del Desafío</h3>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-3">
+                <span class="text-xs font-bold text-amber-600 uppercase tracking-wider block mb-1">
+                    <i class="ti ti-target mr-1"></i> Pregunta o Reto para el Equipo:
+                </span>
+                <p id="genericModalDescription" class="text-sm text-slate-700 font-medium leading-relaxed mb-3">Descripción del desafío.</p>
+                <div id="genericOptionsContainer" class="space-y-2 pt-2 border-t border-slate-200"></div>
+            </div>
+
+            <div id="genericModalImpactDetails" class="bg-slate-50 p-3 rounded-xl border border-slate-200 mb-4 flex justify-around items-center text-center">
+                <div>
+                    <span class="text-[10px] text-slate-500 block uppercase font-bold">Si lo logran</span>
+                    <span id="genericModalRewardText" class="text-xs font-extrabold text-emerald-600">+$100 (+5 pts)</span>
+                </div>
+                <div class="h-6 w-px bg-slate-200"></div>
+                <div>
+                    <span class="text-[10px] text-slate-500 block uppercase font-bold">Si fallan</span>
+                    <span id="genericModalPenaltyText" class="text-xs font-extrabold text-rose-600">-$50 (-2.5 pts)</span>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-200 pt-3">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">Evaluación del Profesor / Facilitador:</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="resolveGenericChallenge(true)" class="py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs shadow-sm transition flex items-center justify-center gap-1.5">
+                        <i class="ti ti-circle-check"></i> Desafío Logrado
+                    </button>
+                    <button onclick="resolveGenericChallenge(false)" class="py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl text-xs shadow-sm transition flex items-center justify-center gap-1.5">
+                        <i class="ti ti-circle-x"></i> Desafío Fallado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: NUEVA PARTIDA -->
+    <div id="modalNewGame" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="card-soft rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <div class="flex items-center gap-3 border-b border-slate-200 pb-4 mb-5">
+                <div class="p-3 bg-blue-50 text-blue-600 border border-blue-200 rounded-xl">
+                    <i class="ti ti-adjustments text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-extrabold text-slate-800">Configuración de Nueva Partida</h3>
+                    <p class="text-xs text-slate-500">Personaliza los equipos y la puntuación inicial</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Capital Inicial por Equipo ($):</label>
+                    <input type="number" id="inputInitialCapital" value="1000" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-800 font-bold text-base focus:outline-none focus:border-blue-500">
+                    <span class="text-xs text-amber-600 mt-1 block">$1,000 iniciales equivalen a 50 Puntos de nota final.</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nombres de los Equipos:</label>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-4 h-4 rounded-full bg-sky-400 flex-shrink-0"></span>
+                            <input type="text" id="inputTeam0" value="Equipo Azul" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 font-medium">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-4 h-4 rounded-full bg-emerald-400 flex-shrink-0"></span>
+                            <input type="text" id="inputTeam1" value="Equipo Verde" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 font-medium">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-4 h-4 rounded-full bg-rose-400 flex-shrink-0"></span>
+                            <input type="text" id="inputTeam2" value="Equipo Rojo" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 font-medium">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-4 h-4 rounded-full bg-amber-400 flex-shrink-0"></span>
+                            <input type="text" id="inputTeam3" value="Equipo Amarillo" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-700 font-medium">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-200 flex gap-3">
+                <button onclick="closeNewGameModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-sm transition">Cancelar</button>
+                <button onclick="startNewGame()" class="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm shadow-sm transition">Iniciar Partida <i class="ti ti-player-play ml-1"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+        const TOTAL_TILES = 30;
+        const DOLLARS_PER_POINT = 20;
+        let roundCount = 1;
+        let currentTeamIndex = 0;
+        let isRolling = false;
+        let patrimonyChart = null;
+        let globallyAnsweredTiles = [];
+        let currentPendingTile = null;
+        let activeWager = 0;
+        let currentGreenQuestionData = null;
+
+        let teams = [
+            { id: 0, name: 'Equipo Azul', color: 'sky', hex: '#0ea5e9', bgClass: 'bg-sky-500', borderClass: 'border-sky-500', textClass: 'text-sky-600', balance: 1000, correctAnswers: 0, position: 1, history: [1000] },
+            { id: 1, name: 'Equipo Verde', color: 'emerald', hex: '#10b981', bgClass: 'bg-emerald-500', borderClass: 'border-emerald-500', textClass: 'text-emerald-600', balance: 1000, correctAnswers: 0, position: 1, history: [1000] },
+            { id: 2, name: 'Equipo Rojo', color: 'rose', hex: '#f43f5e', bgClass: 'bg-rose-500', borderClass: 'border-rose-500', textClass: 'text-rose-600', balance: 1000, correctAnswers: 0, position: 1, history: [1000] },
+            { id: 3, name: 'Equipo Amarillo', color: 'amber', hex: '#eab308', bgClass: 'bg-amber-500', borderClass: 'border-amber-500', textClass: 'text-amber-600', balance: 1000, correctAnswers: 0, position: 1, history: [1000] }
+        ];
+
+        const boardTiles = [
+            { id: 1, type: 'white', title: 'Salida / Inicio', desc: '¡Punto de partida! Todos los equipos inician con $1,000 (50 Puntos).', reward: 0, penalty: 0 },
+            { id: 2, type: 'green', title: 'Desafío de Apuesta Libre', desc: 'Casilla Verde: Apuesten su capital antes de ver la pregunta.' },
+            { id: 3, type: 'blue', title: 'Inversión en CETES / Bonos',
+              desc: '¿Qué caracteriza principalmente a un instrumento de Renta Fija como CETES o Bonos?',
+              options: ['A) Alta volatilidad diaria con riesgo de pérdida total.', 'B) Rentabilidad conocida o calculable desde el inicio con menor riesgo.', 'C) Otorga propiedad y votos en las asambleas de la empresa.', 'D) Solo se compra con criptomonedas.'],
+              correctIndex: 1, reward: 120, penalty: -40 },
+            { id: 4, type: 'orange', title: 'Mantenimiento de Vehículo',
+              desc: '¿Cuál es la estrategia financiera ideal ante un gasto de reparación imprevisto?',
+              options: ['A) Solicitar un préstamo express con tasa de interés alta.', 'B) Utilizar el Fondo de Emergencias creado con anticipación.', 'C) Dejar de pagar los servicios básicos del mes.', 'D) Vender activos a la mitad de su valor comercial.'],
+              correctIndex: 1, reward: 100, penalty: -100 },
+            { id: 5, type: 'green', title: 'Desafío de Apuesta Libre', desc: 'Casilla Verde: Apuesten su capital antes de ver la pregunta.' },
+            { id: 6, type: 'yellow', title: 'Aumento de Inflación',
+              desc: '¿Por qué la acumulación de efectivo en caja pierde valor durante un ciclo de inflación elevada?',
+              options: ['A) Porque los billetes se deterioran físicamente con el tiempo.', 'B) Porque reduce el poder adquisitivo real de la moneda.', 'C) Porque el banco cobra comisiones automáticas por inflación.', 'D) Porque las empresas dejan de aceptar dinero en efectivo.'],
+              correctIndex: 1, reward: 140, penalty: -80 },
+            { id: 7, type: 'blue', title: 'Dividendos de Acciones',
+              desc: '¿Qué representa el pago de un dividendo para un inversionista accionario?',
+              options: ['A) La devolución obligatoria del capital invertido.', 'B) La distribución de una parte de las utilidades de la empresa.', 'C) Un cobro por comisión de gestión bursátil.', 'D) Un incentivo fiscal libre de todo impuesto.'],
+              correctIndex: 1, reward: 160, penalty: -60 },
+            { id: 8, type: 'white', title: 'Día de Cobro / Presupuesto',
+              desc: 'Según la regla presupuestaria 50/30/20, ¿a qué debe destinarse el 20% del ingreso?',
+              options: ['A) Gastos superfluos y entretenimiento.', 'B) Necesidades básicas fijas como vivienda y alimentos.', 'C) Ahorro, inversión o pago acelerado de deudas.', 'D) Pago de comisiones bancarias imprevistas.'],
+              correctIndex: 2, reward: 100, penalty: -20 },
+            { id: 9, type: 'green', title: 'Desafío de Apuesta Libre', desc: 'Casilla Verde: Apuesten su capital antes de ver la pregunta.' },
+            { id: 10, type: 'orange', title: 'Comisión Bancaria Imprevista',
+              desc: '¿Cómo se puede evitar la comisión por saldo promedio mínimo en una cuenta bancaria?',
+              options: ['A) Retirando todo el saldo disponible a inicio de mes.', 'B) Manteniendo el nivel de saldo pactado o domiciliando la nómina.', 'C) Cambiando el nombre del titular de la cuenta.', 'D) Usando únicamente la tarjeta en horario nocturno.'],
+              correctIndex: 1, reward: 80, penalty: -60 },
+            { id: 11, type: 'yellow', title: 'Mercado Al Alza (Bull Market)',
+              desc: '¿Qué caracteriza a un entorno financiero denominado "Bull Market"?',
+              options: ['A) Caída generalizada y sostenida de los precios bursátiles.', 'B) Congelamiento de transacciones en la bolsa de valores.', 'C) Tendencia alcista de precios impulsada por el optimismo económico.', 'D) Salida masiva de inversionistas hacia activos de refugio.'],
+              correctIndex: 2, reward: 180, penalty: -80 },
+            { id: 12, type: 'green', title: 'Desafío de Apuesta Libre', desc: 'Casilla Verde: Apuesten su capital antes de ver la pregunta.' },
+            { id: 13, type: 'blue', title: 'Bienes Raíces / Renta',
+              desc: '¿Cuál es un gasto operativo fijo obligatorio al administrar un inmueble en alquiler?',
+              options: ['A) Impuesto predial y mantenimiento de la estructura.', 'B) Publicidad diaria en redes sociales.', 'C) Remodelación total del inmueble cada 3 meses.', 'D) Subvención de transporte para el inquilino.'],
+              correctIndex: 0, reward: 200, penalty: -100 },
+            { id: 14, type: 'orange', title: 'Emergencia de Salud',
+              desc: 'En un seguro de salud, ¿qué es la "Suma Asegurada"?',
+              options: ['A) El monto de la prima mensual que paga el cliente.', 'B) El límite máximo de coberturas que pagará la aseguradora.', 'C) La cuota fija del deducible a cargo del paciente.', 'D) El salario acumulado del asegurado.'],
+              correctIndex: 1, reward: 150, penalty: -120 },
+            { id: 15, type: 'white', title: 'Capacitación Financiera',
+              desc: '¿Por qué el interés compuesto acelera el crecimiento del capital en el tiempo?',
+              options: ['A) Porque los intereses generados se recalculan sobre la base agregando los rendimientos anteriores.', 'B) Porque elimina el pago de comisiones administrativas.', 'C) Porque garantiza rentabilidades fijas sin riesgo.', 'D) Porque duplica automáticamente el capital en 30 días.'],
+              correctIndex: 0, reward: 100, penalty: 0 },
+            { id: 16, type: 'green', title: 'Desafío de Apuesta Libre', desc: 'Casilla Verde: Apuesten su capital antes de ver la pregunta.' },
+            { id: 17, type: 'yellow', title: 'Volatilidad Cambiaria',
+              desc: 'En términos generales, ¿a quién favorece la devaluación de la moneda local frente al dólar?',
+              options: ['A) Al importador que adquiere productos en el extranjero.', 'B) Al exportador local que recibe ingresos en divisas extranjeras.', 'C) Al consumidor que compra productos importados.', 'D) A las personas con deudas contraídas en dólares.'],
+              correctIndex: 1, reward: 160, penalty: -90 },
+            { id: 18, type: 'blue', title: 'Inversión en Start-up',
+              desc: '¿Qué caracteriza al Capital de Riesgo (Venture Capital)?',
+              options: ['A) Inversión en empresas emergentes con alto potencial de crecimiento pero elevado riesgo.', 'B) Depósito a plazo fijo con rendimiento garantizado por el gobierno.', 'C) Préstamo bancario con garantía hipotecaria.', 'D) Compra de metales preciosos para resguardo.'],
+              correctIndex: 0, reward: 220, penalty: -120 },
+            { id: 19, type: 'green', title: 'Desafío de Apuesta Libre', desc: 'Casilla Verde: Apuesten su capital antes de ver la pregunta.' },
+            { id: 20, type: 'orange', title: 'Compras Impulsivas',
+              desc: '¿Cuál es la finalidad de la "Regla de las 24 horas" antes de efectuar una compra no planeada?',
+              options: ['A) Comparar la inflación diaria del producto.', 'B) Enfriar las emociones y analizar objetivamente la necesidad del gasto.', 'C) Esperar a que el producto reduzca su precio a la mitad.', 'D) Consultar con el banco la autorización del límite.'],
+              correctIndex: 1, reward: 120, penalty: -100 },
+            { id: 21, type: 'white', title: 'Auditoría de Presupuesto',
+              desc: '¿Qué son los "Gastos Hormiga" en las finanzas personales?',
+              options: ['A) Pagos anuales de seguros e impuestos.', 'B) Pequeños consumos diarios invisibles que suman una cantidad significativa al mes.', 'C) Deudas contraídas para la compra de vivienda.', 'D) Aportaciones fijas al plan personal de retiro.'],
+              correctIndex: 1, reward: 100, penalty: -30 },
+            { id: 22, type: 'yellow', title: 'Estímulo o Bono Gubernamental',
+              desc: '¿Qué busca incentivar una política fiscal expansiva en la economía?',
+              options: ['A) Reducir el gasto público y subir impuestos.', 'B) Fomentar el consumo y la inversión mediante incentivos o mayor gasto estatal.', 'C) Prohibir el crédito bancario para controlar la masa monetaria.', 'D) Incrementar las tasas de interés bancarias.'],
+              correctIndex: 1, reward: 160, penalty: -60 },
+            { id: 23, type: 'green', title: 'Desafío de Apuesta Libre', desc: 'Casilla Verde: Apuesten su capital antes de ver la pregunta.' },
+            { id: 24, type: 'blue', title: 'Magia del Interés Compuesto',
+              desc: 'Si inviertes $1,000 con una tasa de interés del 10% anual compuesto, ¿cuánto capital acumulas al final del año 2?',
+              options: ['A) $1,100', 'B) $1,200', 'C) $1,210', 'D) $1,300'],
+              correctIndex: 2, reward: 240, penalty: -100 },
+            { id: 25, type: 'orange', title: 'Deuda de Tarjeta de Crédito',
+              desc: '¿Qué ocurre al realizar únicamente el "Pago Mínimo" indicado en el estado de cuenta de la tarjeta?',
+              options: ['A) Se liquida totalmente la deuda sin generar intereses.', 'B) Se mantiene el crédito activo pero la mayor parte del pago se va a intereses, prolongando la deuda.', 'C) El banco descuenta el 50% del saldo pendiente.', 'D) Se mejora inmediatamente el puntaje crediticio al máximo.'],
+              correctIndex: 1, reward: 140, penalty: -150 },
+            { id: 26, type: 'green', title: 'Desafío de Apuesta Libre', desc: 'Casilla Verde: Apuesten su capital antes de ver la pregunta.' },
+            { id: 27, type: 'yellow', title: 'Corrección Bajista de Mercado',
+              desc: '¿Por qué no es recomendable vender posiciones presas del pánico durante una caída temporal del mercado?',
+              options: ['A) Porque la bolsa liquida automáticamente las acciones.', 'B) Porque se consolida (materializa) la pérdida de capital sin dar tiempo a la recuperación.', 'C) Porque se cobran tarifas dobles de comisión bursátil.', 'D) Porque las acciones vendidas en pérdida devuelven dinero en efectivo.'],
+              correctIndex: 1, reward: 180, penalty: -100 },
+            { id: 28, type: 'blue', title: 'Inversión en Criptoactivos',
+              desc: '¿Cuál es la principal consideración al incluir activos de alta volatilidad en un portafolio?',
+              options: ['A) Invertir la totalidad del patrimonio personal en ellos.', 'B) Asignar solo una proporción ponderada que no comprometa la estabilidad financiera.', 'C) Garantizar una tasa de rendimiento libre de riesgo.', 'D) Omitir cualquier estrategia de gestión de riesgo.'],
+              correctIndex: 1, reward: 260, penalty: -140 },
+            { id: 29, type: 'orange', title: 'Imprevisto del Hogar',
+              desc: '¿De cuánto tiempo de gastos fijos debe constar un Fondo de Emergencia recomendado por expertos?',
+              options: ['A) De 1 a 2 semanas de salario.', 'B) De 3 a 6 meses de gastos presupuestados.', 'C) De 2 a 3 años de ingresos totales.', 'D) De un presupuesto igual al límite de tarjeta de crédito.'],
+              correctIndex: 1, reward: 120, penalty: -110 },
+            { id: 30, type: 'white', title: 'Meta Financiera Final',
+              desc: '¿Cuál es la lección central sobre la administración eficiente del capital?',
+              options: ['A) El dinero guardado sin invertir incrementa su valor automáticamente.', 'B) El equilibrio entre presupuesto, control de riesgos e inversión informada maximiza la salud financiera.', 'C) La deuda siempre debe evitarse sin importar las condiciones.', 'D) La especulación es el único camino hacia el crecimiento patrimonial.'],
+              correctIndex: 1, reward: 300, penalty: 0 }
+        ];
+
+        const greenTileQuestionsBank = [
+            { q: "¿Cuál es la diferencia principal entre un ACTIVO y un PASIVO financiero según la economía personal?",
+              options: ["A) Un activo pone dinero en tu bolsillo; un pasivo saca dinero de tu bolsillo.", "B) Un activo es un gasto recurrente; un pasivo es una inversión a plazo fijo.", "C) Un activo siempre es físico; un pasivo siempre es digital.", "D) No existe diferencia en términos contables."],
+              correctIndex: 0 },
+            { q: "Si una inversión ofrece un rendimiento nominal del 12% anual y la inflación fue del 4%, ¿cuál fue la tasa de rendimiento REAL?",
+              options: ["A) 16%", "B) 8%", "C) 3%", "D) 12%"], correctIndex: 1 },
+            { q: "¿Qué permite calcular la Regla del 72 en el ámbito de las inversiones?",
+              options: ["A) Los años aproximados para duplicar un capital dada una tasa de interés fija.", "B) El porcentaje exacto de impuestos a pagar al fisco.", "C) La cantidad máxima de acciones que puede comprar un inversionista.", "D) El límite de crédito recomendado en tarjetas de crédito."],
+              correctIndex: 0 },
+            { q: "¿Qué diferencia existe entre el Interés Simple y el Interés Compuesto?",
+              options: ["A) El interés simple acumula intereses sobre intereses anteriores; el compuesto no.", "B) El interés simple se calcula solo sobre el capital inicial; el compuesto sobre capital + intereses acumulados.", "C) El interés compuesto solo aplica para préstamos de auto.", "D) El interés simple únicamente se paga en moneda extranjera."],
+              correctIndex: 1 },
+            { q: "¿Cuál es el objetivo principal de la DIVERSIFICACIÓN en una cartera de inversión?",
+              options: ["A) Eliminar completamente todos los impuestos sobre las ganancias.", "B) Reducir el riesgo global combinando diferentes tipos de activos.", "C) Duplicar la velocidad con la que se recibe el dinero.", "D) Aumentar la comisión pagada al corredor de bolsa."],
+              correctIndex: 1 }
+        ];
+
+        function calcPoints(dollars) { return (dollars / DOLLARS_PER_POINT).toFixed(1); }
+
+        window.onload = function() {
+            renderBoard();
+            initChart();
+            updateScoreboard();
+            updateActiveTeamUI();
+            addLogEvent("🎮 ¡Partida iniciada! Cada equipo cuenta con $1,000 (equivalente a 50 puntos de nota final).");
+        };
+
+        function renderBoard() {
+            const grid = document.getElementById('boardGrid');
+            grid.innerHTML = '';
+            boardTiles.forEach((tile) => {
+                const tileDiv = document.createElement('div');
+                tileDiv.id = `tile-${tile.id}`;
+                const isLocked = globallyAnsweredTiles.includes(tile.id);
+                let colorClasses = "bg-white border-slate-200 text-slate-600";
+                let badgeColor = "bg-slate-100 text-slate-500";
+                let typeIcon = "ti-hash";
+                if (isLocked) {
+                    colorClasses = "bg-slate-100 border-rose-200 text-slate-400 opacity-60";
+                    badgeColor = "bg-rose-50 text-rose-500 border border-rose-200";
+                    typeIcon = "ti-lock";
+                } else if (tile.type === 'green') {
+                    colorClasses = "bg-emerald-50 border-emerald-200 text-emerald-800 hover:border-emerald-400";
+                    badgeColor = "bg-emerald-100 text-emerald-600 border border-emerald-200";
+                    typeIcon = "ti-dice-5";
+                } else if (tile.type === 'blue') {
+                    colorClasses = "bg-blue-50 border-blue-200 text-blue-800 hover:border-blue-400";
+                    badgeColor = "bg-blue-100 text-blue-600 border border-blue-200";
+                    typeIcon = "ti-chart-line";
+                } else if (tile.type === 'orange') {
+                    colorClasses = "bg-orange-50 border-orange-200 text-orange-800 hover:border-orange-400";
+                    badgeColor = "bg-orange-100 text-orange-600 border border-orange-200";
+                    typeIcon = "ti-receipt";
+                } else if (tile.type === 'yellow') {
+                    colorClasses = "bg-amber-50 border-amber-200 text-amber-800 hover:border-amber-400";
+                    badgeColor = "bg-amber-100 text-amber-600 border border-amber-200";
+                    typeIcon = "ti-world";
+                }
+                tileDiv.className = `p-2.5 rounded-xl border flex flex-col justify-between min-h-[90px] relative transition duration-200 ${colorClasses}`;
+                tileDiv.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold w-6 h-6 rounded-lg ${badgeColor} flex items-center justify-center">${tile.id}</span>
+                        <i class="ti ${typeIcon} text-xs opacity-70"></i>
+                    </div>
+                    <div class="text-[11px] font-semibold leading-tight line-clamp-2 my-1">
+                        ${isLocked ? '<span class="text-rose-500 font-bold">[BLOQ]</span> ' + tile.title : tile.title}
+                    </div>
+                    <div id="tileTokens-${tile.id}" class="flex flex-wrap gap-1 min-h-[16px]"></div>
+                `;
+                grid.appendChild(tileDiv);
+            });
+            renderTokens();
+        }
+
+        function renderTokens() {
+            for (let i = 1; i <= TOTAL_TILES; i++) {
+                const c = document.getElementById(`tileTokens-${i}`);
+                if (c) c.innerHTML = '';
+            }
+            teams.forEach(team => {
+                const c = document.getElementById(`tileTokens-${team.position}`);
+                if (c) {
+                    const token = document.createElement('span');
+                    token.className = `w-4 h-4 rounded-full ${team.bgClass} inline-block border border-white shadow-sm transform hover:scale-125 transition`;
+                    token.title = `${team.name} (${team.correctAnswers} aciertos | ${calcPoints(team.balance)} pts)`;
+                    c.appendChild(token);
+                }
+            });
+        }
+
+        function updateScoreboard() {
+            const container = document.getElementById('teamsContainer');
+            container.innerHTML = '';
+            teams.forEach((team, index) => {
+                const isActive = index === currentTeamIndex;
+                const pts = calcPoints(team.balance);
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `px-2 py-1.5 rounded-lg border transition duration-200 flex items-center justify-between text-xs ${
+                    isActive ? `bg-emerald-50 border-emerald-300 shadow-sm` : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
+                }`;
+                cardDiv.innerHTML = `
+                    <div class="flex items-center gap-1.5 overflow-hidden">
+                        <span class="w-2 h-2 rounded-full ${team.bgClass} flex-shrink-0"></span>
+                        <span class="font-medium text-slate-700 truncate max-w-[70px] text-[11px]">${team.name}</span>
+                    </div>
+                    <div class="flex items-center gap-1 flex-shrink-0 ml-1">
+                        <span class="font-extrabold text-emerald-600 text-[10px]" title="Aciertos"><i class="ti ti-circle-check text-[10px] mr-0.5"></i>${team.correctAnswers}</span>
+                        <span class="text-[9px] font-bold px-1 py-0.5 bg-amber-50 text-amber-700 rounded border border-amber-200">$${team.balance.toLocaleString()} (${pts}p)</span>
+                    </div>
+                `;
+                container.appendChild(cardDiv);
+            });
+            updateChart();
+        }
+
+        function updateActiveTeamUI() {
+            const currentTeam = teams[currentTeamIndex];
+            const pts = calcPoints(currentTeam.balance);
+            document.getElementById('currentTurnName').innerText = currentTeam.name;
+            document.getElementById('currentTurnColorDot').className = `w-3 h-3 rounded-full ${currentTeam.bgClass} inline-block`;
+            document.getElementById('activeTeamName').innerText = currentTeam.name;
+            document.getElementById('activeTeamCorrects').innerText = `${currentTeam.correctAnswers}`;
+            document.getElementById('activeTeamPoints').innerText = `$${currentTeam.balance.toLocaleString()} (${pts} pts)`;
+            const avatar = document.getElementById('activeTeamAvatar');
+            avatar.className = `w-9 h-9 rounded-lg ${currentTeam.bgClass} flex items-center justify-center font-bold text-white text-xs shadow-sm`;
+            avatar.innerText = `E${currentTeam.id + 1}`;
+        }
+
+        function rollDice() {
+            if (isRolling) return;
+            isRolling = true;
+            const btn = document.getElementById('btnRollDice');
+            const diceEl = document.getElementById('diceElement');
+            const resultText = document.getElementById('diceResultText');
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            diceEl.classList.add('rolling');
+            resultText.innerText = "Girando dado...";
+            let rollVal = 1, count = 0;
+            const interval = setInterval(() => {
+                rollVal = Math.floor(Math.random() * 6) + 1;
+                diceEl.innerText = rollVal;
+                count++;
+                if (count > 10) {
+                    clearInterval(interval);
+                    diceEl.classList.remove('rolling');
+                    resultText.innerText = `¡Avanzas ${rollVal} casillas!`;
+                    moveCurrentTeam(rollVal);
+                }
+            }, 50);
+        }
+
+        function moveCurrentTeam(steps) {
+            const team = teams[currentTeamIndex];
+            const oldPos = team.position;
+            let newPos = oldPos + steps;
+            if (newPos > TOTAL_TILES) newPos = TOTAL_TILES;
+            team.position = newPos;
+            renderTokens();
+            if (newPos !== 1 && globallyAnsweredTiles.includes(newPos)) {
+                addLogEvent(`🔒 <b>${team.name}</b> cayó en la casilla <b>${newPos}</b> ya respondida. ¡Debe volver a lanzar!`);
+                AudioFX.playFailure();
+                setTimeout(() => {
+                    isRolling = false;
+                    const btn = document.getElementById('btnRollDice');
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    document.getElementById('diceResultText').innerText = "Casilla bloqueada. ¡Lanza de nuevo!";
+                }, 800);
+                return;
+            }
+            addLogEvent(`🎲 <b>${team.name}</b> avanzó a la casilla <b>${newPos}</b>.`);
+            setTimeout(() => { handleTileEvent(team, boardTiles[newPos - 1]); }, 600);
+        }
+
+        function handleTileEvent(team, tile) {
+            currentPendingTile = tile;
+            if (tile.type === 'green') openGreenChallengeModal(team);
+            else if (['blue', 'orange', 'yellow', 'white'].includes(tile.type)) openGenericChallengeModal(team, tile);
+        }
+
+        function openGreenChallengeModal(team) {
+            const pts = calcPoints(team.balance);
+            document.getElementById('modalTeamTag').innerText = team.name;
+            document.getElementById('wagerTeamBalance').innerText = `$${team.balance.toLocaleString()}`;
+            document.getElementById('wagerTeamPoints').innerText = `(${pts} pts)`;
+            document.getElementById('inputWagerAmount').value = Math.round(team.balance * 0.2);
+            document.getElementById('inputWagerAmount').max = team.balance;
+            document.getElementById('challengeStepWager').classList.remove('hidden');
+            document.getElementById('challengeStepQuestion').classList.add('hidden');
+            document.getElementById('modalGreenChallenge').classList.remove('hidden');
+        }
+
+        function setWagerPercent(pct) {
+            const team = teams[currentTeamIndex];
+            document.getElementById('inputWagerAmount').value = Math.round((team.balance * pct) / 100);
+        }
+
+        function proceedToQuestion() {
+            const team = teams[currentTeamIndex];
+            const inputVal = parseInt(document.getElementById('inputWagerAmount').value);
+            if (isNaN(inputVal) || inputVal <= 0) return;
+            activeWager = Math.min(inputVal, team.balance);
+            const qIndex = Math.floor(Math.random() * greenTileQuestionsBank.length);
+            currentGreenQuestionData = greenTileQuestionsBank[qIndex];
+            const potentialGain = Math.round(activeWager * 0.10);
+            const potentialLoss = Math.round(activeWager * 0.20);
+            document.getElementById('confirmedWagerText').innerText = `$${activeWager.toLocaleString()} (${calcPoints(activeWager)} pts)`;
+            document.getElementById('potentialGainText').innerText = `+$${potentialGain.toLocaleString()} (+${calcPoints(potentialGain)} pts)`;
+            document.getElementById('potentialLossText').innerText = `-$${potentialLoss.toLocaleString()} (-${calcPoints(potentialLoss)} pts)`;
+            document.getElementById('challengeQuestionText').innerText = `"${currentGreenQuestionData.q}"`;
+            const optsContainer = document.getElementById('greenOptionsContainer');
+            optsContainer.innerHTML = '';
+            currentGreenQuestionData.options.forEach((optText, optIdx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-2.5 rounded-lg bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-xs text-slate-700 transition font-medium flex items-center justify-between";
+                btn.innerHTML = `<span>${optText}</span> <i class="ti ti-chevron-right text-[10px] text-slate-400"></i>`;
+                btn.onclick = () => highlightOptionSelection(optsContainer, optIdx, currentGreenQuestionData.correctIndex);
+                optsContainer.appendChild(btn);
+            });
+            document.getElementById('labelGainPoints').innerText = `Suma +$${potentialGain} (+${calcPoints(potentialGain)} pts)`;
+            document.getElementById('labelLossPoints').innerText = `Resta -$${potentialLoss} (-${calcPoints(potentialLoss)} pts)`;
+            document.getElementById('challengeStepWager').classList.add('hidden');
+            document.getElementById('challengeStepQuestion').classList.remove('hidden');
+        }
+
+        function highlightOptionSelection(container, selectedIdx, correctIdx) {
+            const buttons = container.querySelectorAll('button');
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === correctIdx) {
+                    btn.className = "w-full text-left p-2.5 rounded-lg bg-emerald-50 border-2 border-emerald-500 text-xs text-emerald-800 font-bold transition flex items-center justify-between";
+                    btn.innerHTML += ` <i class="ti ti-circle-check text-emerald-600 text-sm"></i>`;
+                } else if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                    btn.className = "w-full text-left p-2.5 rounded-lg bg-rose-50 border-2 border-rose-500 text-xs text-rose-800 font-bold transition flex items-center justify-between";
+                    btn.innerHTML += ` <i class="ti ti-circle-x text-rose-600 text-sm"></i>`;
+                } else {
+                    btn.className = "w-full text-left p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-400 opacity-50";
+                }
+            });
+        }
+
+        function resolveChallenge(isCorrect) {
+            const team = teams[currentTeamIndex];
+            if (team.position !== 1 && !globallyAnsweredTiles.includes(team.position)) globallyAnsweredTiles.push(team.position);
+            if (isCorrect) {
+                const reward = Math.round(activeWager * 0.10);
+                team.balance += reward;
+                team.correctAnswers += 1;
+                addLogEvent(`✅ <b>${team.name}</b> CUMPLIÓ el Desafío Verde. Ganó <b>+$${reward.toLocaleString()} (+${calcPoints(reward)} pts)</b>. Aciertos: ${team.correctAnswers}.`);
+                AudioFX.playSuccess();
+                triggerConfetti();
+            } else {
+                const penalty = Math.round(activeWager * 0.20);
+                team.balance = Math.max(0, team.balance - penalty);
+                addLogEvent(`❌ <b>${team.name}</b> NO CUMPLIÓ el Desafío Verde. Perdió <b>-$${penalty.toLocaleString()} (-${calcPoints(penalty)} pts)</b>.`);
+                AudioFX.playFailure();
+            }
+            renderBoard();
+            document.getElementById('modalGreenChallenge').classList.add('hidden');
+            finishTurn();
+        }
+
+        function openGenericChallengeModal(team, tile) {
+            const modal = document.getElementById('modalGenericTile');
+            const typeLabel = document.getElementById('genericModalType');
+            const titleEl = document.getElementById('genericModalTitle');
+            const descEl = document.getElementById('genericModalDescription');
+            const iconEl = document.getElementById('genericModalIcon');
+            titleEl.innerText = tile.title;
+            descEl.innerText = tile.desc;
+            const optsContainer = document.getElementById('genericOptionsContainer');
+            optsContainer.innerHTML = '';
+            if (tile.options && tile.options.length > 0) {
+                optsContainer.classList.remove('hidden');
+                tile.options.forEach((optText, optIdx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left p-2 rounded-lg bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 text-xs text-slate-700 transition font-medium flex items-center justify-between";
+                    btn.innerHTML = `<span>${optText}</span> <i class="ti ti-chevron-right text-[10px] text-slate-400"></i>`;
+                    btn.onclick = () => highlightOptionSelection(optsContainer, optIdx, tile.correctIndex);
+                    optsContainer.appendChild(btn);
+                });
+            } else {
+                optsContainer.classList.add('hidden');
+            }
+            const reward = tile.reward || 100;
+            const penalty = Math.abs(tile.penalty || 50);
+            document.getElementById('genericModalRewardText').innerText = `+$${reward} (+${calcPoints(reward)} pts)`;
+            document.getElementById('genericModalPenaltyText').innerText = `-$${penalty} (-${calcPoints(penalty)} pts)`;
+            if (tile.type === 'blue') {
+                typeLabel.innerText = "Desafío de Inversión";
+                typeLabel.className = "text-xs font-bold uppercase tracking-wider text-blue-600";
+                iconEl.className = "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl mb-1.5 bg-blue-50 text-blue-600 border border-blue-200";
+                iconEl.innerHTML = '<i class="ti ti-chart-line"></i>';
+            } else if (tile.type === 'orange') {
+                typeLabel.innerText = "Desafío de Mitigación de Gasto";
+                typeLabel.className = "text-xs font-bold uppercase tracking-wider text-orange-600";
+                iconEl.className = "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl mb-1.5 bg-orange-50 text-orange-600 border border-orange-200";
+                iconEl.innerHTML = '<i class="ti ti-shield-half"></i>';
+            } else if (tile.type === 'yellow') {
+                typeLabel.innerText = "Desafío de Análisis de Mercado";
+                typeLabel.className = "text-xs font-bold uppercase tracking-wider text-amber-600";
+                iconEl.className = "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl mb-1.5 bg-amber-50 text-amber-600 border border-amber-200";
+                iconEl.innerHTML = '<i class="ti ti-world"></i>';
+            } else {
+                typeLabel.innerText = "Desafío de Concepto Financiero";
+                typeLabel.className = "text-xs font-bold uppercase tracking-wider text-indigo-600";
+                iconEl.className = "w-12 h-12 rounded-2xl mx-auto flex items-center justify-center text-xl mb-1.5 bg-indigo-50 text-indigo-600 border border-indigo-200";
+                iconEl.innerHTML = '<i class="ti ti-school"></i>';
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function resolveGenericChallenge(isSuccess) {
+            const team = teams[currentTeamIndex];
+            const tile = currentPendingTile;
+            if (team.position !== 1 && !globallyAnsweredTiles.includes(team.position)) globallyAnsweredTiles.push(team.position);
+            const reward = tile.reward || 100;
+            const penalty = Math.abs(tile.penalty || 50);
+            if (isSuccess) {
+                team.balance += reward;
+                team.correctAnswers += 1;
+                addLogEvent(`✅ <b>${team.name}</b> CUMPLIÓ el Desafío en Casilla ${tile.id} (${tile.title}). Sumó <b>+$${reward} (+${calcPoints(reward)} pts)</b>. Aciertos: ${team.correctAnswers}.`);
+                AudioFX.playSuccess();
+                triggerConfetti();
+            } else {
+                team.balance = Math.max(0, team.balance - penalty);
+                addLogEvent(`❌ <b>${team.name}</b> NO CUMPLIÓ el Desafío en Casilla ${tile.id} (${tile.title}). Perdió <b>-$${penalty.toLocaleString()} (-${calcPoints(penalty)} pts)</b>.`);
+                AudioFX.playFailure();
+            }
+            renderBoard();
+            document.getElementById('modalGenericTile').classList.add('hidden');
+            finishTurn();
+        }
+
+        function finishTurn() {
+            teams[currentTeamIndex].history.push(teams[currentTeamIndex].balance);
+            currentTeamIndex = (currentTeamIndex + 1) % teams.length;
+            if (currentTeamIndex === 0) {
+                roundCount++;
+                document.getElementById('roundCounter').innerHTML = `Ronda: <span class="text-slate-800 font-bold">${roundCount}</span>`;
+            }
+            updateScoreboard();
+            updateActiveTeamUI();
+            isRolling = false;
+            const btn = document.getElementById('btnRollDice');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('diceResultText').innerText = "Presiona para lanzar";
+        }
+
+        function addLogEvent(htmlText) {
+            const logContainer = document.getElementById('auditLog');
+            const entry = document.createElement('div');
+            entry.className = "p-2 bg-slate-50 rounded-lg border border-slate-200 leading-snug flex items-start gap-2";
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            entry.innerHTML = `
+                <span class="text-[10px] text-slate-400 font-mono flex-shrink-0 pt-0.5">${timeStr}</span>
+                <span class="flex-1">${htmlText}</span>
+            `;
+            logContainer.prepend(entry);
+        }
+
+        function clearAuditLog() {
+            document.getElementById('auditLog').innerHTML = '';
+            addLogEvent("Registro limpiado.");
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('patrimonyChart').getContext('2d');
+            patrimonyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Inicio'],
+                    datasets: teams.map(t => ({
+                        label: t.name,
+                        data: t.history,
+                        borderColor: t.hex,
+                        backgroundColor: t.hex + '20',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 3
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, position: 'bottom', labels: { color: '#64748b', font: { size: 10 } } },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#94a3b8', font: { size: 9 } } },
+                        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#94a3b8', font: { size: 9 } } }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            if (!patrimonyChart) return;
+            const maxLen = Math.max(...teams.map(t => t.history.length));
+            const labels = Array.from({ length: maxLen }, (_, i) => i === 0 ? 'Inicio' : `T${i}`);
+            patrimonyChart.data.labels = labels;
+            patrimonyChart.data.datasets.forEach((dataset, idx) => { dataset.data = teams[idx].history; });
+            patrimonyChart.update();
+        }
+
+        function openNewGameModal() { document.getElementById('modalNewGame').classList.remove('hidden'); }
+        function closeNewGameModal() { document.getElementById('modalNewGame').classList.add('hidden'); }
+
+        function startNewGame() {
+            const initCapital = parseInt(document.getElementById('inputInitialCapital').value) || 1000;
+            teams[0].name = document.getElementById('inputTeam0').value || 'Equipo Azul';
+            teams[1].name = document.getElementById('inputTeam1').value || 'Equipo Verde';
+            teams[2].name = document.getElementById('inputTeam2').value || 'Equipo Rojo';
+            teams[3].name = document.getElementById('inputTeam3').value || 'Equipo Amarillo';
+            globallyAnsweredTiles = [];
+            teams.forEach(t => {
+                t.balance = initCapital;
+                t.correctAnswers = 0;
+                t.position = 1;
+                t.history = [initCapital];
+            });
+            currentTeamIndex = 0;
+            roundCount = 1;
+            isRolling = false;
+            document.getElementById('roundCounter').innerHTML = `Ronda: <span class="text-slate-800 font-bold">${roundCount}</span>`;
+            document.getElementById('diceElement').innerHTML = '<i class="ti ti-dice text-gray-400"></i>';
+            renderBoard();
+            updateScoreboard();
+            updateActiveTeamUI();
+            clearAuditLog();
+            addLogEvent(`🚀 ¡Nueva partida iniciada! Capital inicial: $${initCapital.toLocaleString()} (${calcPoints(initCapital)} pts).`);
+            closeNewGameModal();
+        }
+
+        function triggerConfetti() {
+            try { confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
+        }
+    </script>
+</body>
+</html>
