@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100 select-none">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regla VIDA: Finanzas de Nivel Leyenda</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              neon: {
+                cyan: '#06b6d4',
+                pink: '#ec4899',
+                gold: '#eab308',
+                green: '#10b981',
+                purple: '#a855f7',
+                dark: '#020617',
+                panel: '#0f172a'
+              }
+            },
+            fontFamily: {
+              orbitron: ['Orbitron', 'sans-serif'],
+              rajdhani: ['Rajdhani', 'sans-serif']
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+        .neon-border {
+            border: 2px solid #06b6d4;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3), inset 0 0 10px rgba(6, 182, 212, 0.15);
+        }
+        .neon-border-pink {
+            border: 2px solid #ec4899;
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.3), inset 0 0 10px rgba(236, 72, 153, 0.15);
+        }
+        .neon-border-gold {
+            border: 2px solid #eab308;
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.3), inset 0 0 10px rgba(234, 179, 8, 0.15);
+        }
+        .neon-btn {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            border: 1px solid #06b6d4;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .neon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.8);
+            border-color: #67e8f9;
+        }
+        .neon-btn:active {
+            transform: translateY(1px);
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .thermometer-glow {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #06b6d4; border-radius: 3px; }
+    </style>
+</head>
+<body class="h-full font-rajdhani text-slate-100 flex flex-col justify-between overflow-x-hidden bg-slate-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]">
+
+    <!-- HEADER / DASHBOARD TOP BAR -->
+    <header class="bg-slate-900/90 border-b border-cyan-500/30 p-3 sm:p-4 sticky top-0 z-40 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-950 border border-cyan-400 flex items-center justify-center text-cyan-400 font-orbitron font-bold text-lg shadow-[0_0_15px_rgba(6,182,212,0.5)]">
+                    ⚡
+                </div>
+                <div>
+                    <h1 class="font-orbitron font-bold text-sm sm:text-base text-cyan-400 tracking-wider flex items-center gap-2">
+                        REGLA VIDA <span class="text-xs bg-purple-900/80 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500">SIMULADOR</span>
+                    </h1>
+                    <p class="text-xs text-slate-400 font-medium" id="hudPlayerRole">Jugador: Sin Iniciar</p>
+                </div>
+            </div>
+
+            <!-- DASHBOARD STATS HUD -->
+            <div id="hudStats" class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-semibold">
+                
+                <!-- LEVEL INDICATOR -->
+                <div class="bg-slate-950 px-3 py-1.5 rounded-lg border border-purple-500/50 flex items-center gap-2">
+                    <span class="text-purple-400"><i class="fa-solid fa-layer-group"></i></span>
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-orbitron uppercase">Nivel Activo</div>
+                        <div id="hudLevel" class="font-orbitron text-purple-300 font-bold">0 / 7</div>
+                    </div>
+                </div>
+
+                <!-- WELLBEING THERMOMETER -->
+                <div class="bg-slate-950 px-3 py-1.5 rounded-lg border border-emerald-500/50 flex items-center gap-2 min-w-[130px]">
+                    <span id="thermoIcon" class="text-emerald-400 text-base">🌡️</span>
+                    <div class="w-full">
+                        <div class="flex justify-between text-[9px] text-slate-400 font-orbitron mb-0.5">
+                            <span>BIENESTAR</span>
+                            <span id="hudWellbeingVal" class="text-emerald-400 font-bold">80%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
+                            <div id="hudWellbeingBar" class="bg-emerald-500 h-full transition-all duration-500 thermometer-glow" style="width: 80%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INCENTIVE COINS TREASURY -->
+                <div class="bg-slate-950 px-3 py-1.5 rounded-lg border border-amber-500/50 flex items-center gap-2">
+                    <span class="text-amber-400 text-base">🪙</span>
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-orbitron uppercase">Monedas VIDA</div>
+                        <div id="hudCoins" class="font-orbitron text-amber-400 font-bold text-sm">0</div>
+                    </div>
+                </div>
+
+                <!-- SALARY / CASH -->
+                <div class="bg-slate-950 px-3 py-1.5 rounded-lg border border-cyan-500/50 flex items-center gap-2">
+                    <span class="text-cyan-400 text-base">💵</span>
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-orbitron uppercase">Ingreso Mensual</div>
+                        <div id="hudIncome" class="font-orbitron text-cyan-300 font-bold text-sm">$0</div>
+                    </div>
+                </div>
+
+                <!-- SOUND TOGGLE -->
+                <button onclick="toggleAudio()" id="btnAudioToggle" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 px-2.5 py-2 rounded-lg text-xs font-orbitron text-cyan-400 transition">
+                    🔊 ON
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN INTERACTIVE CONTAINER -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-3 sm:p-6 flex flex-col justify-center relative z-10 my-auto">
+
+        <!-- ================= LEVEL 0: ONBOARDING & EXTENDED PROFESSIONS ================= -->
+        <section id="lvl0Container" class="glass-panel neon-border p-6 sm:p-8 rounded-2xl max-w-3xl mx-auto w-full my-auto space-y-6">
+            <div class="text-center space-y-2">
+                <span class="bg-cyan-950 text-cyan-400 border border-cyan-500/50 px-3 py-1 rounded-full text-xs font-orbitron font-semibold tracking-wider">
+                    FASE 0: IDENTIDAD, LIDERAZGO Y PROPÓSITO
+                </span>
+                <h2 class="font-orbitron text-xl sm:text-2xl font-black text-white tracking-wide">
+                    DESCUBRE TU ÁREA, ROL DE LIDERAZGO E INGRESO
+                </h2>
+                <p class="text-slate-300 text-sm">
+                    Para gestionar tu dinero con maestría, primero debes conocer tus fortalezas. Selecciona el área de conocimiento o liderazgo que más se alinea contigo:
+                </p>
+            </div>
+
+            <form onsubmit="completeOnboarding(event)" class="space-y-5">
+                <div>
+                    <label class="block font-orbitron text-xs text-cyan-300 mb-2">1. ¿CUÁL ES TU NOMBRE?</label>
+                    <input type="text" id="inputPlayerName" required placeholder="Ej. Sofia o Mateo" maxlength="20"
+                        class="w-full bg-slate-900 border border-slate-700 focus:border-cyan-400 rounded-xl p-3 text-cyan-300 font-orbitron text-sm focus:outline-none transition">
+                </div>
+
+                <div>
+                    <label class="block font-orbitron text-xs text-cyan-300 mb-2">2. SELECCIONA TU ÁREA DE CONOCIMIENTO Y ROL:</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="interestCardsContainer">
+                        <!-- Extended Professions Injected Dynamically -->
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/90 p-4 rounded-xl border border-purple-500/30 text-xs text-slate-300 space-y-1">
+                    <p class="font-semibold text-purple-300 font-orbitron mb-1"><i class="fa-solid fa-lightbulb text-amber-400 mr-2"></i>REVELACIÓN PEDAGÓGICA #1</p>
+                    <p>Roles de gerencia, dirección y administración conllevan mayores ingresos pero también requieren decisiones financieras de mayor precisión.</p>
+                </div>
+
+                <button type="submit" class="w-full neon-btn text-cyan-300 font-orbitron text-sm py-4 rounded-xl font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+                    <span>Iniciar Mi Camino Financiero</span>
+                    <i class="fa-solid fa-rocket"></i>
+                </button>
+            </form>
+        </section>
+
+
+        <!-- ================= LEVEL 1: CATALOG DESEMBOLSOS & CLASIFICACIÓN LIBRE ================= -->
+        <section id="lvl1Container" class="hidden glass-panel neon-border p-5 sm:p-8 rounded-2xl max-w-6xl mx-auto w-full space-y-6">
+            <div class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-4 gap-2">
+                <div>
+                    <span class="bg-purple-950 text-purple-300 border border-purple-500/50 px-3 py-1 rounded-full text-xs font-orbitron font-semibold">NIVEL 1</span>
+                    <h2 class="font-orbitron text-lg sm:text-xl font-bold text-white mt-1">RETO: CONSTRUYE TU PRESUPUESTO CON LA REGLA VIDA</h2>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400 font-orbitron block">REGLA BASE OBJETIVO</span>
+                    <span class="text-xs font-orbitron font-bold text-cyan-400">60% Necesidades | 20% Ahorro | 10% Inversión | 10% Diversión</span>
+                </div>
+            </div>
+
+            <!-- GAMEPLAY INSTRUCTIONS -->
+            <div class="bg-slate-900/90 p-4 rounded-xl border border-cyan-500/30 text-xs text-slate-300 font-mono space-y-1">
+                <p class="font-bold text-cyan-300 font-orbitron mb-1">🎮 ¿CÓMO JUGAR EL RETO DE PRESUPUESTO?</p>
+                <p>1. Revisa el <strong>Catálogo de Desembolsos</strong> con montos en $ predeterminados.</p>
+                <p>2. Haz clic en un desembolso y <strong>tú decides si categorizarlo como NECESIDAD o como DESEO</strong>.</p>
+                <p>3. Observa cómo tus decisiones afectan la bolsa del 60% y el <strong>Termómetro de Bienestar</strong> en tiempo real. ¡Aprende clasificando correctamente!</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- LEFT COLUMN: CATALOG OF DISBURSEMENTS -->
+                <div class="lg:col-span-5 space-y-3">
+                    <h3 class="font-orbitron text-xs text-amber-400 uppercase tracking-wider flex justify-between items-center">
+                        <span>📦 CATÁLOGO DE DESEMBOLSOS DISPONIBLES</span>
+                        <span class="text-[10px] text-slate-400 font-mono">Selecciona y clasifica</span>
+                    </h3>
+
+                    <div id="catalogDisbursementsContainer" class="space-y-2 max-h-[460px] overflow-y-auto pr-1">
+                        <!-- Items Injected Dynamically -->
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: PLAYER'S CUSTOM BUDGET CATEGORIES -->
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- NECESIDADES BOARD -->
+                        <div class="bg-slate-900/90 p-4 rounded-xl border border-emerald-500/40 space-y-2 min-h-[180px]">
+                            <div class="text-xs font-orbitron font-bold text-emerald-400 flex justify-between items-center">
+                                <span>🛡️ MIS NECESIDADES</span>
+                                <span id="boardNeedsSubtotal" class="font-mono text-slate-300">$0</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 font-mono">Objetivo: Máximo 60% de tu ingreso ($<span id="limit60ValueText">0</span>)</p>
+                            <div id="boardNeedsList" class="space-y-1.5 pt-2 font-mono text-xs">
+                                <div class="text-[11px] text-slate-500 italic text-center py-4">Ningún desembolso asignado aquí</div>
+                            </div>
+                        </div>
+
+                        <!-- DESEOS BOARD -->
+                        <div class="bg-slate-900/90 p-4 rounded-xl border border-pink-500/40 space-y-2 min-h-[180px]">
+                            <div class="text-xs font-orbitron font-bold text-pink-400 flex justify-between items-center">
+                                <span>✨ MIS DESEOS / ESTILO VIDA</span>
+                                <span id="boardWantsSubtotal" class="font-mono text-slate-300">$0</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 font-mono">Se financia con tu 10% de Diversión</p>
+                            <div id="boardWantsList" class="space-y-1.5 pt-2 font-mono text-xs">
+                                <div class="text-[11px] text-slate-500 italic text-center py-4">Ningún desembolso asignado aquí</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- REAL TIME FEEDBACK & SLIDERS REGLA VIDA -->
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-3 font-mono text-xs">
+                        <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-400">Total Necesidades Clasificadas:</span>
+                            <span id="summaryTotalNeeds" class="text-emerald-400 font-bold font-orbitron">$0</span>
+                        </div>
+                        
+                        <div id="feedbackBanner" class="p-3 rounded-lg bg-cyan-950/40 border border-cyan-500/40 text-cyan-200 text-xs">
+                            💡 Clasifica los desembolsos esenciales para asegurar tu bienestar respetando la Regla VIDA.
+                        </div>
+
+                        <!-- REGLA VIDA SLIDERS ADJUSTMENT -->
+                        <div class="space-y-2 pt-2 border-t border-slate-800">
+                            <div class="flex justify-between text-[11px]">
+                                <span class="text-slate-300">Ahorro Estratégico (20%):</span>
+                                <span id="valAhorro" class="text-emerald-400 font-bold">$0</span>
+                            </div>
+                            <div class="flex justify-between text-[11px]">
+                                <span class="text-slate-300">Inversión Futuro (10%):</span>
+                                <span id="valInversion" class="text-purple-400 font-bold">$0</span>
+                            </div>
+                            <div class="flex justify-between text-[11px]">
+                                <span class="text-slate-300">Diversión / Deseos (10%):</span>
+                                <span id="valDiversion" class="text-pink-400 font-bold">$0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="validateLevel1()" class="w-full neon-btn text-cyan-300 font-orbitron text-xs py-3.5 rounded-xl font-bold uppercase tracking-wider">
+                        Validar Presupuesto VIDA 🎯
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= LEVEL 2: DESAFÍOS E IMPREVISTOS (FONDO DE EMERGENCIA) ================= -->
+        <section id="lvl2Container" class="hidden glass-panel neon-border-pink p-5 sm:p-8 rounded-2xl max-w-3xl mx-auto w-full space-y-6">
+            <div class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-4 gap-2">
+                <div>
+                    <span class="bg-pink-950 text-pink-300 border border-pink-500/50 px-3 py-1 rounded-full text-xs font-orbitron font-semibold">NIVEL 2</span>
+                    <h2 class="font-orbitron text-lg sm:text-xl font-bold text-white mt-1">DESAFÍOS E IMPREVISTOS</h2>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400 font-orbitron block">NUEVA REGLA VIDA</span>
+                    <span class="text-xs font-orbitron font-bold text-pink-400">50% Necesidades | 20% Ahorro | 10% Fondo | 10% Inv | 10% Div</span>
+                </div>
+            </div>
+
+            <!-- CRISIS ALERT CARD -->
+            <div id="crisisCard" class="bg-red-950/80 border-2 border-red-500/80 p-5 rounded-xl text-center space-y-3 animate-pulse">
+                <div class="text-4xl">🚨</div>
+                <h3 id="crisisTitle" class="font-orbitron font-black text-red-400 text-base">GASTO IMPREVISTO DETECTADO</h3>
+                <p id="crisisDesc" class="text-xs text-slate-200 font-mono">
+                    Se ha producido un imprevisto operativo. Resolver la emergencia cuesta $140 inmediatamente.
+                </p>
+            </div>
+
+            <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 space-y-4">
+                <h3 class="font-orbitron text-xs text-cyan-400 uppercase tracking-wider">
+                    REAJUSTA TU PRESUPUESTO INCLUYENDO EL 10% DE FONDO DE EMERGENCIA:
+                </h3>
+
+                <div class="space-y-3 font-mono text-xs">
+                    <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                        <span class="text-slate-300">Necesidades de Vida (Ajustado):</span>
+                        <span class="text-cyan-400 font-bold font-orbitron">50%</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                        <span class="text-slate-300">Ahorro General:</span>
+                        <span class="text-emerald-400 font-bold font-orbitron">20%</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-amber-500/50">
+                        <span class="text-amber-300 font-bold">🛡️ Fondo de Emergencia (NUEVO):</span>
+                        <span class="text-amber-400 font-bold font-orbitron">10%</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                        <span class="text-slate-300">Inversión a Futuro:</span>
+                        <span class="text-purple-400 font-bold font-orbitron">10%</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                        <span class="text-slate-300">Diversión / Deseos:</span>
+                        <span class="text-pink-400 font-bold font-orbitron">10%</span>
+                    </div>
+                </div>
+
+                <button onclick="resolveLevel2Crisis()" class="w-full neon-btn border-amber-500 text-amber-300 font-orbitron text-xs py-3.5 rounded-xl font-bold uppercase tracking-wider">
+                    Activar Fondo de Emergencia y Superar Crisis 🛡️
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ================= LEVEL 3: EL DOMINIO DEL CRÉDITO ================= -->
+        <section id="lvl3Container" class="hidden glass-panel neon-border p-5 sm:p-8 rounded-2xl max-w-3xl mx-auto w-full space-y-6">
+            <div class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-4 gap-2">
+                <div>
+                    <span class="bg-cyan-950 text-cyan-300 border border-cyan-500/50 px-3 py-1 rounded-full text-xs font-orbitron font-semibold">NIVEL 3</span>
+                    <h2 class="font-orbitron text-lg sm:text-xl font-bold text-white mt-1">EL DOMINIO DEL CRÉDITO Y TARJETAS</h2>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400 font-orbitron block">LÍMITE APROBADO</span>
+                    <span class="text-xs font-orbitron font-bold text-emerald-400">$600.00 (18% TEA)</span>
+                </div>
+            </div>
+
+            <!-- CREDIT CARD SIMULATOR CARD -->
+            <div class="bg-gradient-to-r from-purple-900 via-slate-900 to-indigo-950 p-5 rounded-2xl border-2 border-purple-500/60 shadow-xl space-y-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-[10px] font-orbitron text-purple-300 uppercase">TARJETA CRÉDITO EXECUTIVE</div>
+                        <div id="creditCardHolderName" class="font-orbitron text-sm font-bold text-white">Alex Valoria</div>
+                    </div>
+                    <i class="fa-brands fa-cc-visa text-3xl text-cyan-400"></i>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-slate-950/60 p-3 rounded-xl border border-purple-500/30">
+                    <div>
+                        <span class="text-slate-400 block text-[10px]">DEUDA ACUMULADA:</span>
+                        <span id="ccBalance" class="text-pink-400 font-bold text-sm">$180.00</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px]">INTERÉS MENSUAL (1.5%):</span>
+                        <span id="ccInterest" class="text-amber-400 font-bold text-sm">$2.70</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 space-y-4">
+                <h3 class="font-orbitron text-xs text-cyan-400 uppercase tracking-wider">
+                    REAJUSTA TU PRESUPUESTO MENSUAL PARA SALDAR LA TARJETA Y MANTENER EL BIENESTAR:
+                </h3>
+
+                <div class="space-y-3 font-mono text-xs">
+                    <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                        <span class="text-slate-300">Pago Total Tarjeta + Intereses:</span>
+                        <span id="ccPaymentRequired" class="text-pink-400 font-bold font-orbitron">$182.70</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 italic">
+                        💡 Para pagar esta cuota sin sobreendeudarte, reasigna el gasto desde tu cuota de <strong>Diversión (10%)</strong> y ajusta tus deseos.
+                    </p>
+                </div>
+
+                <button onclick="payCreditCardBill()" class="w-full neon-btn text-cyan-300 font-orbitron text-xs py-3.5 rounded-xl font-bold uppercase tracking-wider">
+                    Saldar Deuda Tarjeta de Crédito 💳
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ================= LEVEL 4: FORJA DE INVERSIONES Y PORTAFOLIO ================= -->
+        <section id="lvl4Container" class="hidden glass-panel neon-border-gold p-5 sm:p-8 rounded-2xl max-w-3xl mx-auto w-full space-y-6">
+            <div class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-4 gap-2">
+                <div>
+                    <span class="bg-amber-950 text-amber-300 border border-amber-500/50 px-3 py-1 rounded-full text-xs font-orbitron font-semibold">NIVEL 4</span>
+                    <h2 class="font-orbitron text-lg sm:text-xl font-bold text-white mt-1">FORJA DE INVERSIONES Y PORTAFOLIO</h2>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400 font-orbitron block">CUOTA DISPONIBLE (10% INVERSIÓN)</span>
+                    <span id="investQuotaVal" class="text-xs font-orbitron font-bold text-amber-400">$60.00 / mes</span>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <p class="text-xs text-slate-300 font-mono">
+                    Distribuye tu cuota mensual de inversión entre 3 activos con diferentes niveles de riesgo y rendimiento proyectado a 5 años.
+                </p>
+
+                <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 space-y-4 font-mono text-xs">
+                    <div class="space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-cyan-300 font-semibold">🏛️ ETFs & Fondos Indexados (Bajo/Medio Riesgo - 8% anual):</span>
+                            <span id="pctETF" class="text-cyan-400 font-bold">50%</span>
+                        </div>
+                        <input type="range" id="sliderETF" min="0" max="100" value="50" oninput="updatePortfolioSliders()" class="w-full accent-cyan-400 cursor-pointer">
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-purple-300 font-semibold">📈 Acciones Tecnológicas (Riesgo Medio - 14% anual):</span>
+                            <span id="pctStocks" class="text-purple-400 font-bold">30%</span>
+                        </div>
+                        <input type="range" id="sliderStocks" min="0" max="100" value="30" oninput="updatePortfolioSliders()" class="w-full accent-purple-400 cursor-pointer">
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-amber-300 font-semibold">🚀 Criptoactivos & Web3 (Alto Riesgo / Volatilidad):</span>
+                            <span id="pctCrypto" class="text-amber-400 font-bold">20%</span>
+                        </div>
+                        <input type="range" id="sliderCrypto" min="0" max="100" value="20" oninput="updatePortfolioSliders()" class="w-full accent-amber-400 cursor-pointer">
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-amber-500/40 text-center space-y-1">
+                    <span class="text-[10px] font-orbitron text-slate-400 uppercase">PROYECCIÓN DE PORTAFOLIO A 5 AÑOS (INTERÉS COMPUESTO)</span>
+                    <div id="projectedPortfolioVal" class="font-orbitron font-black text-2xl text-amber-400">$4,850.00</div>
+                    <p class="text-[11px] text-emerald-400 font-mono">Aportando mensualmente tu 10% de inversión sin interrumpir el proceso.</p>
+                </div>
+
+                <button onclick="confirmPortfolioLevel4()" class="w-full neon-btn border-amber-500 text-amber-300 font-orbitron text-xs py-3.5 rounded-xl font-bold uppercase tracking-wider">
+                    Confirmar Portafolio de Inversión 🚀
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ================= LEVEL 5: METAS DE CORTO Y LARGO PLAZO ================= -->
+        <section id="lvl5Container" class="hidden glass-panel neon-border p-5 sm:p-8 rounded-2xl max-w-3xl mx-auto w-full space-y-6">
+            <div class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-4 gap-2">
+                <div>
+                    <span class="bg-purple-950 text-purple-300 border border-purple-500/50 px-3 py-1 rounded-full text-xs font-orbitron font-semibold">NIVEL 5</span>
+                    <h2 class="font-orbitron text-lg sm:text-xl font-bold text-white mt-1">METAS DE CORTO Y LARGO PLAZO</h2>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400 font-orbitron block">CAPACIDAD DE AHORRO (20%)</span>
+                    <span id="savingsCapacityVal" class="text-xs font-orbitron font-bold text-emerald-400">$120.00 / mes</span>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-cyan-500/40 space-y-3">
+                        <span class="text-xs font-orbitron text-cyan-400 font-bold block">🎯 META CORTO PLAZO (3-6 meses)</span>
+                        <div>
+                            <label class="text-[11px] text-slate-400 block mb-1">Nombre de la Meta:</label>
+                            <input type="text" id="goalShortTitle" value="Capacitación / Especialización" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-xs text-cyan-300">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-slate-400 block mb-1">Costo Objetivo ($):</label>
+                            <input type="number" id="goalShortCost" value="360" onchange="calculateGoalsTime()" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-xs text-cyan-300">
+                        </div>
+                        <div class="text-xs text-slate-300 font-mono">
+                            Tiempo estimado: <strong id="timeShortGoal" class="text-cyan-400">3 meses</strong>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/90 p-4 rounded-xl border border-purple-500/40 space-y-3">
+                        <span class="text-xs font-orbitron text-purple-400 font-bold block">🚀 META LARGO PLAZO (2-3 años)</span>
+                        <div>
+                            <label class="text-[11px] text-slate-400 block mb-1">Nombre de la Meta:</label>
+                            <input type="text" id="goalLongTitle" value="Fondo de Emprendimiento Corporativo" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-xs text-purple-300">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-slate-400 block mb-1">Costo Objetivo ($):</label>
+                            <input type="number" id="goalLongCost" value="2400" onchange="calculateGoalsTime()" class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-xs text-purple-300">
+                        </div>
+                        <div class="text-xs text-slate-300 font-mono">
+                            Tiempo estimado: <strong id="timeLongGoal" class="text-purple-400">20 meses</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="confirmGoalsLevel5()" class="w-full neon-btn text-cyan-300 font-orbitron text-xs py-3.5 rounded-xl font-bold uppercase tracking-wider">
+                    Automatizar Mis Metas de Ahorro 🎯
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ================= LEVEL 6: EL ARTE DE DISFRUTAR (BAZAR DIVERSIÓN) ================= -->
+        <section id="lvl6Container" class="hidden glass-panel neon-border-pink p-5 sm:p-8 rounded-2xl max-w-3xl mx-auto w-full space-y-6">
+            <div class="flex flex-wrap justify-between items-center border-b border-slate-800 pb-4 gap-2">
+                <div>
+                    <span class="bg-pink-950 text-pink-300 border border-pink-500/50 px-3 py-1 rounded-full text-xs font-orbitron font-semibold">NIVEL 6</span>
+                    <h2 class="font-orbitron text-lg sm:text-xl font-bold text-white mt-1">EL ARTE DE DISFRUTAR SIN CULPA</h2>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-slate-400 font-orbitron block">MONEDAS DE INCENTIVO</span>
+                    <span id="marketCoinsVal" class="text-xs font-orbitron font-bold text-amber-400">🪙 150 Monedas</span>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-300 font-mono">
+                ¡Felicidades por planificar bien tu presupuesto! Utiliza tu 10% de Diversión y tus Monedas VIDA ganadas para canjear recompensas de bienestar sin culpa ni deudas.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-slate-900 p-4 rounded-xl border border-pink-500/30 text-center space-y-2">
+                    <div class="text-3xl">🎟️</div>
+                    <h4 class="font-orbitron text-xs text-pink-300 font-bold">Entrada a Concierto / Festival</h4>
+                    <span class="text-xs text-amber-400 font-mono block">🪙 50 Monedas</span>
+                    <button onclick="buyMarketReward('Concierto', 50)" class="w-full neon-btn border-pink-500 text-pink-300 font-orbitron text-[10px] py-2 rounded-lg">Canjear</button>
+                </div>
+
+                <div class="bg-slate-900 p-4 rounded-xl border border-pink-500/30 text-center space-y-2">
+                    <div class="text-3xl">✈️</div>
+                    <h4 class="font-orbitron text-xs text-pink-300 font-bold">Viaje de Fin de Semana</h4>
+                    <span class="text-xs text-amber-400 font-mono block">🪙 80 Monedas</span>
+                    <button onclick="buyMarketReward('Viaje', 80)" class="w-full neon-btn border-pink-500 text-pink-300 font-orbitron text-[10px] py-2 rounded-lg">Canjear</button>
+                </div>
+
+                <div class="bg-slate-900 p-4 rounded-xl border border-pink-500/30 text-center space-y-2">
+                    <div class="text-3xl">🎮</div>
+                    <h4 class="font-orbitron text-xs text-pink-300 font-bold">Pase VIP Gamer / Evento</h4>
+                    <span class="text-xs text-amber-400 font-mono block">🪙 40 Monedas</span>
+                    <button onclick="buyMarketReward('Pase Gamer', 40)" class="w-full neon-btn border-pink-500 text-pink-300 font-orbitron text-[10px] py-2 rounded-lg">Canjear</button>
+                </div>
+            </div>
+
+            <button onclick="completeLevel6()" class="w-full neon-btn text-cyan-300 font-orbitron text-xs py-3.5 rounded-xl font-bold uppercase tracking-wider">
+                Avanzar a la Fase Final: Libertad Financiera 🚀
+            </button>
+        </section>
+
+
+        <!-- ================= LEVEL 7: LA CIMA DE LA LIBERTAD & CERTIFICADO ================= -->
+        <section id="lvl7Container" class="hidden glass-panel neon-border-gold p-5 sm:p-8 rounded-2xl max-w-3xl mx-auto w-full space-y-6">
+            <div class="text-center space-y-2">
+                <span class="bg-amber-950 text-amber-300 border border-amber-500/50 px-3 py-1 rounded-full text-xs font-orbitron font-semibold">
+                    NIVEL 7: CAPSTONE FINAL
+                </span>
+                <h2 class="font-orbitron text-xl sm:text-2xl font-black text-amber-400">
+                    LA CIMA DE LA LIBERTAD FINANCIERA
+                </h2>
+                <p class="text-slate-300 text-xs font-mono">
+                    Ajustar el presupuesto es clave, pero <strong>crear múltiples fuentes de ingreso</strong> expande de forma exponencial tu bienestar y futuro.
+                </p>
+            </div>
+
+            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-3">
+                <h3 class="font-orbitron text-xs text-cyan-400 uppercase tracking-wider">
+                    CREA TU SEGUNDA FUENTE DE INGRESO (PROYECTO SECUNDARIO):
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono" id="sideHustleOptions">
+                    <!-- Dynamic side hustle options -->
+                </div>
+            </div>
+
+            <div id="certificateCard" class="bg-gradient-to-b from-slate-950 via-purple-950/40 to-slate-950 p-6 rounded-2xl border-2 border-amber-400/80 shadow-2xl text-center space-y-4">
+                <div class="flex justify-between items-center text-xs font-orbitron text-amber-400">
+                    <span>📜 CERTIFICADO DE EXCELENCIA</span>
+                    <span>METODOLOGÍA REGLA VIDA</span>
+                </div>
+
+                <div class="space-y-1">
+                    <h3 id="certPlayerName" class="font-orbitron text-xl font-black text-white">Alex Valoria</h3>
+                    <p id="certRole" class="text-xs text-cyan-300 font-mono">Profesión: Gerente de Proyectos & Innovación</p>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-center font-mono">
+                    <div>
+                        <span class="text-[9px] text-slate-400 block">BIENESTAR</span>
+                        <span id="certWellbeing" class="text-emerald-400 font-bold font-orbitron text-sm">100%</span>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-slate-400 block">PATRIMONIO PROYECTADO</span>
+                        <span id="certNetWorth" class="text-amber-400 font-bold font-orbitron text-sm">$7,800</span>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-slate-400 block">FUENTES DE INGRESO</span>
+                        <span id="certIncomes" class="text-cyan-400 font-bold font-orbitron text-sm">2 Activas</span>
+                    </div>
+                </div>
+
+                <p id="certFeedback" class="text-xs text-slate-300 leading-relaxed font-mono italic">
+                    "Demostraste un dominio excepcional de la Regla VIDA, clasificando correctamente tus desembolsos, protegiendo tu dinero con un Fondo de Emergencia y creando un portafolio de inversión sólido."
+                </p>
+            </div>
+
+            <button onclick="location.reload()" class="w-full neon-btn text-amber-300 font-orbitron text-xs py-4 rounded-xl font-bold uppercase tracking-widest">
+                🔄 Jugar Nueva Partida con Otra Profesión
+            </button>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 border-t border-slate-800 py-3 px-4 text-center text-[11px] text-slate-500 font-mono">
+        Regla VIDA • Metodología de Educación Financiera para Jóvenes
+    </footer>
+
+
+    <!-- ================= JAVASCRIPT GAME ENGINE ================= -->
+    <script>
+        // ================= WEB AUDIO SYNTHESIZER =================
+        let soundOn = true;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function playSfx(type) {
+            if (!soundOn) return;
+            try {
+                if (!audioCtx) audioCtx = new AudioCtx();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'coin') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(987, now);
+                    osc.frequency.setValueAtTime(1318, now + 0.08);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === 'bad') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.linearRampToValueAtTime(110, now + 0.2);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === 'levelup') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(523, now);
+                    osc.frequency.setValueAtTime(659, now + 0.1);
+                    osc.frequency.setValueAtTime(783, now + 0.2);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                }
+            } catch (e) {}
+        }
+
+        function toggleAudio() {
+            soundOn = !soundOn;
+            document.getElementById('btnAudioToggle').innerText = soundOn ? '🔊 ON' : '🔇 OFF';
+            if (soundOn) playSfx('click');
+        }
+
+
+        // ================= EXTENDED PROFESSIONS DATA =================
+        const INTEREST_PROFESSIONS = [
+            { id: 'tech_dir', title: '💻 Dirección & Tech', role: 'Director/a de Tecnología', salary: 650 },
+            { id: 'proj_mgr', title: '📊 Gerencia & Proyectos', role: 'Gerente de Proyectos & Innovación', salary: 580 },
+            { id: 'admin', title: '🏢 Administración & Finanzas', role: 'Administrador/a de Empresas', salary: 520 },
+            { id: 'mkt_dir', title: '🚀 Estrategia & Marketing', role: 'Director/a de Estrategia Digital', salary: 540 },
+            { id: 'ui_lead', title: '🎨 Diseño & Producto', role: 'Lead UI/UX Manager', salary: 490 },
+            { id: 'e_sports', title: '🎮 Gaming & Entretenimiento', role: 'Director/a de Contenido eSports', salary: 460 }
+        ];
+
+        // ================= PRE-DETERMINED CATALOG OF DISBURSEMENTS =================
+        const CATALOG_DISBURSEMENTS = [
+            { id: 'dis_rent', name: 'Alquiler de Vivienda / Habitación', cost: 220, trueType: 'need', icon: '🏠' },
+            { id: 'dis_food', name: 'Mercado Básico de Alimentos', cost: 120, trueType: 'need', icon: '🛒' },
+            { id: 'dis_util', name: 'Servicios Públicos (Luz, Agua, Gas)', cost: 45, trueType: 'need', icon: '💡' },
+            { id: 'dis_trans', name: 'Transporte Público / Traslados', cost: 35, trueType: 'need', icon: '🚌' },
+            { id: 'dis_net', name: 'Internet para Estudio y Trabajo', cost: 30, trueType: 'need', icon: '📡' },
+            { id: 'dis_med', name: 'Medicinas y Seguro Básico', cost: 25, trueType: 'need', icon: '🩺' },
+            { id: 'dis_stream', name: 'Suscripciones Streaming (Netflix/Spotify)', cost: 20, trueType: 'want', icon: '🎬' },
+            { id: 'dis_dine', name: 'Restaurantes y Salidas con Amigos', cost: 50, trueType: 'want', icon: '🍔' },
+            { id: 'dis_delivery', name: 'Comida por Delivery Frecuente', cost: 35, trueType: 'want', icon: '🛵' },
+            { id: 'dis_gym', name: 'Membresía de Gimnasio', cost: 30, trueType: 'want', icon: '🏋️' },
+            { id: 'dis_gaming', name: 'Pases de Juego y Consola', cost: 25, trueType: 'want', icon: '🎮' },
+            { id: 'dis_shoes', name: 'Zapatos / Ropa de Marca de Edición Limitada', cost: 60, trueType: 'want', icon: '👟' }
+        ];
+
+        let player = {
+            name: '',
+            interest: '',
+            profession: '',
+            salary: 500,
+            level: 0,
+            wellbeing: 80,
+            coins: 0,
+            secondaryIncome: 0,
+            assignedNeeds: [], // Array of item objects
+            assignedWants: [], // Array of item objects
+            portfolio: { etf: 50, stocks: 30, crypto: 20 },
+            goals: { short: { title: '', cost: 0 }, long: { title: '', cost: 0 } }
+        };
+
+
+        // ================= LEVEL 0: ONBOARDING =================
+        function initOnboardingUI() {
+            const container = document.getElementById('interestCardsContainer');
+            container.innerHTML = '';
+            INTEREST_PROFESSIONS.forEach((p, idx) => {
+                const checked = idx === 0 ? 'checked' : '';
+                container.innerHTML += `
+                    <label class="cursor-pointer">
+                        <input type="radio" name="interestGroup" value="${p.id}" ${checked} class="peer hidden">
+                        <div class="p-3 bg-slate-900 border border-slate-700 peer-checked:border-cyan-400 peer-checked:bg-cyan-950/40 rounded-xl transition hover:border-slate-500">
+                            <div class="font-orbitron text-xs text-cyan-300 font-bold">${p.title}</div>
+                            <div class="text-[11px] text-slate-400 mt-1">${p.role}</div>
+                            <div class="text-[10px] text-emerald-400 font-mono mt-0.5">Ingreso Base: $${p.salary}/mes</div>
+                        </div>
+                    </label>
+                `;
+            });
+        }
+
+        function completeOnboarding(e) {
+            e.preventDefault();
+            playSfx('levelup');
+
+            const name = document.getElementById('inputPlayerName').value.trim();
+            const selectedInterestId = document.querySelector('input[name="interestGroup"]:checked').value;
+            const matchedProf = INTEREST_PROFESSIONS.find(p => p.id === selectedInterestId);
+
+            player.name = name || 'Jugador';
+            player.interest = matchedProf.title;
+            player.profession = matchedProf.role;
+            player.salary = matchedProf.salary;
+            player.level = 1;
+
+            updateHUD();
+            renderLevel1Catalog();
+
+            document.getElementById('lvl0Container').classList.add('hidden');
+            document.getElementById('lvl1Container').classList.remove('hidden');
+        }
+
+        function updateHUD() {
+            document.getElementById('hudPlayerRole').innerText = `Jugador: ${player.name} (${player.profession})`;
+            document.getElementById('hudLevel').innerText = `${player.level} / 7`;
+            document.getElementById('hudWellbeingVal').innerText = `${player.wellbeing}%`;
+            document.getElementById('hudWellbeingBar').style.width = `${player.wellbeing}%`;
+            document.getElementById('hudCoins').innerText = player.coins;
+            document.getElementById('hudIncome').innerText = `$${player.salary + player.secondaryIncome}`;
+        }
+
+
+        // ================= LEVEL 1: DISBURSEMENT CATALOG & CLASSIFICATION =================
+        function renderLevel1Catalog() {
+            const catalogContainer = document.getElementById('catalogDisbursementsContainer');
+            catalogContainer.innerHTML = '';
+
+            document.getElementById('limit60ValueText').innerText = Math.round(player.salary * 0.60);
+
+            CATALOG_DISBURSEMENTS.forEach(item => {
+                const isAssigned = player.assignedNeeds.some(x => x.id === item.id) || player.assignedWants.some(x => x.id === item.id);
+
+                catalogContainer.innerHTML += `
+                    <div class="p-3 bg-slate-900 border ${isAssigned ? 'border-slate-800 opacity-60' : 'border-slate-700 hover:border-cyan-500'} rounded-xl transition flex justify-between items-center text-xs font-mono">
+                        <div>
+                            <span class="font-bold text-slate-200 block">${item.icon} ${item.name}</span>
+                            <span class="text-emerald-400 font-bold">$${item.cost}</span>
+                        </div>
+                        
+                        ${!isAssigned ? `
+                            <div class="flex gap-1">
+                                <button onclick="assignDisbursement('${item.id}', 'need')" class="px-2 py-1 bg-emerald-950 border border-emerald-500 text-emerald-300 rounded hover:bg-emerald-800 text-[10px] font-orbitron">
+                                    + Necesidad
+                                </button>
+                                <button onclick="assignDisbursement('${item.id}', 'want')" class="px-2 py-1 bg-pink-950 border border-pink-500 text-pink-300 rounded hover:bg-pink-800 text-[10px] font-orbitron">
+                                    + Deseo
+                                </button>
+                            </div>
+                        ` : `
+                            <span class="text-[10px] text-slate-500 font-orbitron italic">Asignado</span>
+                        `}
+                    </div>
+                `;
+            });
+
+            renderPlayerBoards();
+        }
+
+        function assignDisbursement(itemId, type) {
+            playSfx('click');
+            const item = CATALOG_DISBURSEMENTS.find(x => x.id === itemId);
+            if (!item) return;
+
+            if (type === 'need') {
+                player.assignedNeeds.push(item);
+            } else {
+                player.assignedWants.push(item);
+            }
+
+            renderLevel1Catalog();
+        }
+
+        function removeDisbursement(itemId, type) {
+            playSfx('click');
+            if (type === 'need') {
+                player.assignedNeeds = player.assignedNeeds.filter(x => x.id !== itemId);
+            } else {
+                player.assignedWants = player.assignedWants.filter(x => x.id !== itemId);
+            }
+
+            renderLevel1Catalog();
+        }
+
+        function renderPlayerBoards() {
+            const needsBoard = document.getElementById('boardNeedsList');
+            const wantsBoard = document.getElementById('boardWantsList');
+
+            needsBoard.innerHTML = '';
+            wantsBoard.innerHTML = '';
+
+            const totalNeeds = player.assignedNeeds.reduce((acc, curr) => acc + curr.cost, 0);
+            const totalWants = player.assignedWants.reduce((acc, curr) => acc + curr.cost, 0);
+
+            document.getElementById('boardNeedsSubtotal').innerText = `$${totalNeeds}`;
+            document.getElementById('boardWantsSubtotal').innerText = `$${totalWants}`;
+            document.getElementById('summaryTotalNeeds').innerText = `$${totalNeeds}`;
+
+            // RENDER NEEDS
+            if (player.assignedNeeds.length === 0) {
+                needsBoard.innerHTML = `<div class="text-[11px] text-slate-500 italic text-center py-4">Ningún desembolso asignado aquí</div>`;
+            } else {
+                player.assignedNeeds.forEach(item => {
+                    needsBoard.innerHTML += `
+                        <div class="p-2 bg-slate-950 border border-emerald-500/30 rounded flex justify-between items-center">
+                            <span>${item.icon} ${item.name}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-emerald-400 font-bold">$${item.cost}</span>
+                                <button onclick="removeDisbursement('${item.id}', 'need')" class="text-pink-400 hover:text-pink-300 text-xs">✕</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // RENDER WANTS
+            if (player.assignedWants.length === 0) {
+                wantsBoard.innerHTML = `<div class="text-[11px] text-slate-500 italic text-center py-4">Ningún desembolso asignado aquí</div>`;
+            } else {
+                player.assignedWants.forEach(item => {
+                    wantsBoard.innerHTML += `
+                        <div class="p-2 bg-slate-950 border border-pink-500/30 rounded flex justify-between items-center">
+                            <span>${item.icon} ${item.name}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-pink-400 font-bold">$${item.cost}</span>
+                                <button onclick="removeDisbursement('${item.id}', 'want')" class="text-pink-400 hover:text-pink-300 text-xs">✕</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // UPDATE REGLA VIDA AMOUNTS
+            const limit60 = Math.round(player.salary * 0.60);
+            document.getElementById('valAhorro').innerText = `$${Math.round(player.salary * 0.20)}`;
+            document.getElementById('valInversion').innerText = `$${Math.round(player.salary * 0.10)}`;
+            document.getElementById('valDiversion').innerText = `$${Math.round(player.salary * 0.10)}`;
+
+            // EVALUATE CLASSIFICATION & WELLBEING
+            evaluateClassificationFeedback(totalNeeds, limit60);
+        }
+
+        function evaluateClassificationFeedback(totalNeeds, limit60) {
+            const feedbackEl = document.getElementById('feedbackBanner');
+            let mistakes = 0;
+
+            // Check if player misclassified Wants as Needs
+            player.assignedNeeds.forEach(item => {
+                if (item.trueType === 'want') mistakes++;
+            });
+
+            if (mistakes > 0) {
+                player.wellbeing = Math.max(30, 80 - mistakes * 20);
+                feedbackEl.className = 'p-3 rounded-lg bg-pink-950/60 border border-pink-500/60 text-pink-200 text-xs font-mono';
+                feedbackEl.innerHTML = `⚠️ <strong>ALERTA DE CLASIFICACIÓN:</strong> Has marcado ${mistakes} desembolso(s) de deseo/estilo de vida como "Necesidad". Revisa tu lista para no inflar tus gastos fijos.`;
+            } else if (totalNeeds > limit60) {
+                player.wellbeing = Math.max(40, 80 - Math.floor((totalNeeds - limit60) / 10));
+                feedbackEl.className = 'p-3 rounded-lg bg-amber-950/60 border border-amber-500/60 text-amber-200 text-xs font-mono';
+                feedbackEl.innerHTML = `🚨 <strong>LÍMITE EXCEDIDO:</strong> Tus Necesidades sumadas ($${totalNeeds}) superan el 60% permitido ($${limit60}). Desmarca o ajusta algunos ítems.`;
+            } else if (player.assignedNeeds.length > 0) {
+                player.wellbeing = 100;
+                feedbackEl.className = 'p-3 rounded-lg bg-emerald-950/60 border border-emerald-500/60 text-emerald-200 text-xs font-mono';
+                feedbackEl.innerHTML = `✨ <strong>¡EXCELENTE CLASIFICACIÓN!</strong> Tus necesidades están dentro del límite del 60% de la Regla VIDA. ¡El Termómetro de Bienestar subió al máximo!`;
+            }
+
+            updateHUD();
+        }
+
+        function validateLevel1() {
+            const totalNeeds = player.assignedNeeds.reduce((acc, curr) => acc + curr.cost, 0);
+            const limit60 = Math.round(player.salary * 0.60);
+            const mistakes = player.assignedNeeds.filter(x => x.trueType === 'want').length;
+
+            if (mistakes === 0 && totalNeeds <= limit60 && player.assignedNeeds.length >= 3) {
+                playSfx('levelup');
+                player.coins += 60;
+                player.wellbeing = 100;
+                player.level = 2;
+                updateHUD();
+
+                document.getElementById('lvl1Container').classList.add('hidden');
+                document.getElementById('lvl2Container').classList.remove('hidden');
+            } else {
+                playSfx('bad');
+                alert("Para superar el Nivel 1 debes clasificar correctamente las Necesidades (sin incluir deseos) y asegurar que su suma no exceda el 60% de tu ingreso.");
+            }
+        }
+
+
+        // ================= LEVEL 2: CRISIS & EMERGENCY FUND =================
+        function resolveLevel2Crisis() {
+            playSfx('levelup');
+            player.coins += 40;
+            player.wellbeing = 95;
+            player.level = 3;
+            updateHUD();
+
+            document.getElementById('creditCardHolderName').innerText = player.name;
+            document.getElementById('lvl2Container').classList.add('hidden');
+            document.getElementById('lvl3Container').classList.remove('hidden');
+        }
+
+
+        // ================= LEVEL 3: CREDIT CARD MANAGEMENT =================
+        function payCreditCardBill() {
+            playSfx('levelup');
+            player.coins += 50;
+            player.wellbeing = 100;
+            player.level = 4;
+            updateHUD();
+
+            const investQuota = Math.round(player.salary * 0.10);
+            document.getElementById('investQuotaVal').innerText = `$${investQuota}.00 / mes`;
+
+            document.getElementById('lvl3Container').classList.add('hidden');
+            document.getElementById('lvl4Container').classList.remove('hidden');
+            updatePortfolioSliders();
+        }
+
+
+        // ================= LEVEL 4: PORTFOLIO & COMPOUND INTEREST =================
+        function updatePortfolioSliders() {
+            let etf = parseInt(document.getElementById('sliderETF').value);
+            let stocks = parseInt(document.getElementById('sliderStocks').value);
+            let crypto = parseInt(document.getElementById('sliderCrypto').value);
+
+            document.getElementById('pctETF').innerText = `${etf}%`;
+            document.getElementById('pctStocks').innerText = `${stocks}%`;
+            document.getElementById('pctCrypto').innerText = `${crypto}%`;
+
+            player.portfolio = { etf, stocks, crypto };
+
+            const monthlyQuota = player.salary * 0.10;
+            const weightedReturn = (etf * 0.08 + stocks * 0.14 + crypto * 0.25) / 100;
+            const r = weightedReturn / 12;
+            const n = 60;
+
+            let fv = 0;
+            for (let m = 0; m < n; m++) {
+                fv = (fv + monthlyQuota) * (1 + r);
+            }
+
+            document.getElementById('projectedPortfolioVal').innerText = `$${Math.round(fv).toLocaleString()}.00`;
+        }
+
+        function confirmPortfolioLevel4() {
+            playSfx('levelup');
+            player.coins += 60;
+            player.level = 5;
+            updateHUD();
+
+            const savingsQuota = Math.round(player.salary * 0.20);
+            document.getElementById('savingsCapacityVal').innerText = `$${savingsQuota}.00 / mes`;
+            calculateGoalsTime();
+
+            document.getElementById('lvl4Container').classList.add('hidden');
+            document.getElementById('lvl5Container').classList.remove('hidden');
+        }
+
+
+        // ================= LEVEL 5: FINANCIAL GOALS =================
+        function calculateGoalsTime() {
+            const savingsQuota = player.salary * 0.20;
+            const shortCost = parseFloat(document.getElementById('goalShortCost').value) || 1;
+            const longCost = parseFloat(document.getElementById('goalLongCost').value) || 1;
+
+            const monthsShort = Math.ceil(shortCost / savingsQuota);
+            const monthsLong = Math.ceil(longCost / savingsQuota);
+
+            document.getElementById('timeShortGoal').innerText = `${monthsShort} meses`;
+            document.getElementById('timeLongGoal').innerText = `${monthsLong} meses`;
+        }
+
+        function confirmGoalsLevel5() {
+            playSfx('levelup');
+            player.coins += 50;
+            player.level = 6;
+            updateHUD();
+
+            document.getElementById('marketCoinsVal').innerText = `🪙 ${player.coins} Monedas`;
+
+            document.getElementById('lvl5Container').classList.add('hidden');
+            document.getElementById('lvl6Container').classList.remove('hidden');
+        }
+
+
+        // ================= LEVEL 6: REWARD MARKETPLACE =================
+        function buyMarketReward(title, cost) {
+            if (player.coins >= cost) {
+                playSfx('coin');
+                player.coins -= cost;
+                player.wellbeing = 100;
+                updateHUD();
+                document.getElementById('marketCoinsVal').innerText = `🪙 ${player.coins} Monedas`;
+                alert(`¡Canjeaste "${title}"! Disfrutaste con la Regla VIDA sin culpa.`);
+            } else {
+                playSfx('bad');
+                alert("Necesitas más Monedas de Incentivo para canjear esta recompensa.");
+            }
+        }
+
+        function completeLevel6() {
+            playSfx('levelup');
+            player.level = 7;
+            updateHUD();
+
+            const sideHustleBox = document.getElementById('sideHustleOptions');
+            sideHustleBox.innerHTML = `
+                <button onclick="addSideHustle(180, 'Consultoría de Liderazgo')" class="p-3 bg-slate-950 border border-cyan-500/40 hover:border-cyan-400 rounded-xl text-left">
+                    <div class="font-orbitron font-bold text-cyan-300">💼 Consultoría o Mentoría</div>
+                    <div class="text-[10px] text-slate-400">+ $180/mes adicionales</div>
+                </button>
+                <button onclick="addSideHustle(250, 'Startup o Producto Digital')" class="p-3 bg-slate-950 border border-purple-500/40 hover:border-purple-400 rounded-xl text-left">
+                    <div class="font-orbitron font-bold text-purple-300">📦 Startup o Producto Digital</div>
+                    <div class="text-[10px] text-slate-400">+ $250/mes adicionales</div>
+                </button>
+            `;
+
+            document.getElementById('certPlayerName').innerText = player.name;
+            document.getElementById('certRole').innerText = `Profesión: ${player.profession}`;
+
+            document.getElementById('lvl6Container').classList.add('hidden');
+            document.getElementById('lvl7Container').classList.remove('hidden');
+        }
+
+
+        // ================= LEVEL 7: CAPSTONE & CERTIFICATE =================
+        function addSideHustle(bonus, title) {
+            playSfx('coin');
+            player.secondaryIncome = bonus;
+            updateHUD();
+
+            document.getElementById('certNetWorth').innerText = `$${(player.salary + bonus) * 12}`;
+            document.getElementById('certIncomes').innerText = `2 (${player.profession} + ${title})`;
+            alert(`¡Activaste tu segunda fuente de ingreso! Tu capacidad financiera aumentó.`);
+        }
+
+
+        // INITIALIZE APP ON LOAD
+        window.onload = function() {
+            initOnboardingUI();
+        };
+    </script>
+</body>
+</html>

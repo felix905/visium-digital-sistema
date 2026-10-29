@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta Financiera · Visium Digital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen p-4 bg-slate-50 font-sans text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- HEADER con logo -->
+    <header class="sticky top-0 z-50 pt-2 pb-3">
+        <div class="container mx-auto px-4">
+            <nav class="flex items-center justify-between text-sm font-normal bg-white/80 py-3 pl-2 pr-4 backdrop-blur-md rounded-xl shadow-sm border border-gray-100">
+                <a href="index.html" class="flex items-center">
+                    <img src="img/logo_v.svg" alt="Visium Digital" class="ml-3 h-7" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'font-bold text-emerald-600 text-lg\'>Visium Digital</span>'">
+                </a>
+                <div class="hidden md:block text-right">
+                    <div class="text-sm font-normal text-gray-800 leading-tight">Escuela de diseño</div>
+                    <div class="text-sm font-normal text-gray-800 leading-tight">e innovación</div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+  
+
+    <!-- FOOTER -->
+    <footer class="mt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 border-t border-gray-300">
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Visium Digital</h3>
+                    <p class="text-gray-600 text-sm">Escuela de diseño e innovación</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Contactos</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-brand-whatsapp"></i> (+58) 424 152 9071
+                        </li>
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-mail"></i> visiumdigitalca@gmail.com
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Síguenos</h3>
+                    <div class="flex space-x-3">
+                        <a href="https://www.instagram.com/visium.digital.c.a/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-instagram text-xl"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/visium-digital/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-500">© 2025 Visium Digital</p>
+            </div>
+        </div>
+    </footer>
+
+   
+</body>
+</html>
