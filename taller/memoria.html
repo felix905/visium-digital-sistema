@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memoria · Visium Digital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <!-- Lucide Icons (for the game) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        },
+                        dark: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilos de Flip Card */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Card Glow Animations */
+        .card-matched {
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
+            border-color: #22c55e !important;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Ajuste para que el tablero no se desborde */
+        #game-board {
+            transition: all 0.3s ease;
+        }
+
+        /* Pequeño ajuste para que los iconos de Lucide se vean bien en tamaño pequeño */
+        .icon-sm svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 font-sans text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- HEADER con logo (Visium Digital) -->
+    <header class="sticky top-0 z-50 pt-2 pb-3">
+        <div class="container mx-auto px-4">
+            <nav class="flex items-center justify-between text-sm font-normal bg-white/80 py-3 pl-2 pr-4 backdrop-blur-md rounded-xl shadow-sm border border-gray-100">
+                <a href="index.html" class="flex items-center">
+                    <img src="img/logo_v.svg" alt="Visium Digital" class="ml-3 h-7" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'font-bold text-emerald-600 text-lg\'>Visium Digital</span>'">
+                </a>
+                <div class="hidden md:block text-right">
+                    <div class="text-sm font-normal text-gray-800 leading-tight">Escuela de diseño</div>
+                    <div class="text-sm font-normal text-gray-800 leading-tight">e innovación</div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL: JUEGO FinMemory INTEGRADO -->
+    <main class="container mx-auto px-4 py-6 flex-1 w-full max-w-7xl">
+
+        <!-- Barra de Pestañas y Título del Juego -->
+        <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold text-slate-800 flex items-center gap-2">
+                    <i class="ti ti-brain text-emerald-600"></i> FinMemory
+                </h1>
+                <p class="text-slate-500 text-sm mt-1">Aprende conceptos clave asociando ideas e imágenes</p>
+            </div>
+            <!-- Navegación de Pestañas -->
+            <div class="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm self-start md:self-center">
+                <button id="btn-tab-game" onclick="switchTab('game')" class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-emerald-600 text-white shadow-md">
+                    <i class="ti ti-gamepad-2 text-lg"></i>
+                    <span>Juego</span>
+                </button>
+                <button id="btn-tab-wiki" onclick="switchTab('wiki')" class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-500 hover:text-slate-800 hover:bg-gray-100">
+                    <i class="ti ti-book-open text-lg"></i>
+                    <span>Glosario (<span id="wiki-count">0</span>)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- VISTA DE JUEGO -->
+        <section id="tab-game" class="space-y-6">
+
+            <!-- Dashboard de Métricas y Controles -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+                <div class="glass-panel p-3.5 sm:p-4 rounded-2xl flex items-center gap-3 bg-white/80 border border-gray-200 shadow-sm">
+                    <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
+                        <i data-lucide="timer" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 font-medium block">Tiempo</span>
+                        <span id="timer-display" class="text-lg sm:text-xl font-bold font-mono text-slate-800">00:00</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-3.5 sm:p-4 rounded-2xl flex items-center gap-3 bg-white/80 border border-gray-200 shadow-sm">
+                    <div class="p-3 bg-amber-100 text-amber-600 rounded-xl">
+                        <i data-lucide="footprints" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 font-medium block">Movimientos</span>
+                        <span id="moves-display" class="text-lg sm:text-xl font-bold font-mono text-slate-800">0</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-3.5 sm:p-4 rounded-2xl flex items-center gap-3 bg-white/80 border border-gray-200 shadow-sm">
+                    <div class="p-3 bg-emerald-100 text-emerald-600 rounded-xl">
+                        <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 font-medium block">Parejas</span>
+                        <span id="pairs-display" class="text-lg sm:text-xl font-bold font-mono text-slate-800">0 / 10</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-3.5 sm:p-4 rounded-2xl flex items-center gap-3 bg-white/80 border border-gray-200 shadow-sm">
+                    <div class="p-3 bg-purple-100 text-purple-600 rounded-xl">
+                        <i data-lucide="trophy" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs text-slate-500 font-medium block">Puntuación</span>
+                        <span id="score-display" class="text-lg sm:text-xl font-bold font-mono text-slate-800">0 pts</span>
+                    </div>
+                </div>
+
+                <!-- Botón Reiniciar -->
+                <div class="col-span-2 md:col-span-1 glass-panel p-2 rounded-2xl flex items-center justify-center bg-white/80 border border-gray-200 shadow-sm">
+                    <button onclick="resetGame()" class="w-full h-full bg-slate-800 hover:bg-slate-700 active:scale-[0.98] border border-slate-700 text-white font-semibold rounded-xl py-2 px-4 flex items-center justify-center gap-2 transition-all shadow-md">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        <span>Reiniciar Juego</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tablero del Juego (Grid) -->
+            <div id="game-board" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 transition-all duration-300">
+                <!-- Tarjetas dinámicas generadas mediante JS -->
+            </div>
+        </section>
+
+        <!-- VISTA DE GLOSARIO / CONCEPTOS (Wiki) -->
+        <section id="tab-wiki" class="hidden space-y-6">
+            <div class="glass-panel p-6 rounded-2xl border border-gray-200 bg-white/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-1">Enciclopedia Financiera & Cripto</h2>
+                    <p class="text-slate-500 text-sm">Estudia las asociaciones conceptuales e imágenes representativas que aparecen en el juego.</p>
+                </div>
+                <div class="relative min-w-[240px]">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="wiki-search" oninput="filterWiki()" placeholder="Buscar concepto..." class="w-full bg-white border border-gray-300 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:border-emerald-500 transition-colors">
+                </div>
+            </div>
+
+            <div id="wiki-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Se poblará dinámicamente -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal de Victoria -->
+    <div id="win-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel max-w-md w-full p-6 sm:p-8 rounded-3xl border border-gray-200 bg-white shadow-2xl text-center scale-95 transition-transform duration-300" id="win-modal-card">
+            <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-5 border border-emerald-200">
+                <i data-lucide="party-popper" class="w-10 h-10 animate-bounce"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-slate-800 mb-2">¡Felicitaciones! 🎉</h3>
+            <p class="text-slate-500 text-sm mb-6">Has completado todas las asociaciones del tablero con éxito.</p>
+
+            <div class="bg-slate-50 rounded-2xl p-4 border border-gray-200 space-y-3 mb-6">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-500">Tiempo Final:</span>
+                    <span id="final-time" class="font-bold font-mono text-slate-800">00:00</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-500">Movimientos Usados:</span>
+                    <span id="final-moves" class="font-bold font-mono text-slate-800">0</span>
+                </div>
+                <div class="flex justify-between items-center text-sm border-t border-gray-200 pt-2">
+                    <span class="text-emerald-600 font-semibold">Puntuación Total:</span>
+                    <span id="final-score" class="font-extrabold font-mono text-emerald-600 text-lg">0 pts</span>
+                </div>
+            </div>
+
+            <button onclick="closeModal(); resetGame();" class="w-full bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400 text-white font-bold py-3.5 px-6 rounded-xl transition-all shadow-lg shadow-emerald-500/25 active:scale-[0.98]">
+                ¡Jugar de Nuevo!
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER (Visium Digital) -->
+    <footer class="mt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 border-t border-gray-300">
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Visium Digital</h3>
+                    <p class="text-gray-600 text-sm">Escuela de diseño e innovación</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Contactos</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-brand-whatsapp"></i> (+58) 424 152 9071
+                        </li>
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-mail"></i> visiumdigitalca@gmail.com
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Síguenos</h3>
+                    <div class="flex space-x-3">
+                        <a href="https://www.instagram.com/visium.digital.c.a/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-instagram text-xl"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/visium-digital/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-500">© 2025 Visium Digital</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPT PRINCIPAL CON LA LÓGICA Y DATOS DEL JUEGO -->
+    <script>
+        // === BASE DE DATOS DE CONCEPTOS Y SIMBOLOGÍA ===
+        const FIN_CONCEPTS = [
+            {
+                id: 'dinero',
+                title: 'El Dinero',
+                category: 'Fundamentos',
+                conceptText: 'Herramienta de propósito y metas que se siembra con el ahorro para construir el futuro.',
+                icons: ['hammer', 'compass', 'sprout'],
+                iconLabel: 'Martillo, Brújula y Semillas',
+                description: 'Construcción (Martillo), orientación a metas (Brújula) y siembra (Semillas).'
+            },
+            {
+                id: 'criptomonedas',
+                title: 'Criptomonedas',
+                category: 'Tecnología',
+                conceptText: 'Dinero digital respaldado por código criptográfico almacenado en la red blockchain.',
+                icons: ['coins', 'code-2', 'cpu'],
+                iconLabel: 'Moneda Digital con Código',
+                description: 'Activo digital programable y descentralizado.'
+            },
+            {
+                id: 'interes-compuesto',
+                title: 'Interés Compuesto',
+                category: 'Inversión',
+                conceptText: 'El efecto bola de nieve en el tiempo: intereses generando más intereses de forma exponencial.',
+                icons: ['snowflake', 'trending-up', 'clock'],
+                iconLabel: 'Bola de Nieve Aumentando',
+                description: 'Crecimiento acumulativo a lo largo del tiempo.'
+            },
+            {
+                id: 'blockchain',
+                title: 'Blockchain',
+                category: 'Tecnología',
+                conceptText: 'Cadena de bloques descentralizada, transparente e inmutable para registro de transacciones.',
+                icons: ['link', 'blocks', 'lock'],
+                iconLabel: 'Bloques Encadenados',
+                description: 'Red inmutable de información interconectada.'
+            },
+            {
+                id: 'activo',
+                title: 'Qué es un Activo',
+                category: 'Contabilidad',
+                conceptText: 'Conjunto de todos los bienes, recursos y derechos financieros con valor económico que posee una entidad.',
+                icons: ['building-2', 'wallet', 'file-check'],
+                iconLabel: 'Bienes y Derechos Financieros',
+                description: 'Propiedades, capital disponible y derechos de cobro.'
+            },
+            {
+                id: 'pasivo',
+                title: 'Qué es un Pasivo',
+                category: 'Contabilidad',
+                conceptText: 'Todas las deudas, compromisos y obligaciones financieras pendientes por pagar a terceros.',
+                icons: ['receipt-text', 'file-warning', 'arrow-up-right'],
+                iconLabel: 'Deudas y Obligaciones Pendientes',
+                description: 'Compromisos de pago y financiamiento externo.'
+            },
+            {
+                id: 'patrimonio',
+                title: 'Qué es el Patrimonio',
+                category: 'Contabilidad',
+                conceptText: 'Valor neto constituido por los aportes iniciales de los socios sumados al resultado del ejercicio financiero.',
+                icons: ['scale', 'users', 'pie-chart'],
+                iconLabel: 'Aportes de Socios y Resultados',
+                description: 'Capital social invertido + ganancias/pérdidas acumuladas.'
+            },
+            {
+                id: 'necesidad-deseo',
+                title: 'Necesidad vs. Deseo',
+                category: 'Finanzas Personales',
+                conceptText: 'Diferenciar entre lo esencial vital (Agua/Alimentos) frente a gastos prescindibles o entretenimiento (Salida de cine, Diamante/Gafas de sol).',
+                icons: ['apple', 'ticket', 'gem'],
+                iconLabel: 'Agua/Alimento vs Cine y Lujos',
+                description: 'Indispensable para vivir vs. consumos opcionales de entretenimiento o lujo.'
+            },
+            {
+                id: 'credito',
+                title: 'Qué es el Crédito',
+                category: 'Finanzas Personales',
+                conceptText: 'Dinero prestado por una institución o persona que genera confianza y compromiso de pago a futuro.',
+                icons: ['handshake', 'clock', 'credit-card'],
+                iconLabel: 'Apretón de Manos, Reloj y Tarjeta',
+                description: 'Confianza otorgada con acuerdo de devolución en el tiempo.'
+            },
+            {
+                id: 'trump-logro',
+                title: 'Donald Trump',
+                category: 'Grandes Fortunas',
+                conceptText: 'Presidente de los Estados Unidos cuyo patrimonio se ha triplicado significativamente tras las elecciones.',
+                icons: ['flag', 'landmark', 'trending-up'],
+                iconLabel: 'Presidente EE.UU. y Patrimonio Triplicado',
+                description: 'Impacto electoral y revalorización exponencial de su patrimonio.'
+            },
+            {
+                id: 'musk-logro',
+                title: 'Elon Musk',
+                category: 'Grandes Fortunas',
+                conceptText: 'Magnate tecnológico, fundador y dueño de Tesla, revolucionando la industria automotriz y espacial.',
+                icons: ['zap', 'car', 'rocket'],
+                iconLabel: 'Dueño de Tesla e Innovador',
+                description: 'Liderazgo en vehículos eléctricos y tecnología avanzada.'
+            },
+            {
+                id: 'zuckerberg-logro',
+                title: 'Mark Zuckerberg',
+                category: 'Grandes Fortunas',
+                conceptText: 'Fundador de Meta Platforms, enfocado en consolidar la compañía en el mercado global de la Inteligencia Artificial.',
+                icons: ['brain', 'share-2', 'cpu'],
+                iconLabel: 'Meta Platforms en Mercado de IA',
+                description: 'Transformación hacia modelos de Inteligencia Artificial y redes.'
+            },
+            {
+                id: 'broker',
+                title: 'Broker Tradicional',
+                category: 'Mercados',
+                conceptText: 'Intermediario financiero autorizador para operar en mercados tradicionales negociando títulos y acciones.',
+                icons: ['landmark', 'line-chart', 'briefcase'],
+                iconLabel: 'Intermediario de Mercados y Acciones',
+                description: 'Conexión entre inversionistas y la bolsa de valores tradicional.'
+            },
+            {
+                id: 'exchange',
+                title: 'Exchange Digital',
+                category: 'Mercados',
+                conceptText: 'Intermediario de mercados digitales que conecta usuarios para negociar criptoactivos e instrumentos web3.',
+                icons: ['arrow-left-right', 'laptop', 'globe'],
+                iconLabel: 'Plataforma Trading y Puente Digital',
+                description: 'Infraestructura tecnológica para el comercio digital de cripto.'
+            },
+            {
+                id: 'estatero',
+                title: 'El Estatero de Lidia',
+                category: 'Historia',
+                conceptText: 'Origen histórico de la primera moneda circulante oficial, acuñada en la antigua Lidia con un león grabado.',
+                icons: ['coins', 'crown', 'shield'],
+                iconLabel: 'Moneda Antigua con León Grabado',
+                description: 'Primer estándar monetario con sello oficial de garantía estatal.'
+            },
+            {
+                id: 'rendimiento',
+                title: 'El Rendimiento',
+                category: 'Inversión',
+                conceptText: 'Es la rentabilidad u obtención de beneficios generados por el capital invertido durante un periodo.',
+                icons: ['trophy', 'badge-dollar-sign', 'arrow-up-right'],
+                iconLabel: 'Rentabilidad Obtenida y Ganancias',
+                description: 'Retorno económico positivo sobre una inversión previa.'
+            }
+        ];
+
+        // Estado del Juego
+        let cards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        let score = 0;
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        let isBoardLocked = false;
+
+        // Sound Effects utilizando Web Audio API
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'flip') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(500, now + 0.08);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'match') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.1); // C#5
+                osc.frequency.setValueAtTime(659.25, now + 0.2); // E5
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.linearRampToValueAtTime(140, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'win') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.15); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.3); // G5
+                osc.frequency.setValueAtTime(1046.50, now + 0.45); // C6
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.7);
+                osc.start(now);
+                osc.stop(now + 0.7);
+            }
+        }
+
+        // === INICIALIZACIÓN Y CONTROL DEL JUEGO ===
+        function initGame() {
+            const board = document.getElementById('game-board');
+            board.innerHTML = '';
+            
+            // Generar tarjetas (2 por concepto: 1 Concepto Texto, 1 Ilustración/Símbolo)
+            let deck = [];
+            FIN_CONCEPTS.forEach(item => {
+                deck.push({
+                    conceptId: item.id,
+                    type: 'concept',
+                    title: item.title,
+                    text: item.conceptText,
+                    category: item.category,
+                    icons: item.icons
+                });
+                deck.push({
+                    conceptId: item.id,
+                    type: 'image',
+                    title: item.title,
+                    iconLabel: item.iconLabel,
+                    description: item.description,
+                    category: item.category,
+                    icons: item.icons
+                });
+            });
+
+            // Barajar
+            cards = deck.sort(() => Math.random() - 0.5);
+
+            // Renderizar Tarjetas
+            cards.forEach((cardData, index) => {
+                const cardEl = createCardElement(cardData, index);
+                board.appendChild(cardEl);
+            });
+
+            // Reiniciar Contadores
+            matchedPairs = 0;
+            moves = 0;
+            score = 0;
+            flippedCards = [];
+            isBoardLocked = false;
+            
+            updateStatsDisplay();
+            resetTimer();
+            lucide.createIcons();
+        }
+
+        function createCardElement(data, index) {
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'perspective-1000 h-44 sm:h-48 cursor-pointer select-none';
+            cardContainer.dataset.index = index;
+
+            const isConcept = data.type === 'concept';
+
+            cardContainer.innerHTML = `
+                <div class="card-inner relative w-full h-full duration-500 transform-style-3d transition-transform rounded-2xl border border-slate-200 bg-white shadow-sm hover:border-slate-300">
+                    <!-- Frente de la tarjeta (Oculto) -->
+                    <div class="card-front absolute inset-0 w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center backface-hidden border border-slate-200">
+                        <div class="w-12 h-12 rounded-2xl bg-slate-300/80 border border-slate-300 flex items-center justify-center text-slate-500 mb-2">
+                            <i data-lucide="help-circle" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">FinMemory</span>
+                    </div>
+
+                    <!-- Reverso de la tarjeta (Revelado) -->
+                    <div class="card-back absolute inset-0 w-full h-full bg-white rounded-2xl p-3.5 flex flex-col justify-between backface-hidden rotate-y-180 border border-slate-200 overflow-hidden">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">${data.category}</span>
+                            <span class="text-[10px] font-medium text-slate-400">${isConcept ? 'Concepto' : 'Asociación'}</span>
+                        </div>
+
+                        ${isConcept ? `
+                            <div class="my-auto">
+                                <h4 class="font-bold text-xs sm:text-sm text-slate-800 mb-1 leading-snug">${data.title}</h4>
+                                <p class="text-[11px] sm:text-xs text-slate-600 leading-tight line-clamp-4">${data.text}</p>
+                            </div>
+                        ` : `
+                            <div class="my-auto text-center flex flex-col items-center">
+                                <div class="flex items-center justify-center gap-2 mb-2 bg-slate-50 p-2 rounded-xl border border-slate-200 w-full">
+                                    ${data.icons.map(icon => `<i data-lucide="${icon}" class="w-5 h-5 text-amber-500"></i>`).join('')}
+                                </div>
+                                <h4 class="font-bold text-xs sm:text-sm text-amber-600 mb-1">${data.iconLabel}</h4>
+                                <p class="text-[10px] sm:text-xs text-slate-500 leading-tight">${data.description}</p>
+                            </div>
+                        `}
+
+                        <div class="text-[9px] text-slate-400 text-right font-mono font-semibold">
+                            ID: #${data.conceptId}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            cardContainer.addEventListener('click', () => handleCardClick(cardContainer, index));
+
+            return cardContainer;
+        }
+
+        function handleCardClick(cardEl, index) {
+            if (isBoardLocked) return;
+            
+            const cardInner = cardEl.querySelector('.card-inner');
+            
+            // Evitar clic en la misma tarjeta o tarjeta ya volteada
+            if (cardEl.classList.contains('flipped') || cardEl.classList.contains('matched')) return;
+
+            // Iniciar temporizador en primer clic
+            if (secondsElapsed === 0 && !timerInterval) {
+                startTimer();
+            }
+
+            // Voltear Tarjeta
+            playSound('flip');
+            cardEl.classList.add('flipped');
+            cardInner.classList.add('rotate-y-180');
+            flippedCards.push({ cardEl, index, data: cards[index] });
+
+            if (flippedCards.length === 2) {
+                moves++;
+                updateStatsDisplay();
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            isBoardLocked = true;
+            const [first, second] = flippedCards;
+
+            const isMatch = first.data.conceptId === second.data.conceptId && first.data.type !== second.data.type;
+
+            if (isMatch) {
+                playSound('match');
+                setTimeout(() => {
+                    first.cardEl.classList.add('matched', 'card-matched');
+                    second.cardEl.classList.add('matched', 'card-matched');
+                    
+                    matchedPairs++;
+                    score += Math.max(100 - (moves * 2), 20); // Bonificación por menos movimientos
+                    
+                    flippedCards = [];
+                    isBoardLocked = false;
+                    updateStatsDisplay();
+
+                    if (matchedPairs === FIN_CONCEPTS.length) {
+                        handleWin();
+                    }
+                }, 400);
+            } else {
+                playSound('wrong');
+                setTimeout(() => {
+                    first.cardEl.classList.remove('flipped');
+                    first.cardEl.querySelector('.card-inner').classList.remove('rotate-y-180');
+                    
+                    second.cardEl.classList.remove('flipped');
+                    second.cardEl.querySelector('.card-inner').classList.remove('rotate-y-180');
+
+                    flippedCards = [];
+                    isBoardLocked = false;
+                }, 1200);
+            }
+        }
+
+        function handleWin() {
+            stopTimer();
+            playSound('win');
+            
+            document.getElementById('final-time').textContent = formatTime(secondsElapsed);
+            document.getElementById('final-moves').textContent = moves;
+            document.getElementById('final-score').textContent = `${score} pts`;
+
+            const modal = document.getElementById('win-modal');
+            const card = document.getElementById('win-modal-card');
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-95');
+            card.classList.add('scale-100');
+
+            // Confetti effect
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#10b981', '#34d399', '#6ee7b7', '#fbbf24', '#f59e0b']
+            });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('win-modal');
+            const card = document.getElementById('win-modal-card');
+            
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+        }
+
+        function updateStatsDisplay() {
+            document.getElementById('moves-display').textContent = moves;
+            document.getElementById('pairs-display').textContent = `${matchedPairs} / ${FIN_CONCEPTS.length}`;
+            document.getElementById('score-display').textContent = `${score} pts`;
+        }
+
+        // === TIMING LOGIC ===
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                document.getElementById('timer-display').textContent = formatTime(secondsElapsed);
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function resetTimer() {
+            stopTimer();
+            secondsElapsed = 0;
+            document.getElementById('timer-display').textContent = '00:00';
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            return `${mins}:${secs}`;
+        }
+
+        function resetGame() {
+            closeModal();
+            initGame();
+        }
+
+        // === PESTAÑAS & WIKI / GLOSARIO ===
+        function switchTab(tab) {
+            const gameTab = document.getElementById('tab-game');
+            const wikiTab = document.getElementById('tab-wiki');
+            const btnGame = document.getElementById('btn-tab-game');
+            const btnWiki = document.getElementById('btn-tab-wiki');
+
+            if (tab === 'game') {
+                gameTab.classList.remove('hidden');
+                wikiTab.classList.add('hidden');
+
+                btnGame.className = 'flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-emerald-600 text-white shadow-md';
+                btnWiki.className = 'flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-500 hover:text-slate-800 hover:bg-gray-100';
+            } else {
+                gameTab.classList.add('hidden');
+                wikiTab.classList.remove('hidden');
+
+                btnWiki.className = 'flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-emerald-600 text-white shadow-md';
+                btnGame.className = 'flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-500 hover:text-slate-800 hover:bg-gray-100';
+            }
+        }
+
+        function renderWiki(filterText = '') {
+            const container = document.getElementById('wiki-grid');
+            document.getElementById('wiki-count').textContent = FIN_CONCEPTS.length;
+            container.innerHTML = '';
+
+            const filtered = FIN_CONCEPTS.filter(item => 
+                item.title.toLowerCase().includes(filterText.toLowerCase()) || 
+                item.conceptText.toLowerCase().includes(filterText.toLowerCase()) ||
+                item.category.toLowerCase().includes(filterText.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-slate-500">
+                        No se encontraron conceptos que coincidan con la búsqueda.
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'glass-panel p-5 rounded-2xl border border-gray-200 bg-white/80 flex flex-col justify-between gap-4 hover:border-gray-300 transition-colors';
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">${item.category}</span>
+                            <span class="text-xs text-slate-400 font-mono">ID: #${item.id}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800">${item.title}</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">${item.conceptText}</p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-gray-200 flex items-center gap-3">
+                        <div class="flex items-center gap-1.5 bg-white p-2 rounded-lg border border-gray-200">
+                            ${item.icons.map(icon => `<i data-lucide="${icon}" class="w-4 h-4 text-amber-500"></i>`).join('')}
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-amber-600 block">${item.iconLabel}</span>
+                            <span class="text-xs text-slate-500 block">${item.description}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        function filterWiki() {
+            const query = document.getElementById('wiki-search').value;
+            renderWiki(query);
+        }
+
+        // Inicializar al cargar la ventana
+        window.onload = function() {
+            initGame();
+            renderWiki();
+            // Aseguramos que los iconos de lucide se rendericen también en el header/footer si usan data-lucide
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
