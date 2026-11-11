@@ -1,0 +1,1097 @@
+
+100 %
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Enigma del Capital - Dashboard de Juego</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0B0F17',
+                            card: '#151C2C',
+                            accent: '#3B82F6',
+                            gold: '#F59E0B',
+                            goldHover: '#D97706',
+                            emerald: '#10B981',
+                            purple: '#8B5CF6'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B0F17;
+            color: #F3F4F6;
+        }
+        .font-display {
+            font-family: 'Outfit', sans-serif;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0F17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E293B;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(21, 28, 44, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Roulette Wheel CSS Animation */
+        .wheel-container {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            border: 6px solid #1E293B;
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);
+            transition: transform 3.5s cubic-bezier(0.15, 0.99, 0.18, 1);
+            overflow: hidden;
+            background: conic-gradient(
+                #F59E0B 0deg 45deg,
+                #3B82F6 45deg 90deg,
+                #10B981 90deg 135deg,
+                #8B5CF6 135deg 180deg,
+                #EC4899 180deg 225deg,
+                #06B6D4 225deg 270deg,
+                #F97316 270deg 315deg,
+                #6366F1 315deg 360deg
+            );
+        }
+        .wheel-icon-slot {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            top: 50%;
+            left: 50%;
+            margin-top: -16px;
+            margin-left: -16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #0B0F17;
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top: 22px solid #F59E0B;
+            z-index: 30;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+        }
+
+        .glow-gold {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- HEADER / BARRA NAVEGACIÓN PRINCIPAL -->
+    <header class="glass-panel sticky top-0 z-40 border-b border-slate-800/80 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Título del Juego -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg glow-gold">
+                    <i class="fa-solid fa-vault"></i>
+                </div>
+                <div>
+                    <h1 class="font-display font-black text-lg md:text-xl tracking-tight bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
+                        EL ENIGMA DEL CAPITAL
+                    </h1>
+                    <p class="text-[11px] text-slate-400 font-medium">Panel de Control & Arena de Juego de Equipos</p>
+                </div>
+            </div>
+
+            <!-- Cronómetro Global del Profesor -->
+            <div class="flex items-center gap-4 bg-slate-900/90 px-4 py-2 rounded-xl border border-slate-800">
+                <div class="text-slate-400 text-xs font-semibold flex items-center gap-1.5">
+                    <i class="fa-solid fa-stopwatch text-amber-400 animate-pulse"></i> TIEMPO GENERAL:
+                </div>
+                <div id="global-timer" class="font-mono font-bold text-lg text-amber-300">00:00</div>
+                <div class="flex items-center gap-1">
+                    <button id="btn-timer-toggle" onclick="toggleGlobalTimer()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button onclick="resetGlobalTimer()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 rounded-lg text-xs font-bold transition">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botón Ver Podio -->
+            <button onclick="showPodiumModal()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black rounded-xl text-xs flex items-center gap-2 transition shadow-lg">
+                <i class="fa-solid fa-trophy text-sm"></i> VER PODIO DE GANADORES
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="max-w-7xl w-full mx-auto p-4 md:p-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- LEFT COLUMN: SELECTOR DE GRUPOS & TIEMPOS DE CARRERA (4 cols) -->
+        <section class="lg:col-span-4 flex flex-col gap-5">
+            
+            <!-- PANEL DE SELECCIÓN DE GRUPOS -->
+            <div class="glass-panel rounded-2xl p-5 border border-slate-800">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                    <h2 class="font-display font-bold text-sm text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-amber-400"></i> Selector de Grupo Activo
+                    </h2>
+                    <span class="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-mono font-bold">5 Grupos</span>
+                </div>
+
+                <!-- Selector de Botones -->
+                <div class="grid grid-cols-5 gap-2 mb-4" id="group-selector-grid">
+                    <!-- Javascript generará los 5 botones de grupo -->
+                </div>
+
+                <!-- Personalizar Nombre del Equipo Activo -->
+                <div class="space-y-3 bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+                    <div class="flex items-center justify-between text-xs">
+                        <label class="text-slate-400 font-semibold">Nombre de Equipo:</label>
+                        <span id="active-group-label" class="font-mono text-amber-300 font-bold">Grupo 1</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="input-team-name" placeholder="Ej: Los Inversores" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 outline-none focus:border-amber-400">
+                        <button onclick="updateTeamName()" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs transition">
+                            Guardar
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between text-xs pt-1">
+                        <label class="text-slate-400 font-semibold">Avatar de Equipo:</label>
+                        <div class="flex gap-1.5" id="avatar-picker">
+                            <!-- Generado por JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TIEMPOS Y PROGRESO EN VIVO -->
+            <div class="glass-panel rounded-2xl p-5 border border-slate-800 flex-1 flex flex-col">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                    <h3 class="font-display font-bold text-sm text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-list-ol text-blue-400"></i> Registro de Tiempos
+                    </h3>
+                    <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-800 font-mono">En Vivo</span>
+                </div>
+
+                <div id="live-time-tracker" class="space-y-2 flex-1 overflow-y-auto pr-1">
+                    <!-- Javascript generará las tarjetas de tiempo de los 5 grupos -->
+                </div>
+            </div>
+
+        </section>
+
+        <!-- RIGHT COLUMN: ARENA DE JUEGO / FASES DEL GRUPO ACTIVO (8 cols) -->
+        <section class="lg:col-span-8 flex flex-col gap-5">
+
+            <!-- CABECERA DEL GRUPO ACTIVO -->
+            <div id="active-team-header" class="glass-panel rounded-2xl p-5 border-l-4 border-l-amber-400">
+                <!-- Carga dinámica por JS -->
+            </div>
+
+            <!-- VISTA DE LA FASE ACTIVA -->
+            <div id="phase-content-card" class="glass-panel rounded-2xl p-6 flex flex-col gap-4 min-h-[440px] justify-between">
+                <!-- Carga dinámica por JS -->
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-900 py-3 text-center text-xs text-slate-600">
+        El Enigma del Capital &copy; Juego Didáctico de Finanzas para Aula de Clases
+    </footer>
+
+    <!-- MODAL DE PODIO / GANADORES -->
+    <div id="podium-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel rounded-3xl border border-amber-500/30 p-6 md:p-8 max-w-xl w-full text-center space-y-6 relative animate-fade-in">
+            <button onclick="hidePodiumModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl p-2">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center text-3xl mx-auto border border-amber-500/40 glow-gold">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+
+            <div>
+                <h2 class="font-display text-2xl font-black text-amber-300">PODIO DE GANADORES</h2>
+                <p class="text-xs text-slate-400 mt-1">Equipos clasificados por menor tiempo total de finalización</p>
+            </div>
+
+            <div id="podium-list" class="space-y-2.5">
+                <!-- JS inserta las posiciones -->
+            </div>
+
+            <button onclick="hidePodiumModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition">
+                CERRAR
+            </button>
+        </div>
+    </div>
+
+    <!-- LOGICA DEL JUEGO EN JAVASCRIPT -->
+    <script>
+        // CONFIGURACIÓN Y BANCO DE PREGUNTAS (TRIVIA FASE 1)
+        const triviaQuestions = [
+            { q: "¿Qué es el crédito financiero?", options: ["Un regalo del banco", "Dinero prestado con compromiso de pago futuro más intereses", "Dinero digital sin valor"], correct: 1 },
+            { q: "¿Qué diferencia a un Broker de un Exchange?", options: ["Un Broker vende ropa, un Exchange vende criptos", "Un Broker facilita activos tradicionales y un Exchange es plataforma para criptoactivos", "Son exactamente lo mismo"], correct: 1 },
+            { q: "¿Qué caracteriza a la Renta Fija frente a la Variable?", options: ["La renta fija conoce su rendimiento de antemano; la variable fluctúa", "La renta fija cambia todos los días y la variable no", "La renta variable es solo para gobiernos"], correct: 0 },
+            { q: "¿Qué es la Inflación?", options: ["Aumento general del valor de la moneda", "Pérdida del poder adquisitivo del dinero con el tiempo", "Un tipo de criptomoneda"], correct: 1 },
+            { q: "¿Cuál fue la primera moneda oficial fabricada en Lidia?", options: ["El Dólar", "El Estatero de Electrum", "El Bitcóin"], correct: 1 },
+            { q: "¿Qué es una Blockchain?", options: ["Una cadena física de oro", "Un libro contable digital distribuido e inalterable", "Un banco tradicional centralizado"], correct: 1 },
+            { q: "¿Qué es un Gasto Fijo Necesario?", options: ["Comprar zapatos de diseñador", "Pagar el alquiler o servicios de la vivienda", "Ir al cine el fin de semana"], correct: 1 },
+            { q: "¿Quién es Warren Buffett y por qué destaca?", options: ["Creador de Facebook", "Magnate conocido por su estrategia de inversión en valor y ahorro a largo plazo", "Fundador de Amazon"], correct: 1 }
+        ];
+
+        // PRESUPUESTO FASE 3 ($1500 Total para que el saldo restante sea positivo)
+        const phase2Items = [
+            { id: "p1", name: "Alquiler y Servicios de Vivienda", val: 350, correctType: "gastos" },
+            { id: "p2", name: "Alimentación Básica de la Semana", val: 250, correctType: "gastos" },
+            { id: "p3", name: "Reserva para Emergencias", val: 200, correctType: "ahorro" },
+            { id: "p4", name: "Fondo de Renta Fija / ETFs", val: 100, correctType: "inversion" },
+            { id: "p5", name: "Salidas y Entretenimiento", val: 100, correctType: "diversion" }
+        ];
+
+        // HITOS HISTÓRICOS PARA FASE 2: ROMPECABEZAS CRONOLÓGICO
+        const timelineEvents = [
+            { id: "t1", title: "Trueque de Sal y Ganado", period: "Prehistoria / Antigüedad", order: 1 },
+            { id: "t2", title: "Monedas de Electrum en Lidia", period: "Siglo VII a.C.", order: 2 },
+            { id: "t3", title: "Primeros Billetes de Papel", period: "Dinastía Song (China, S. XI)", order: 3 },
+            { id: "t4", title: "Creación de Bancos y Tarjetas", period: "Siglo XX", order: 4 },
+            { id: "t5", title: "Nacimiento de Bitcoin y Blockchain", period: "Año 2009", order: 5 }
+        ];
+
+        // RETO FASE 4 (Clasificación con Aliado: Necesidad vs Deseo)
+        const phase3Items = [
+            { id: "c1", name: "Agua potable y comida básica", correct: "necesidad" },
+            { id: "c2", name: "Zapatillas de colección $300", correct: "deseo" },
+            { id: "c3", name: "Transporte para ir a estudiar", correct: "necesidad" },
+            { id: "c4", name: "Suscripción a 4 plataformas streaming", correct: "deseo" },
+            { id: "c5", name: "Medicinas y chequeo de salud", correct: "necesidad" },
+            { id: "c6", name: "Consola de última generación", correct: "deseo" }
+        ];
+
+        // PREGUNTAS FASE 5 (Desbloqueo de Bóveda por Conteo de Letras)
+        const phase4Questions = [
+            { q: "1. Primera moneda fabricada en Lidia (siglo VII a.C.):", answer: "estatero", len: 8 },
+            { q: "2. Registro contable digital e inalterable tras Bitcoin:", answer: "blockchain", len: 10 },
+            { q: "3. Acción de guardar una parte de ingresos para el futuro:", answer: "ahorro", len: 6 }
+        ];
+
+        // AVATARES DISPONIBLES
+        const groupAvatars = [
+            { icon: "fa-solid fa-crown", color: "text-amber-400" },
+            { icon: "fa-solid fa-rocket", color: "text-blue-400" },
+            { icon: "fa-solid fa-shield-halved", color: "text-emerald-400" },
+            { icon: "fa-solid fa-gem", color: "text-purple-400" },
+            { icon: "fa-solid fa-bolt", color: "text-pink-400" }
+        ];
+
+        // ESTADO DE LOS 5 GRUPOS
+        let groups = [
+            { id: 1, name: "Grupo 1", avatarIdx: 0, currentPhase: 1, rouletteActive: false, currentQuestion: null, phase1Score: 0, puzzleOrder: ["t3", "t1", "t5", "t2", "t4"], phase2Selections: {}, phase2RemainingAmount: "", phase3Classifications: {}, phase4Answers: ["", "", ""], finished: false, finishTime: null, usedQuestions: [] },
+            { id: 2, name: "Grupo 2", avatarIdx: 1, currentPhase: 1, rouletteActive: false, currentQuestion: null, phase1Score: 0, puzzleOrder: ["t4", "t2", "t1", "t5", "t3"], phase2Selections: {}, phase2RemainingAmount: "", phase3Classifications: {}, phase4Answers: ["", "", ""], finished: false, finishTime: null, usedQuestions: [] },
+            { id: 3, name: "Grupo 3", avatarIdx: 2, currentPhase: 1, rouletteActive: false, currentQuestion: null, phase1Score: 0, puzzleOrder: ["t2", "t5", "t3", "t1", "t4"], phase2Selections: {}, phase2RemainingAmount: "", phase3Classifications: {}, phase4Answers: ["", "", ""], finished: false, finishTime: null, usedQuestions: [] },
+            { id: 4, name: "Grupo 4", avatarIdx: 3, currentPhase: 1, rouletteActive: false, currentQuestion: null, phase1Score: 0, puzzleOrder: ["t5", "t1", "t4", "t3", "t2"], phase2Selections: {}, phase2RemainingAmount: "", phase3Classifications: {}, phase4Answers: ["", "", ""], finished: false, finishTime: null, usedQuestions: [] },
+            { id: 5, name: "Grupo 5", avatarIdx: 4, currentPhase: 1, rouletteActive: false, currentQuestion: null, phase1Score: 0, puzzleOrder: ["t1", "t4", "t2", "t5", "t3"], phase2Selections: {}, phase2RemainingAmount: "", phase3Classifications: {}, phase4Answers: ["", "", ""], finished: false, finishTime: null, usedQuestions: [] }
+        ];
+
+        let activeGroupId = 1;
+        let globalTimerInterval = null;
+        let globalSeconds = 0;
+
+        // ACCIONADORES DE SONIDO CON WEB AUDIO API
+        function playSound(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'spin') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.15);
+                } else if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.25);
+                } else if (type === 'phase_complete') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, ctx.currentTime);
+                    osc.frequency.setValueAtTime(554.37, ctx.currentTime + 0.12);
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.24);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.4);
+                } else if (type === 'error') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(220, ctx.currentTime);
+                    osc.frequency.setValueAtTime(130, ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.3);
+                }
+            } catch(e) {
+                // AudioContext fallback silencioso
+            }
+        }
+
+        // INICIALIZACIÓN
+        window.onload = function() {
+            renderGroupSelectorGrid();
+            renderLiveTimeTracker();
+            renderActiveGroupHeader();
+            renderPhaseContent();
+            renderAvatarPicker();
+        };
+
+        // CRONÓMETRO GLOBAL
+        function toggleGlobalTimer() {
+            const btn = document.getElementById("btn-timer-toggle");
+            if (globalTimerInterval) {
+                clearInterval(globalTimerInterval);
+                globalTimerInterval = null;
+                btn.innerHTML = `<i class="fa-solid fa-play"></i>`;
+            } else {
+                globalTimerInterval = setInterval(() => {
+                    globalSeconds++;
+                    document.getElementById("global-timer").innerText = formatTime(globalSeconds);
+                }, 1000);
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+            }
+        }
+
+        function resetGlobalTimer() {
+            if (globalTimerInterval) {
+                clearInterval(globalTimerInterval);
+                globalTimerInterval = null;
+                document.getElementById("btn-timer-toggle").innerHTML = `<i class="fa-solid fa-play"></i>`;
+            }
+            globalSeconds = 0;
+            document.getElementById("global-timer").innerText = "00:00";
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        // PANEL DE GRUPOS (IZQUIERDA)
+        function renderGroupSelectorGrid() {
+            const container = document.getElementById("group-selector-grid");
+            container.innerHTML = "";
+            groups.forEach(g => {
+                const isActive = g.id === activeGroupId;
+                const av = groupAvatars[g.avatarIdx];
+                const btn = document.createElement("button");
+                btn.onclick = () => selectGroup(g.id);
+                btn.className = `p-2.5 rounded-xl flex flex-col items-center justify-center transition border ${
+                    isActive 
+                    ? 'bg-amber-500 text-slate-950 font-black border-amber-400 shadow-lg glow-gold' 
+                    : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800 font-bold'
+                }`;
+                btn.innerHTML = `
+                    <i class="${av.icon} text-base mb-1 ${isActive ? 'text-slate-950' : av.color}"></i>
+                    <span class="text-[11px]">G${g.id}</span>
+                `;
+                container.appendChild(btn);
+            });
+
+            const activeGroup = groups.find(g => g.id === activeGroupId);
+            document.getElementById("active-group-label").innerText = `Grupo ${activeGroup.id}`;
+            document.getElementById("input-team-name").value = activeGroup.name;
+        }
+
+        function selectGroup(id) {
+            activeGroupId = id;
+            renderGroupSelectorGrid();
+            renderLiveTimeTracker();
+            renderActiveGroupHeader();
+            renderPhaseContent();
+            renderAvatarPicker();
+        }
+
+        function updateTeamName() {
+            const val = document.getElementById("input-team-name").value.trim();
+            if (val) {
+                const g = groups.find(x => x.id === activeGroupId);
+                g.name = val;
+                renderGroupSelectorGrid();
+                renderLiveTimeTracker();
+                renderActiveGroupHeader();
+            }
+        }
+
+        function renderAvatarPicker() {
+            const container = document.getElementById("avatar-picker");
+            container.innerHTML = "";
+            const activeGroup = groups.find(g => g.id === activeGroupId);
+            
+            groupAvatars.forEach((av, idx) => {
+                const btn = document.createElement("button");
+                btn.onclick = () => setGroupAvatar(idx);
+                btn.className = `w-7 h-7 rounded-lg bg-slate-900 border flex items-center justify-center text-xs ${activeGroup.avatarIdx === idx ? 'border-amber-400 text-amber-300' : 'border-slate-800 text-slate-500'}`;
+                btn.innerHTML = `<i class="${av.icon}"></i>`;
+                container.appendChild(btn);
+            });
+        }
+
+        function setGroupAvatar(idx) {
+            const g = groups.find(x => x.id === activeGroupId);
+            g.avatarIdx = idx;
+            renderGroupSelectorGrid();
+            renderLiveTimeTracker();
+            renderActiveGroupHeader();
+            renderAvatarPicker();
+        }
+
+        // REGISTRO DE TIEMPOS Y PROGRESO EN VIVO
+        function renderLiveTimeTracker() {
+            const container = document.getElementById("live-time-tracker");
+            container.innerHTML = "";
+
+            groups.forEach(g => {
+                const av = groupAvatars[g.avatarIdx];
+                const card = document.createElement("div");
+                card.className = `p-3 rounded-xl border bg-slate-900/80 border-slate-800 flex items-center justify-between text-xs ${g.id === activeGroupId ? 'border-amber-400/50 bg-slate-850' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-lg bg-slate-950 flex items-center justify-center ${av.color} text-sm">
+                            <i class="${av.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-200">${g.name}</div>
+                            <div class="text-[10px] text-slate-400">
+                                ${g.finished ? '<span class="text-emerald-400 font-bold">🏁 BÓVEDA COMPLETADA</span>' : 'Fase ' + g.currentPhase + ' de 5'}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right font-mono font-bold">
+                        ${g.finishTime 
+                            ? `<span class="text-emerald-400 text-xs bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">${g.finishTime}</span>` 
+                            : `<span class="text-slate-500 text-[11px]">En Carrera</span>`
+                        }
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // CABECERA DEL GRUPO SELECCIONADO
+        function renderActiveGroupHeader() {
+            const group = groups.find(g => g.id === activeGroupId);
+            const av = groupAvatars[group.avatarIdx];
+            const header = document.getElementById("active-team-header");
+
+            header.innerHTML = `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-2xl ${av.color}">
+                            <i class="${av.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                    GRUPO ${group.id}
+                                </span>
+                                <h2 class="font-display font-bold text-lg text-slate-100">${group.name}</h2>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-0.5">Controlador de Avance y Fases de Juego</p>
+                        </div>
+                    </div>
+
+                    <!-- PASOS DE FASES -->
+                    <div class="flex items-center gap-1 bg-slate-950 p-2 rounded-xl border border-slate-800">
+                        ${[1, 2, 3, 4, 5].map(step => {
+                            const isDone = group.currentPhase > step || group.finished;
+                            const isCurrent = group.currentPhase === step && !group.finished;
+                            if (isDone) {
+                                return `<div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold text-xs flex items-center justify-center border border-emerald-500/40" title="Fase ${step} Lista"><i class="fa-solid fa-check"></i></div>`;
+                            } else if (isCurrent) {
+                                return `<div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-300 font-bold text-xs flex items-center justify-center border border-amber-400 animate-pulse">F${step}</div>`;
+                            } else {
+                                return `<div class="w-7 h-7 rounded-lg bg-slate-900 text-slate-600 font-bold text-xs flex items-center justify-center border border-slate-800">F${step}</div>`;
+                            }
+                        }).join('<i class="fa-solid fa-chevron-right text-[8px] text-slate-700"></i>')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // RENDER DE FASES EN EL PANEL DERECHO
+        function renderPhaseContent() {
+            const group = groups.find(g => g.id === activeGroupId);
+            const container = document.getElementById("phase-content-card");
+            container.innerHTML = "";
+
+            if (group.finished) {
+                container.innerHTML = `
+                    <div class="text-center py-10 space-y-4 my-auto">
+                        <div class="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-4xl mx-auto border-2 border-emerald-400 glow-gold">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <h3 class="font-display text-3xl font-bold text-emerald-300">¡BÓVEDA DESBLOQUEADA!</h3>
+                        <p class="text-sm text-slate-300 max-w-md mx-auto">
+                            El <strong>${group.name}</strong> ha completado las 5 fases de la carrera financiera en un tiempo oficial de:
+                        </p>
+                        <div class="text-2xl font-mono font-bold text-amber-300 bg-slate-950 px-6 py-3 rounded-2xl inline-block border border-slate-700">
+                            ${group.finishTime}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            if (group.currentPhase === 1) {
+                renderPhase1(container, group);
+            } else if (group.currentPhase === 2) {
+                renderPuzzlePhase(container, group);
+            } else if (group.currentPhase === 3) {
+                renderPhase2(container, group);
+            } else if (group.currentPhase === 4) {
+                renderPhase3(container, group);
+            } else if (group.currentPhase === 5) {
+                renderPhase4(container, group);
+            }
+        }
+
+        // FASE 1: RULETA Y TRIVIA
+        function renderPhase1(container, group) {
+            container.innerHTML = `
+                <div class="border-b border-slate-800 pb-3">
+                    <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">FASE 1: TRIVIA CON RULETA</span>
+                    <h3 class="font-display font-bold text-lg text-slate-100">Desafío de Preguntas Financieras</h3>
+                    <p class="text-xs text-slate-400 mt-1">
+                        Gira la ruleta para obtener una pregunta al azar (sin repetir). Requieren <strong>4 respuestas correctas</strong> para avanzar. 
+                        Aciertos actuales: <strong class="text-amber-300 font-mono">${group.phase1Score} / 4</strong>
+                    </p>
+                </div>
+
+                <div class="flex flex-col md:flex-row items-center justify-around gap-6 py-4 my-auto">
+                    <!-- RULETA ANIMADA CON ICONOS / IMÁGENES -->
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="relative">
+                            <div class="wheel-pointer"></div>
+                            <div id="roulette-wheel" class="wheel-container">
+                                <!-- Iconos en la ruleta -->
+                                <div class="wheel-icon-slot" style="transform: rotate(22.5deg) translate(80px) rotate(-22.5deg);"><i class="fa-solid fa-coins"></i></div>
+                                <div class="wheel-icon-slot" style="transform: rotate(67.5deg) translate(80px) rotate(-67.5deg);"><i class="fa-solid fa-building-columns"></i></div>
+                                <div class="wheel-icon-slot" style="transform: rotate(112.5deg) translate(80px) rotate(-112.5deg);"><i class="fa-solid fa-chart-line"></i></div>
+                                <div class="wheel-icon-slot" style="transform: rotate(157.5deg) translate(80px) rotate(-157.5deg);"><i class="fa-solid fa-vault"></i></div>
+                                <div class="wheel-icon-slot" style="transform: rotate(202.5deg) translate(80px) rotate(-202.5deg);"><i class="fa-brands fa-bitcoin"></i></div>
+                                <div class="wheel-icon-slot" style="transform: rotate(247.5deg) translate(80px) rotate(-247.5deg);"><i class="fa-solid fa-credit-card"></i></div>
+                                <div class="wheel-icon-slot" style="transform: rotate(292.5deg) translate(80px) rotate(-292.5deg);"><i class="fa-solid fa-sack-dollar"></i></div>
+                                <div class="wheel-icon-slot" style="transform: rotate(337.5deg) translate(80px) rotate(-337.5deg);"><i class="fa-solid fa-piggy-bank"></i></div>
+
+                                <div class="w-16 h-16 rounded-full bg-slate-950 border-4 border-amber-400 flex items-center justify-center text-amber-400 text-xl font-black shadow-inner z-10">
+                                    <i class="fa-solid fa-question"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="spinRoulette()" ${group.rouletteActive ? 'disabled' : ''} class="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-black rounded-xl text-xs transition shadow-lg flex items-center gap-2">
+                            <i class="fa-solid fa-rotate text-sm"></i> GIRAR RULETA
+                        </button>
+                    </div>
+
+                    <!-- PREGUNTA REVELADA ÚNICAMENTE AL GIRAR -->
+                    <div class="flex-1 w-full bg-slate-950 p-4 rounded-xl border border-slate-800 min-h-[160px] flex flex-col justify-center">
+                        ${group.currentQuestion ? `
+                            <div class="space-y-3">
+                                <span class="text-[10px] font-bold text-amber-400 uppercase bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">Pregunta Revelada</span>
+                                <p class="text-sm font-semibold text-slate-200">${group.currentQuestion.q}</p>
+                                <div class="space-y-1.5">
+                                    ${group.currentQuestion.options.map((opt, idx) => `
+                                        <button onclick="answerPhase1(${idx})" class="w-full text-left p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs text-slate-300 border border-slate-800 hover:border-amber-400/50 transition">
+                                            ${opt}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : `
+                            <div class="text-center py-6 text-slate-500 text-xs space-y-2">
+                                <i class="fa-solid fa-lock text-2xl block text-slate-700"></i>
+                                <span>La pregunta se mantiene oculta hasta presionar "GIRAR RULETA".</span>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        function spinRoulette() {
+            const group = groups.find(g => g.id === activeGroupId);
+            if (group.rouletteActive) return;
+
+            // Filtrar preguntas que no han salido para este grupo
+            const availableQuestions = triviaQuestions.filter((_, idx) => !group.usedQuestions.includes(idx));
+
+            if (availableQuestions.length === 0) {
+                group.usedQuestions = []; // Reiniciar pool si se agotaron
+            }
+
+            group.rouletteActive = true;
+            playSound('spin');
+
+            const wheel = document.getElementById("roulette-wheel");
+            const randomDeg = 1440 + Math.floor(Math.random() * 360);
+            wheel.style.transform = `rotate(${randomDeg}deg)`;
+
+            setTimeout(() => {
+                group.rouletteActive = false;
+                
+                // Elegir una de las no usadas
+                const remainingIndices = triviaQuestions
+                    .map((q, idx) => idx)
+                    .filter(idx => !group.usedQuestions.includes(idx));
+                
+                const chosenIdx = remainingIndices[Math.floor(Math.random() * remainingIndices.length)];
+                group.usedQuestions.push(chosenIdx);
+                group.currentQuestion = triviaQuestions[chosenIdx];
+
+                renderPhaseContent();
+            }, 3000);
+        }
+
+        function answerPhase1(selectedIdx) {
+            const group = groups.find(g => g.id === activeGroupId);
+            if (!group.currentQuestion) return;
+
+            if (selectedIdx === group.currentQuestion.correct) {
+                playSound('correct');
+                if (typeof confetti === 'function') confetti({ particleCount: 35, spread: 60, origin: { y: 0.7 } });
+                group.phase1Score += 1;
+                group.currentQuestion = null;
+
+                if (group.phase1Score >= 4) {
+                    playSound('phase_complete');
+                    group.currentPhase = 2; // Avanza al Rompecabezas Cronológico
+                    if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 90 });
+                }
+            } else {
+                playSound('error');
+                alert("Respuesta incorrecta. ¡Giren la ruleta nuevamente para probar con otra pregunta!");
+                group.currentQuestion = null;
+            }
+
+            renderLiveTimeTracker();
+            renderActiveGroupHeader();
+            renderPhaseContent();
+        }
+
+        // FASE 2: ROMPECABEZAS DE LA EVOLUCIÓN DEL DINERO
+        // FASE 3: PRESUPUESTO $1500 REGLA VIDA
+        function renderPhase2(container, group) {
+            container.innerHTML = `
+                <div class="border-b border-slate-800 pb-3">
+                    <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">FASE 3: EL PRESUPUESTO ($1500)</span>
+                    <h3 class="font-display font-bold text-lg text-slate-100">Clave para Abrir la Bóveda</h3>
+                    <p class="text-xs text-slate-400 mt-1">
+                        Ingreso mensual total: <strong>$1500</strong>. Asigna cada item a la categoría correspondiente de la Regla VIDA y calcula el monto restante del presupuesto. La cifra exacta restante será la clave para desbloquear este nivel.
+                    </p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                    <div class="space-y-2 max-h-[35vh] overflow-y-auto pr-1">
+                        ${phase2Items.map(item => `
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-900 p-3 rounded-lg border border-slate-800 text-xs">
+                                <div>
+                                    <div class="font-bold text-slate-200">${item.name}</div>
+                                    <div class="text-[11px] font-mono text-amber-400">$${item.val}</div>
+                                </div>
+                                <select onchange="selectPhase2Cat('${item.id}', this.value)" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-amber-400">
+                                    <option value="">-- Seleccionar Categoría --</option>
+                                    <option value="gastos" ${group.phase2Selections[item.id] === 'gastos' ? 'selected' : ''}>Gastos Necesarios</option>
+                                    <option value="ahorro" ${group.phase2Selections[item.id] === 'ahorro' ? 'selected' : ''}>Ahorro</option>
+                                    <option value="inversion" ${group.phase2Selections[item.id] === 'inversion' ? 'selected' : ''}>Inversión</option>
+                                    <option value="diversion" ${group.phase2Selections[item.id] === 'diversion' ? 'selected' : ''}>Diversión / Deseos</option>
+                                </select>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- CASILLA PARA EL MONTO RESTANTE QUE FUNCIONA COMO CLAVE -->
+                    <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex items-center justify-between gap-3 text-xs">
+                        <div>
+                            <span class="font-bold text-slate-200 block">Monto Restante del Presupuesto ($):</span>
+                            <span class="text-[10px] text-slate-400">Ingresa la clave numérica calculada ($1500 - Total asignado)</span>
+                        </div>
+                        <input type="number" id="phase2-amount-input" oninput="updatePhase2Amount(this.value)" value="${group.phase2RemainingAmount || ''}" placeholder="Ej: 0" class="w-28 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-center font-mono font-bold text-amber-300 outline-none focus:border-amber-400">
+                    </div>
+                </div>
+
+                <button onclick="submitPhase2()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-lock-open"></i> DESBLOQUEAR CLAVE DE BÓVEDA
+                </button>
+            `;
+        }
+
+        function selectPhase2Cat(itemId, cat) {
+            const group = groups.find(g => g.id === activeGroupId);
+            group.phase2Selections[itemId] = cat;
+        }
+
+        function updatePhase2Amount(val) {
+            const group = groups.find(g => g.id === activeGroupId);
+            group.phase2RemainingAmount = val;
+        }
+
+        function submitPhase2() {
+            const group = groups.find(g => g.id === activeGroupId);
+            let correctCats = true;
+
+            phase2Items.forEach(item => {
+                if (group.phase2Selections[item.id] !== item.correctType) {
+                    correctCats = false;
+                }
+            });
+
+            const expectedTotal = phase2Items.reduce((acc, curr) => acc + curr.val, 0);
+            const expectedRemaining = 1500 - expectedTotal;
+            const userAmount = parseInt(group.phase2RemainingAmount, 10);
+
+            if (correctCats && userAmount === expectedRemaining) {
+                playSound('phase_complete');
+                group.currentPhase = 4;
+                if (typeof confetti === 'function') confetti({ particleCount: 50, spread: 80 });
+                renderLiveTimeTracker();
+                renderActiveGroupHeader();
+                renderPhaseContent();
+            } else if (!correctCats) {
+                playSound('error');
+                alert("Las categorías asignadas son incorrectas. Revisen el presupuesto en equipo.");
+            } else {
+                playSound('error');
+                alert("El monto restante ingresado como clave no es correcto. Calculen exactamente cuánto dinero queda tras asignar todos los ítems de los $1500.");
+            }
+        }
+
+        // FASE 3: PRESUPUESTO $1000 REGLA VIDA
+        function renderPhase2(container, group) {
+            container.innerHTML = `
+                <div class="border-b border-slate-800 pb-3">
+                    <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">FASE 3: EL PRESUPUESTO ($1000)</span>
+                    <h3 class="font-display font-bold text-lg text-slate-100">Clave para Abrir la Bóveda</h3>
+                    <p class="text-xs text-slate-400 mt-1">
+                        Ingreso mensual total: <strong>$1000</strong>. Asigna cada item a la categoría correspondiente de la Regla VIDA y calcula el monto restante del presupuesto. La cifra exacta restante será la clave para desbloquear este nivel.
+                    </p>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                    <div class="space-y-2 max-h-[35vh] overflow-y-auto pr-1">
+                        ${phase2Items.map(item => `
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-900 p-3 rounded-lg border border-slate-800 text-xs">
+                                <div>
+                                    <div class="font-bold text-slate-200">${item.name}</div>
+                                    <div class="text-[11px] font-mono text-amber-400">$${item.val}</div>
+                                </div>
+                                <select onchange="selectPhase2Cat('${item.id}', this.value)" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-amber-400">
+                                    <option value="">-- Seleccionar Categoría --</option>
+                                    <option value="gastos" ${group.phase2Selections[item.id] === 'gastos' ? 'selected' : ''}>Gastos Necesarios</option>
+                                    <option value="ahorro" ${group.phase2Selections[item.id] === 'ahorro' ? 'selected' : ''}>Ahorro</option>
+                                    <option value="inversion" ${group.phase2Selections[item.id] === 'inversion' ? 'selected' : ''}>Inversión</option>
+                                    <option value="diversion" ${group.phase2Selections[item.id] === 'diversion' ? 'selected' : ''}>Diversión / Deseos</option>
+                                </select>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- CASILLA PARA EL MONTO RESTANTE QUE FUNCIONA COMO CLAVE -->
+                    <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 flex items-center justify-between gap-3 text-xs">
+                        <div>
+                            <span class="font-bold text-slate-200 block">Monto Restante del Presupuesto ($):</span>
+                            <span class="text-[10px] text-slate-400">Ingresa la clave numérica calculada ($1000 - Total asignado)</span>
+                        </div>
+                        <input type="number" id="phase2-amount-input" oninput="updatePhase2Amount(this.value)" value="${group.phase2RemainingAmount || ''}" placeholder="Ej: 0" class="w-28 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-center font-mono font-bold text-amber-300 outline-none focus:border-amber-400">
+                    </div>
+                </div>
+
+                <button onclick="submitPhase2()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-lock-open"></i> DESBLOQUEAR CLAVE DE BÓVEDA
+                </button>
+            `;
+        }
+
+        function selectPhase2Cat(itemId, cat) {
+            const group = groups.find(g => g.id === activeGroupId);
+            group.phase2Selections[itemId] = cat;
+        }
+
+        function updatePhase2Amount(val) {
+            const group = groups.find(g => g.id === activeGroupId);
+            group.phase2RemainingAmount = val;
+        }
+
+        function submitPhase2() {
+            const group = groups.find(g => g.id === activeGroupId);
+            let correctCats = true;
+
+            phase2Items.forEach(item => {
+                if (group.phase2Selections[item.id] !== item.correctType) {
+                    correctCats = false;
+                }
+            });
+
+            const expectedTotal = phase2Items.reduce((acc, curr) => acc + curr.val, 0);
+            const expectedRemaining = 1000 - expectedTotal;
+            const userAmount = parseInt(group.phase2RemainingAmount, 10);
+
+            if (correctCats && userAmount === expectedRemaining) {
+                playSound('phase_complete');
+                group.currentPhase = 4;
+                if (typeof confetti === 'function') confetti({ particleCount: 50, spread: 80 });
+                renderLiveTimeTracker();
+                renderActiveGroupHeader();
+                renderPhaseContent();
+            } else if (!correctCats) {
+                playSound('error');
+                alert("Las categorías asignadas son incorrectas. Revisen el presupuesto en equipo.");
+            } else {
+                playSound('error');
+                alert("El monto restante ingresado como clave no es correcto. Calculen exactamente cuánto dinero queda tras asignar todos los ítems.");
+            }
+        }
+
+        // FASE 4: RETOS (CLASIFICACIÓN CON ALIADO)
+        function renderPhase3(container, group) {
+            container.innerHTML = `
+                <div class="border-b border-slate-800 pb-3">
+                    <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">FASE 4: RETO DE ALIANZA INTER-EQUIPO</span>
+                    <h3 class="font-display font-bold text-lg text-slate-100">Necesidades vs. Deseos</h3>
+                    <p class="text-xs text-slate-400 mt-1">
+                        <strong>Misión:</strong> Busca a UN integrante de otro equipo para que se siente en tu mesa y te ayude a clasificar correctamente esta lista.
+                    </p>
+                </div>
+
+                <div class="space-y-2 py-1 max-h-[42vh] overflow-y-auto pr-1">
+                    ${phase3Items.map(item => `
+                        <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
+                            <span class="font-semibold text-slate-200">${item.name}</span>
+                            <div class="flex gap-1.5">
+                                <button onclick="classifyPhase3('${item.id}', 'necesidad')" class="px-3 py-1.5 rounded-lg border font-bold ${group.phase3Classifications[item.id] === 'necesidad' ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300' : 'bg-slate-900 border-slate-800 text-slate-400'}">
+                                    Necesidad
+                                </button>
+                                <button onclick="classifyPhase3('${item.id}', 'deseo')" class="px-3 py-1.5 rounded-lg border font-bold ${group.phase3Classifications[item.id] === 'deseo' ? 'bg-purple-500/20 border-purple-400 text-purple-300' : 'bg-slate-900 border-slate-800 text-slate-400'}">
+                                    Deseo
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <button onclick="submitPhase3()" class="w-full py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-black rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-handshake"></i> VALIDAR RETO DE ALIANZA
+                </button>
+            `;
+        }
+
+        function classifyPhase3(itemId, type) {
+            const group = groups.find(g => g.id === activeGroupId);
+            group.phase3Classifications[itemId] = type;
+            renderPhaseContent();
+        }
+
+        function submitPhase3() {
+            const group = groups.find(g => g.id === activeGroupId);
+            let allCorrect = true;
+
+            phase3Items.forEach(item => {
+                if (group.phase3Classifications[item.id] !== item.correct) {
+                    allCorrect = false;
+                }
+            });
+
+            if (allCorrect) {
+                playSound('phase_complete');
+                group.currentPhase = 5;
+                if (typeof confetti === 'function') confetti({ particleCount: 60, spread: 90 });
+                renderLiveTimeTracker();
+                renderActiveGroupHeader();
+                renderPhaseContent();
+            } else {
+                playSound('error');
+                alert("Clasificación incorrecta. Consulten bien con su integrante aliado antes de volver a enviar.");
+            }
+        }
+
+        // FASE 5: MULTI-PREGUNTAS FINALES
+        function renderPhase4(container, group) {
+            container.innerHTML = `
+                <div class="border-b border-slate-800 pb-3">
+                    <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">FASE 5: APERTURA BÓVEDA FINAL</span>
+                    <h3 class="font-display font-bold text-lg text-slate-100">Código de Desbloqueo Final</h3>
+                    <p class="text-xs text-slate-400 mt-1">
+                        Respondan las 3 preguntas finales. <strong>Instrucción clave:</strong> El código numérico final para abrir la bóveda es la <strong>sumatoria del total de letras</strong> de las tres palabras correctas.
+                    </p>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    ${phase4Questions.map((pq, idx) => `
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
+                            <label class="block font-bold text-slate-200">${pq.q}</label>
+                            <input type="text" onchange="updatePhase4Ans(${idx}, this.value)" value="${group.phase4Answers[idx] || ''}" placeholder="Escribe tu respuesta..." class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-amber-300 font-bold outline-none focus:border-amber-400">
+                        </div>
+                    `).join('')}
+
+                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-slate-200 block">Sumatoria Total de Letras:</span>
+                            <span class="text-[10px] text-slate-400">Suma la cantidad de letras de cada palabra acertada</span>
+                        </div>
+                        <input type="number" id="phase4-code-input" placeholder="Código" class="w-28 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-center font-mono font-bold text-amber-300 outline-none focus:border-amber-400">
+                    </div>
+                </div>
+
+                <button onclick="submitPhase4()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg">
+                    <i class="fa-solid fa-key"></i> INGRESAR CLAVE Y FINALIZAR
+                </button>
+            `;
+        }
+
+        function updatePhase4Ans(idx, val) {
+            const group = groups.find(g => g.id === activeGroupId);
+            group.phase4Answers[idx] = val.trim().toLowerCase();
+        }
+
+        function submitPhase4() {
+            const group = groups.find(g => g.id === activeGroupId);
+            let wordsCorrect = true;
+
+            phase4Questions.forEach((pq, idx) => {
+                if (group.phase4Answers[idx] !== pq.answer) {
+                    wordsCorrect = false;
+                }
+            });
+
+            const userCode = parseInt(document.getElementById("phase4-code-input").value, 10);
+            const expectedSum = phase4Questions.reduce((acc, curr) => acc + curr.len, 0);
+
+            if (wordsCorrect && userCode === expectedSum) {
+                playSound('phase_complete');
+                group.finished = true;
+                group.finishTime = formatTime(globalSeconds);
+
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 120, spread: 100, origin: { y: 0.6 } });
+                }
+
+                renderLiveTimeTracker();
+                renderActiveGroupHeader();
+                renderPhaseContent();
+                showPodiumModal();
+            } else if (!wordsCorrect) {
+                playSound('error');
+                alert("Alguna de las 3 respuestas escritas no es correcta. Verifiquen la ortografía.");
+            } else {
+                playSound('error');
+                alert("El código ingresado no coincide con la sumatoria total del número de letras de las tres palabras correctas.");
+            }
+        }
+
+        // MODAL DE PODIO
+        function showPodiumModal() {
+            const modal = document.getElementById("podium-modal");
+            const list = document.getElementById("podium-list");
+            list.innerHTML = "";
+
+            const finishedGroups = groups.filter(g => g.finished);
+            finishedGroups.sort((a, b) => {
+                const parseT = (tStr) => {
+                    const [m, s] = tStr.split(":").map(Number);
+                    return m * 60 + s;
+                };
+                return parseT(a.finishTime) - parseT(b.finishTime);
+            });
+
+            if (finishedGroups.length === 0) {
+                list.innerHTML = `<div class="p-6 text-slate-500 text-xs font-semibold">Ningún grupo ha completado la bóveda aún.</div>`;
+            } else {
+                finishedGroups.forEach((g, idx) => {
+                    const av = groupAvatars[g.avatarIdx];
+                    const item = document.createElement("div");
+                    item.className = `p-3 rounded-xl border flex items-center justify-between text-xs ${
+                        idx === 0 ? 'bg-amber-500/20 border-amber-400 text-amber-200 font-bold' : 'bg-slate-900 border-slate-800 text-slate-300'
+                    }`;
+                    item.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-full bg-slate-950 font-black flex items-center justify-center ${idx === 0 ? 'text-amber-400' : 'text-slate-500'}">
+                                ${idx + 1}º
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <i class="${av.icon} ${av.color}"></i>
+                                <span>${g.name}</span>
+                            </div>
+                        </div>
+                        <div class="font-mono font-bold text-amber-300">${g.finishTime}</div>
+                    `;
+                    list.appendChild(item);
+                });
+            }
+
+            modal.classList.remove("hidden");
+        }
+
+        function hidePodiumModal() {
+            document.getElementById("podium-modal").classList.add("hidden");
+        }
+    </script>
+</body>
+</html>
