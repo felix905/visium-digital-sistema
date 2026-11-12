@@ -41,7 +41,6 @@
         .font-display {
             font-family: 'Outfit', sans-serif;
         }
-        /* Custom Scrollbar Light */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -56,15 +55,11 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
-
-        /* Light Card Surface */
         .light-panel {
             background: #ffffff;
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
         }
-
-        /* Roulette Wheel CSS Animation */
         .wheel-container {
             position: relative;
             width: 230px;
@@ -113,12 +108,71 @@
             z-index: 30;
             filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.2));
         }
+
+        /* CORRECCIÓN MULTIPÁGINA PARA IMPRESIÓN Y EXPORTACIÓN A PDF */
+        @media print {
+            @page {
+                size: auto;
+                margin: 12mm;
+            }
+            html, body {
+                height: auto !important;
+                min-height: auto !important;
+                overflow: visible !important;
+                background: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            /* Ocultar todo lo que no sea el modal de informe */
+            body > *:not(#report-modal) {
+                display: none !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            /* Liberar el modal para que fluya en múltiples hojas sin recortar */
+            #report-modal {
+                position: static !important;
+                inset: auto !important;
+                display: block !important;
+                background: transparent !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                height: auto !important;
+                max-height: none !important;
+            }
+            #report-modal-box {
+                max-width: 100% !important;
+                width: 100% !important;
+                max-height: none !important;
+                height: auto !important;
+                overflow: visible !important;
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                display: block !important;
+            }
+            #printable-report {
+                position: static !important;
+                width: 100% !important;
+                max-height: none !important;
+                height: auto !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+            }
+            /* Evitar que una tarjeta de pregunta/respuesta se corte entre dos hojas */
+            .report-entry-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen p-4 bg-slate-50 font-sans text-slate-800 antialiased selection:bg-emerald-500 selection:text-white flex flex-col justify-between">
 
     <!-- HEADER con logo (INTACTO) -->
-    <header class="sticky top-0 z-50 pt-2 pb-3">
+    <header class="sticky top-0 z-50 pt-2 pb-3 no-print">
         <div class="container mx-auto px-4">
             <nav class="flex items-center justify-between text-sm font-normal bg-white/80 py-3 pl-2 pr-4 backdrop-blur-md rounded-xl shadow-sm border border-gray-100">
                 <a href="index.html" class="flex items-center">
@@ -133,11 +187,10 @@
     </header>
 
     <!-- CONTENIDO PRINCIPAL: EL ENIGMA DEL CAPITAL (LIGHT MODE) -->
-    <main class="container mx-auto px-4 py-4 flex-1 space-y-6">
+    <main class="container mx-auto px-4 py-4 flex-1 space-y-6 no-print">
 
         <!-- BARRA DE CONTROL SUPERIOR DEL JUEGO -->
         <div class="light-panel rounded-2xl p-4 md:px-6 flex flex-wrap items-center justify-between gap-4">
-            <!-- Título del Juego -->
             <div class="flex items-center gap-3.5">
                 <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center text-white font-black text-xl shadow-md shadow-emerald-500/20">
                     <i class="fa-solid fa-vault"></i>
@@ -166,10 +219,15 @@
                 </div>
             </div>
 
-            <!-- Botón Ver Podio -->
-            <button onclick="showPodiumModal()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition shadow-md shadow-amber-500/20">
-                <i class="fa-solid fa-trophy text-sm"></i> VER PODIO DE GANADORES
-            </button>
+            <!-- Botones de Acción Global -->
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="showReportModal(activeGroupId)" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition shadow-sm">
+                    <i class="fa-solid fa-file-lines text-emerald-400"></i> INFORME DEL GRUPO
+                </button>
+                <button onclick="showPodiumModal()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition shadow-md shadow-amber-500/20">
+                    <i class="fa-solid fa-trophy text-sm"></i> VER PODIO
+                </button>
+            </div>
         </div>
 
         <!-- GRID PRINCIPAL DE JUEGO -->
@@ -187,12 +245,8 @@
                         <span class="text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full font-mono font-bold">5 Grupos</span>
                     </div>
 
-                    <!-- Selector de Botones -->
-                    <div class="grid grid-cols-5 gap-2 mb-4" id="group-selector-grid">
-                        <!-- Javascript generará los 5 botones de grupo -->
-                    </div>
+                    <div class="grid grid-cols-5 gap-2 mb-4" id="group-selector-grid"></div>
 
-                    <!-- Personalizar Nombre del Equipo Activo -->
                     <div class="space-y-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
                         <div class="flex items-center justify-between text-xs">
                             <label class="text-slate-500 font-semibold">Nombre de Equipo:</label>
@@ -207,9 +261,7 @@
                         
                         <div class="flex items-center justify-between text-xs pt-1">
                             <label class="text-slate-500 font-semibold">Avatar de Equipo:</label>
-                            <div class="flex gap-1.5" id="avatar-picker">
-                                <!-- Generado por JS -->
-                            </div>
+                            <div class="flex gap-1.5" id="avatar-picker"></div>
                         </div>
                     </div>
                 </div>
@@ -223,9 +275,7 @@
                         <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 font-mono font-medium">En Vivo</span>
                     </div>
 
-                    <div id="live-time-tracker" class="space-y-2.5 flex-1 overflow-y-auto pr-1">
-                        <!-- Javascript generará las tarjetas de tiempo de los 5 grupos -->
-                    </div>
+                    <div id="live-time-tracker" class="space-y-2.5 flex-1 overflow-y-auto pr-1"></div>
                 </div>
 
             </section>
@@ -234,22 +284,18 @@
             <section class="lg:col-span-8 flex flex-col gap-5">
 
                 <!-- CABECERA DEL GRUPO ACTIVO -->
-                <div id="active-team-header" class="light-panel rounded-2xl p-5 border-l-4 border-l-emerald-500">
-                    <!-- Carga dinámica por JS -->
-                </div>
+                <div id="active-team-header" class="light-panel rounded-2xl p-5 border-l-4 border-l-emerald-500"></div>
 
                 <!-- VISTA DE LA FASE ACTIVA -->
-                <div id="phase-content-card" class="light-panel rounded-2xl p-6 flex flex-col gap-4 min-h-[460px] justify-between">
-                    <!-- Carga dinámica por JS -->
-                </div>
+                <div id="phase-content-card" class="light-panel rounded-2xl p-6 flex flex-col gap-4 min-h-[460px] justify-between"></div>
 
             </section>
 
         </div>
     </main>
 
-    <!-- MODAL DE PODIO / GANADORES (LIGHT MODE) -->
-    <div id="podium-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <!-- MODAL DE PODIO / GANADORES -->
+    <div id="podium-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl p-6 md:p-8 max-w-xl w-full text-center space-y-6 relative">
             <button onclick="hidePodiumModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-xl p-2 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -264,9 +310,7 @@
                 <p class="text-xs text-slate-500 mt-1">Equipos clasificados por menor tiempo total de finalización</p>
             </div>
 
-            <div id="podium-list" class="space-y-2.5">
-                <!-- JS inserta las posiciones -->
-            </div>
+            <div id="podium-list" class="space-y-2.5"></div>
 
             <button onclick="hidePodiumModal()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition border border-slate-200">
                 CERRAR
@@ -274,8 +318,45 @@
         </div>
     </div>
 
+    <!-- MODAL DE INFORME DE RESULTADOS (MULTIPÁGINA EN PDF) -->
+    <div id="report-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div id="report-modal-box" class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            
+            <!-- Barra superior del modal -->
+            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 no-print">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                        <i class="fa-solid fa-file-contract"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-base text-slate-900">Informe Detallado de Partida</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.print()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm">
+                        <i class="fa-solid fa-print"></i> Imprimir / Guardar PDF
+                    </button>
+                    <button onclick="hideReportModal()" class="w-8 h-8 rounded-lg bg-white hover:bg-slate-200 text-slate-500 hover:text-slate-800 border border-slate-200 flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenido imprimible del Informe -->
+            <div id="printable-report" class="p-6 md:p-8 overflow-y-auto space-y-6 flex-1">
+                <!-- Se llena dinámicamente por JS -->
+            </div>
+
+            <!-- Pie del modal -->
+            <div class="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex justify-between items-center no-print">
+                <span class="text-[11px] text-slate-500">Visium Digital · Evaluación Didáctica Financiera</span>
+                <button onclick="hideReportModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs transition">
+                    Cerrar Informe
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- FOOTER (INTACTO) -->
-    <footer class="mt-16 pb-8">
+    <footer class="mt-16 pb-8 no-print">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 border-t border-gray-300">
                 <div>
@@ -313,7 +394,6 @@
 
     <!-- LÓGICA DEL JUEGO EN JAVASCRIPT -->
     <script>
-        // CONFIGURACIÓN Y BANCO DE PREGUNTAS (TRIVIA FASE 1)
         const triviaQuestions = [
             { q: "¿Qué es el crédito financiero?", options: ["Un regalo del banco", "Dinero prestado con compromiso de pago futuro más intereses", "Dinero digital sin valor"], correct: 1 },
             { q: "¿Qué diferencia a un Broker de un Exchange?", options: ["Un Broker vende ropa, un Exchange vende criptos", "Un Broker facilita activos tradicionales y un Exchange es plataforma para criptoactivos", "Son exactamente lo mismo"], correct: 1 },
@@ -325,7 +405,6 @@
             { q: "¿Quién es Warren Buffett y por qué destaca?", options: ["Creador de Facebook", "Magnate conocido por su estrategia de inversión en valor y ahorro a largo plazo", "Fundador de Amazon"], correct: 1 }
         ];
 
-        // HITOS HISTÓRICOS PARA FASE 2: ROMPECABEZAS CRONOLÓGICO
         const timelineEvents = [
             { id: "t1", title: "Trueque de Sal y Ganado", period: "Prehistoria / Antigüedad", order: 1 },
             { id: "t2", title: "Monedas de Electrum en Lidia", period: "Siglo VII a.C.", order: 2 },
@@ -334,7 +413,6 @@
             { id: "t5", title: "Nacimiento de Bitcoin y Blockchain", period: "Año 2009", order: 5 }
         ];
 
-        // PRESUPUESTO FASE 3 ($1000 Total)
         const phase2Items = [
             { id: "p1", name: "Alquiler y Servicios de Vivienda", val: 350, correctType: "gastos" },
             { id: "p2", name: "Alimentación Básica de la Semana", val: 250, correctType: "gastos" },
@@ -343,7 +421,13 @@
             { id: "p5", name: "Salidas y Entretenimiento", val: 100, correctType: "diversion" }
         ];
 
-        // RETO FASE 4 (Clasificación con Aliado: Necesidad vs Deseo)
+        const categoryLabels = {
+            gastos: "Gastos Necesarios",
+            ahorro: "Ahorro",
+            inversion: "Inversión",
+            diversion: "Diversión / Deseos"
+        };
+
         const phase3Items = [
             { id: "c1", name: "Agua potable y comida básica", correct: "necesidad" },
             { id: "c2", name: "Zapatillas de colección $300", correct: "deseo" },
@@ -353,14 +437,12 @@
             { id: "c6", name: "Consola de última generación", correct: "deseo" }
         ];
 
-        // PREGUNTAS FASE 5 (Desbloqueo de Bóveda por Conteo de Letras)
         const phase4Questions = [
             { q: "1. Primera moneda fabricada en Lidia (siglo VII a.C.):", answer: "estatero", len: 8 },
             { q: "2. Registro contable digital e inalterable tras Bitcoin:", answer: "blockchain", len: 10 },
             { q: "3. Acción de guardar una parte de ingresos para el futuro:", answer: "ahorro", len: 6 }
         ];
 
-        // AVATARES DISPONIBLES (Colores adaptados a modo claro)
         const groupAvatars = [
             { icon: "fa-solid fa-crown", color: "text-amber-500" },
             { icon: "fa-solid fa-rocket", color: "text-blue-600" },
@@ -369,20 +451,40 @@
             { icon: "fa-solid fa-bolt", color: "text-pink-600" }
         ];
 
-        // ESTADO DE LOS 5 GRUPOS
+        function createInitialGroup(id, name, avatarIdx, puzzleOrder) {
+            return {
+                id,
+                name,
+                avatarIdx,
+                currentPhase: 1,
+                rouletteActive: false,
+                currentQuestion: null,
+                phase1Score: 0,
+                puzzleOrder,
+                phase2Selections: {},
+                phase2RemainingAmount: "",
+                phase3Classifications: {},
+                phase4Answers: ["", "", ""],
+                phase4Code: "",
+                finished: false,
+                finishTime: null,
+                usedQuestions: [],
+                auditLog: []
+            };
+        }
+
         let groups = [
-            { id: 1, name: "Grupo 1", avatarIdx: 0, currentPhase: 1, rouletteActive: false, currentQuestion: null, phase1Score: 0, puzzleOrder: ["t3", "t1", "t5", "t2", "t4"], phase2Selections: {}, phase2RemainingAmount: "", phase3Classifications: {}, phase4Answers: ["", "", ""], finished: false, finishTime: null, usedQuestions: [] },
-            { id: 2, name: "Grupo 2", avatarIdx: 1, currentPhase: 1, rouletteActive: false, currentQuestion: null, phase1Score: 0, puzzleOrder: ["t4", "t2", "t1", "t5", "t3"], phase2Selections: {}, phase2RemainingAmount: "", phase3Classifications: {}, phase4Answers: ["", "", ""], finished: false, finishTime: null, usedQuestions: [] },
-            { id: 3, name: "Grupo 3", avatarIdx: 2, currentPhase: 1, rouletteActive: false, currentQuestion: null, phase1Score: 0, puzzleOrder: ["t2", "t5", "t3", "t1", "t4"], phase2Selections: {}, phase2RemainingAmount: "", phase3Classifications: {}, phase4Answers: ["", "", ""], finished: false, finishTime: null, usedQuestions: [] },
-            { id: 4, name: "Grupo 4", avatarIdx: 3, currentPhase: 1, rouletteActive: false, currentQuestion: null, phase1Score: 0, puzzleOrder: ["t5", "t1", "t4", "t3", "t2"], phase2Selections: {}, phase2RemainingAmount: "", phase3Classifications: {}, phase4Answers: ["", "", ""], finished: false, finishTime: null, usedQuestions: [] },
-            { id: 5, name: "Grupo 5", avatarIdx: 4, currentPhase: 1, rouletteActive: false, currentQuestion: null, phase1Score: 0, puzzleOrder: ["t1", "t4", "t2", "t5", "t3"], phase2Selections: {}, phase2RemainingAmount: "", phase3Classifications: {}, phase4Answers: ["", "", ""], finished: false, finishTime: null, usedQuestions: [] }
+            createInitialGroup(1, "Grupo 1", 0, ["t3", "t1", "t5", "t2", "t4"]),
+            createInitialGroup(2, "Grupo 2", 1, ["t4", "t2", "t1", "t5", "t3"]),
+            createInitialGroup(3, "Grupo 3", 2, ["t2", "t5", "t3", "t1", "t4"]),
+            createInitialGroup(4, "Grupo 4", 3, ["t5", "t1", "t4", "t3", "t2"]),
+            createInitialGroup(5, "Grupo 5", 4, ["t1", "t4", "t2", "t5", "t3"])
         ];
 
         let activeGroupId = 1;
         let globalTimerInterval = null;
         let globalSeconds = 0;
 
-        // ACCIONADORES DE SONIDO CON WEB AUDIO API
         function playSound(type) {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -424,7 +526,6 @@
             } catch(e) {}
         }
 
-        // INICIALIZACIÓN
         window.onload = function() {
             renderGroupSelectorGrid();
             renderLiveTimeTracker();
@@ -433,7 +534,6 @@
             renderAvatarPicker();
         };
 
-        // CRONÓMETRO GLOBAL
         function toggleGlobalTimer() {
             const btn = document.getElementById("btn-timer-toggle");
             if (globalTimerInterval) {
@@ -465,7 +565,6 @@
             return `${m}:${s}`;
         }
 
-        // PANEL DE GRUPOS (IZQUIERDA)
         function renderGroupSelectorGrid() {
             const container = document.getElementById("group-selector-grid");
             container.innerHTML = "";
@@ -534,7 +633,6 @@
             renderAvatarPicker();
         }
 
-        // REGISTRO DE TIEMPOS Y PROGRESO EN VIVO
         function renderLiveTimeTracker() {
             const container = document.getElementById("live-time-tracker");
             container.innerHTML = "";
@@ -556,7 +654,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="text-right font-mono font-bold">
+                    <div class="flex items-center gap-2 font-mono font-bold">
+                        <button onclick="showReportModal(${g.id})" title="Ver Informe de ${g.name}" class="p-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 transition">
+                            <i class="fa-solid fa-file-lines"></i>
+                        </button>
                         ${g.finishTime 
                             ? `<span class="text-emerald-700 text-xs bg-emerald-100 px-2.5 py-1 rounded-md border border-emerald-200">${g.finishTime}</span>` 
                             : `<span class="text-slate-400 text-[11px]">En Carrera</span>`
@@ -567,7 +668,6 @@
             });
         }
 
-        // CABECERA DEL GRUPO SELECCIONADO
         function renderActiveGroupHeader() {
             const group = groups.find(g => g.id === activeGroupId);
             const av = groupAvatars[group.avatarIdx];
@@ -590,7 +690,6 @@
                         </div>
                     </div>
 
-                    <!-- PASOS DE FASES -->
                     <div class="flex items-center gap-1.5 bg-slate-100 p-2 rounded-xl border border-slate-200">
                         ${[1, 2, 3, 4, 5].map(step => {
                             const isDone = group.currentPhase > step || group.finished;
@@ -608,7 +707,6 @@
             `;
         }
 
-        // RENDER DE FASES EN EL PANEL DERECHO
         function renderPhaseContent() {
             const group = groups.find(g => g.id === activeGroupId);
             const container = document.getElementById("phase-content-card");
@@ -616,16 +714,21 @@
 
             if (group.finished) {
                 container.innerHTML = `
-                    <div class="text-center py-10 space-y-4 my-auto">
+                    <div class="text-center py-8 space-y-4 my-auto">
                         <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-4xl mx-auto border-2 border-emerald-400 shadow-lg shadow-emerald-500/15">
                             <i class="fa-solid fa-trophy"></i>
                         </div>
                         <h3 class="font-display text-3xl font-bold text-slate-900">¡BÓVEDA DESBLOQUEADA!</h3>
                         <p class="text-sm text-slate-600 max-w-md mx-auto">
-                            El <strong class="text-slate-900">${group.name}</strong> ha completado las 5 fases de la carrera financiera en un tiempo oficial de:
+                            El <strong class="text-slate-900">${group.name}</strong> ha completado todas las fases de la carrera financiera en un tiempo oficial de:
                         </p>
                         <div class="text-2xl font-mono font-bold text-emerald-700 bg-emerald-50 px-6 py-3 rounded-2xl inline-block border border-emerald-200">
                             ${group.finishTime}
+                        </div>
+                        <div class="pt-3">
+                            <button onclick="showReportModal(${group.id})" class="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs inline-flex items-center gap-2 transition shadow-md">
+                                <i class="fa-solid fa-file-contract text-emerald-400 text-sm"></i> GENERAR INFORME DE PREGUNTAS Y RESPUESTAS
+                            </button>
                         </div>
                     </div>
                 `;
@@ -658,12 +761,10 @@
                 </div>
 
                 <div class="flex flex-col md:flex-row items-center justify-around gap-6 py-4 my-auto">
-                    <!-- RULETA ANIMADA CON ICONOS -->
                     <div class="flex flex-col items-center gap-4">
                         <div class="relative">
                             <div class="wheel-pointer"></div>
                             <div id="roulette-wheel" class="wheel-container flex items-center justify-center">
-                                <!-- Iconos en la ruleta -->
                                 <div class="wheel-icon-slot" style="transform: rotate(22.5deg) translate(78px) rotate(-22.5deg);"><i class="fa-solid fa-coins"></i></div>
                                 <div class="wheel-icon-slot" style="transform: rotate(67.5deg) translate(78px) rotate(-67.5deg);"><i class="fa-solid fa-building-columns"></i></div>
                                 <div class="wheel-icon-slot" style="transform: rotate(112.5deg) translate(78px) rotate(-112.5deg);"><i class="fa-solid fa-chart-line"></i></div>
@@ -683,7 +784,6 @@
                         </button>
                     </div>
 
-                    <!-- PREGUNTA REVELADA ÚNICAMENTE AL GIRAR -->
                     <div class="flex-1 w-full bg-slate-50 p-5 rounded-xl border border-slate-200 min-h-[190px] flex flex-col justify-center">
                         ${group.currentQuestion ? `
                             <div class="space-y-3">
@@ -742,7 +842,20 @@
             const group = groups.find(g => g.id === activeGroupId);
             if (!group.currentQuestion) return;
 
-            if (selectedIdx === group.currentQuestion.correct) {
+            const isCorrect = selectedIdx === group.currentQuestion.correct;
+            const userAnswerText = group.currentQuestion.options[selectedIdx];
+            const correctAnswerText = group.currentQuestion.options[group.currentQuestion.correct];
+
+            group.auditLog.push({
+                phase: "Fase 1 · Trivia con Ruleta",
+                time: formatTime(globalSeconds),
+                question: group.currentQuestion.q,
+                userAnswer: userAnswerText,
+                expectedAnswer: correctAnswerText,
+                isCorrect: isCorrect
+            });
+
+            if (isCorrect) {
                 playSound('correct');
                 if (typeof confetti === 'function') confetti({ particleCount: 35, spread: 60, origin: { y: 0.7 } });
                 group.phase1Score += 1;
@@ -823,6 +936,18 @@
             const expectedOrder = ["t1", "t2", "t3", "t4", "t5"];
             const isCorrect = group.puzzleOrder.every((val, idx) => val === expectedOrder[idx]);
 
+            const userSequence = group.puzzleOrder.map((id, idx) => `${idx + 1}. ${timelineEvents.find(e => e.id === id).title}`).join(" → ");
+            const expectedSequence = expectedOrder.map((id, idx) => `${idx + 1}. ${timelineEvents.find(e => e.id === id).title}`).join(" → ");
+
+            group.auditLog.push({
+                phase: "Fase 2 · Rompecabezas Cronológico",
+                time: formatTime(globalSeconds),
+                question: "Ordenar cronológicamente la evolución del dinero",
+                userAnswer: userSequence,
+                expectedAnswer: expectedSequence,
+                isCorrect: isCorrect
+            });
+
             if (isCorrect) {
                 playSound('phase_complete');
                 group.currentPhase = 3;
@@ -866,7 +991,6 @@
                         `).join('')}
                     </div>
 
-                    <!-- CASILLA PARA EL MONTO RESTANTE QUE FUNCIONA COMO CLAVE -->
                     <div class="bg-white p-3.5 rounded-lg border border-slate-200 flex items-center justify-between gap-3 text-xs shadow-sm">
                         <div>
                             <span class="font-bold text-slate-800 block">Monto Restante del Presupuesto ($):</span>
@@ -905,8 +1029,21 @@
             const expectedTotal = phase2Items.reduce((acc, curr) => acc + curr.val, 0);
             const expectedRemaining = 1000 - expectedTotal;
             const userAmount = parseInt(group.phase2RemainingAmount, 10);
+            const isSuccess = correctCats && userAmount === expectedRemaining;
 
-            if (correctCats && userAmount === expectedRemaining) {
+            const userSummary = phase2Items.map(i => `${i.name} ($${i.val}): ${categoryLabels[group.phase2Selections[i.id]] || "Sin asignar"}`).join(" | ") + ` — Saldo restante: $${isNaN(userAmount) ? "N/A" : userAmount}`;
+            const expectedSummary = phase2Items.map(i => `${i.name}: ${categoryLabels[i.correctType]}`).join(" | ") + ` — Saldo restante: $${expectedRemaining}`;
+
+            group.auditLog.push({
+                phase: "Fase 3 · Presupuesto Regla VIDA ($1000)",
+                time: formatTime(globalSeconds),
+                question: "Clasificación de partidas presupuestarias y cálculo de saldo restante",
+                userAnswer: userSummary,
+                expectedAnswer: expectedSummary,
+                isCorrect: isSuccess
+            });
+
+            if (isSuccess) {
                 playSound('phase_complete');
                 group.currentPhase = 4;
                 if (typeof confetti === 'function') confetti({ particleCount: 50, spread: 80 });
@@ -971,6 +1108,18 @@
                 }
             });
 
+            const userSummary = phase3Items.map(i => `${i.name}: ${group.phase3Classifications[i.id] ? group.phase3Classifications[i.id].toUpperCase() : "SIN MARCAR"}`).join(" | ");
+            const expectedSummary = phase3Items.map(i => `${i.name}: ${i.correct.toUpperCase()}`).join(" | ");
+
+            group.auditLog.push({
+                phase: "Fase 4 · Reto de Alianza (Necesidades vs. Deseos)",
+                time: formatTime(globalSeconds),
+                question: "Clasificar los 6 conceptos de consumo en Necesidad o Deseo",
+                userAnswer: userSummary,
+                expectedAnswer: expectedSummary,
+                isCorrect: allCorrect
+            });
+
             if (allCorrect) {
                 playSound('phase_complete');
                 group.currentPhase = 5;
@@ -999,7 +1148,7 @@
                     ${phase4Questions.map((pq, idx) => `
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5">
                             <label class="block font-bold text-slate-800">${pq.q}</label>
-                            <input type="text" onchange="updatePhase4Ans(${idx}, this.value)" value="${group.phase4Answers[idx] || ''}" placeholder="Escribe tu respuesta..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-emerald-700 font-bold outline-none focus:border-emerald-500">
+                            <input type="text" oninput="updatePhase4Ans(${idx}, this.value)" value="${group.phase4Answers[idx] || ''}" placeholder="Escribe tu respuesta..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-emerald-700 font-bold outline-none focus:border-emerald-500">
                         </div>
                     `).join('')}
 
@@ -1008,7 +1157,7 @@
                             <span class="font-bold text-slate-900 block">Sumatoria Total de Letras:</span>
                             <span class="text-[11px] text-slate-600">Suma la cantidad de letras de cada palabra acertada</span>
                         </div>
-                        <input type="number" id="phase4-code-input" placeholder="Código" class="w-28 bg-white border border-amber-300 rounded-lg px-3 py-1.5 text-center font-mono font-bold text-amber-700 outline-none focus:border-amber-500">
+                        <input type="number" id="phase4-code-input" oninput="updatePhase4Code(this.value)" value="${group.phase4Code || ''}" placeholder="Código" class="w-28 bg-white border border-amber-300 rounded-lg px-3 py-1.5 text-center font-mono font-bold text-amber-700 outline-none focus:border-amber-500">
                     </div>
                 </div>
 
@@ -1023,6 +1172,11 @@
             group.phase4Answers[idx] = val.trim().toLowerCase();
         }
 
+        function updatePhase4Code(val) {
+            const group = groups.find(g => g.id === activeGroupId);
+            group.phase4Code = val;
+        }
+
         function submitPhase4() {
             const group = groups.find(g => g.id === activeGroupId);
             let wordsCorrect = true;
@@ -1035,8 +1189,21 @@
 
             const userCode = parseInt(document.getElementById("phase4-code-input").value, 10);
             const expectedSum = phase4Questions.reduce((acc, curr) => acc + curr.len, 0);
+            const isSuccess = wordsCorrect && userCode === expectedSum;
 
-            if (wordsCorrect && userCode === expectedSum) {
+            const userSummary = phase4Questions.map((pq, idx) => `P${idx+1}: "${group.phase4Answers[idx] || "vacío"}"`).join(" | ") + ` — Código ingresado: ${isNaN(userCode) ? "N/A" : userCode}`;
+            const expectedSummary = phase4Questions.map((pq, idx) => `P${idx+1}: "${pq.answer}" (${pq.len} letras)`).join(" | ") + ` — Código: ${expectedSum}`;
+
+            group.auditLog.push({
+                phase: "Fase 5 · Apertura de Bóveda Final",
+                time: formatTime(globalSeconds),
+                question: "3 palabras clave financieras + sumatoria total de sus letras",
+                userAnswer: userSummary,
+                expectedAnswer: expectedSummary,
+                isCorrect: isSuccess
+            });
+
+            if (isSuccess) {
                 playSound('phase_complete');
                 group.finished = true;
                 group.finishTime = formatTime(globalSeconds);
@@ -1048,7 +1215,7 @@
                 renderLiveTimeTracker();
                 renderActiveGroupHeader();
                 renderPhaseContent();
-                showPodiumModal();
+                showReportModal(group.id);
             } else if (!wordsCorrect) {
                 playSound('error');
                 alert("Alguna de las 3 respuestas escritas no es correcta. Verifiquen la ortografía.");
@@ -1092,7 +1259,12 @@
                                 <span>${g.name}</span>
                             </div>
                         </div>
-                        <div class="font-mono font-bold ${idx === 0 ? 'text-amber-700' : 'text-emerald-700'}">${g.finishTime}</div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono font-bold ${idx === 0 ? 'text-amber-700' : 'text-emerald-700'}">${g.finishTime}</span>
+                            <button onclick="hidePodiumModal(); showReportModal(${g.id})" class="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold transition">
+                                Ver Informe
+                            </button>
+                        </div>
                     `;
                     list.appendChild(item);
                 });
@@ -1103,6 +1275,117 @@
 
         function hidePodiumModal() {
             document.getElementById("podium-modal").classList.add("hidden");
+        }
+
+        // GENERADOR DE INFORME DETALLADO MULTIPÁGINA
+        function showReportModal(groupId) {
+            const group = groups.find(g => g.id === groupId);
+            if (!group) return;
+
+            const modal = document.getElementById("report-modal");
+            const container = document.getElementById("printable-report");
+            const av = groupAvatars[group.avatarIdx];
+
+            const totalAttempts = group.auditLog.length;
+            const correctAttempts = group.auditLog.filter(item => item.isCorrect).length;
+            const wrongAttempts = totalAttempts - correctAttempts;
+
+            const finishedGroups = groups.filter(g => g.finished).sort((a, b) => {
+                const toSec = t => { const [m, s] = t.split(":").map(Number); return m * 60 + s; };
+                return toSec(a.finishTime) - toSec(b.finishTime);
+            });
+
+            let statusBadge = "";
+            if (group.finished) {
+                const rank = finishedGroups.findIndex(g => g.id === group.id) + 1;
+                if (rank === 1) {
+                    statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300"><i class="fa-solid fa-crown"></i> GANADOR · 1er Lugar (${group.finishTime})</span>`;
+                } else {
+                    statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300"><i class="fa-solid fa-flag-checkered"></i> BÓVEDA COMPLETADA · ${rank}º Lugar (${group.finishTime})</span>`;
+                }
+            } else {
+                statusBadge = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300"><i class="fa-solid fa-hourglass-end"></i> NO COMPLETADO · Detenido en Fase ${group.currentPhase}</span>`;
+            }
+
+            container.innerHTML = `
+                <!-- Encabezado del Informe -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-2xl ${av.color}">
+                            <i class="${av.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="text-[11px] font-bold uppercase tracking-wider text-emerald-600">Visium Digital · El Enigma del Capital</div>
+                            <h2 class="font-display text-2xl font-black text-slate-900">${group.name} <span class="text-sm font-normal text-slate-400">(Grupo ${group.id})</span></h2>
+                        </div>
+                    </div>
+                    <div>${statusBadge}</div>
+                </div>
+
+                <!-- Resumen Estadístico -->
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                        <div class="text-[11px] font-semibold text-slate-500">Total Intentos</div>
+                        <div class="font-display text-xl font-black text-slate-800 mt-0.5">${totalAttempts}</div>
+                    </div>
+                    <div class="bg-emerald-50/70 p-3.5 rounded-2xl border border-emerald-200">
+                        <div class="text-[11px] font-semibold text-emerald-700">Respuestas Correctas</div>
+                        <div class="font-display text-xl font-black text-emerald-700 mt-0.5">${correctAttempts}</div>
+                    </div>
+                    <div class="bg-rose-50/70 p-3.5 rounded-2xl border border-rose-200">
+                        <div class="text-[11px] font-semibold text-rose-700">Respuestas Incorrectas</div>
+                        <div class="font-display text-xl font-black text-rose-700 mt-0.5">${wrongAttempts}</div>
+                    </div>
+                </div>
+
+                <!-- Listado Cronológico de Preguntas y Respuestas -->
+                <div class="space-y-3">
+                    <h4 class="font-display font-bold text-sm text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-emerald-600"></i> Registro Completo de Fases, Preguntas y Respuestas (${totalAttempts} registros)
+                    </h4>
+
+                    ${group.auditLog.length === 0 ? `
+                        <div class="p-8 text-center bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-500">
+                            Este grupo aún no ha registrado respuestas en ninguna fase.
+                        </div>
+                    ` : `
+                        <div class="space-y-3">
+                            ${group.auditLog.map((entry, i) => `
+                                <div class="report-entry-card p-4 rounded-2xl border text-xs space-y-2 ${entry.isCorrect ? 'bg-white border-slate-200' : 'bg-rose-50/30 border-rose-200'}">
+                                    <div class="flex flex-wrap items-center justify-between gap-2">
+                                        <span class="font-bold text-slate-700">
+                                            #${i + 1} · ${entry.phase} <span class="font-mono font-normal text-slate-400">(${entry.time})</span>
+                                        </span>
+                                        ${entry.isCorrect 
+                                            ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px]"><i class="fa-solid fa-check mr-1"></i>Correcta</span>`
+                                            : `<span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold text-[11px]"><i class="fa-solid fa-xmark mr-1"></i>Incorrecta</span>`
+                                        }
+                                    </div>
+                                    <div class="text-slate-900 font-semibold">
+                                        Pregunta / Reto: <span class="font-normal text-slate-700">${entry.question}</span>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
+                                        <div class="p-2.5 rounded-xl ${entry.isCorrect ? 'bg-emerald-50/70 border border-emerald-200 text-emerald-900' : 'bg-rose-50 border border-rose-200 text-rose-900'}">
+                                            <span class="block text-[10px] uppercase font-bold opacity-75 mb-0.5">Respuesta colocada por el equipo:</span>
+                                            <span class="font-medium">${entry.userAnswer}</span>
+                                        </div>
+                                        <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800">
+                                            <span class="block text-[10px] uppercase font-bold text-slate-500 mb-0.5">Respuesta esperada:</span>
+                                            <span class="font-medium">${entry.expectedAnswer}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `}
+                </div>
+            `;
+
+            modal.classList.remove("hidden");
+        }
+
+        function hideReportModal() {
+            document.getElementById("report-modal").classList.add("hidden");
         }
     </script>
 </body>
