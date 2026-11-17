@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta Financiera · Visium Digital</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Lucide Icons (for the form template) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        #pdf-template { background: white; color: #1f2937; box-sizing: border-box; }
+        .pdf-section { break-inside: avoid; page-break-inside: avoid; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="min-h-screen p-4 bg-slate-50 font-sans text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- HEADER con logo (original) -->
+    <header class="sticky top-0 z-50 pt-2 pb-3">
+        <div class="container mx-auto px-4">
+            <nav class="flex items-center justify-between text-sm font-normal bg-white/80 py-3 pl-2 pr-4 backdrop-blur-md rounded-xl shadow-sm border border-gray-100">
+                <a href="index.html" class="flex items-center">
+                    <img src="img/logo_v.svg" alt="Visium Digital" class="ml-3 h-7" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'font-bold text-emerald-600 text-lg\'>Visium Digital</span>'">
+                </a>
+                <div class="hidden md:block text-right">
+                    <div class="text-sm font-normal text-gray-800 leading-tight">Escuela de diseño</div>
+                    <div class="text-sm font-normal text-gray-800 leading-tight">e innovación</div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL: Se inserta aquí la plantilla del juego financiero -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Barra de Navegación Superior de la plantilla (ahora dentro del main, sin header duplicado) -->
+        <div class="bg-emerald-900 text-white shadow-lg rounded-xl mb-6">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="bg-emerald-500/20 p-2.5 rounded-xl border border-emerald-400/30">
+                        <i data-lucide="coins" class="w-7 h-7 text-emerald-300"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight">Ficha Técnica: Juego Financiero</h1>
+                        <p class="text-xs text-emerald-200">Proyecto de Cierre de Lapso • Educación Financiera</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <button onclick="fillExampleData()" type="button" class="text-xs bg-emerald-800 hover:bg-emerald-700 text-emerald-100 px-3 py-2 rounded-lg border border-emerald-700 transition flex items-center gap-1.5" title="Rellenar con un ejemplo guía">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span>Ver Ejemplo</span>
+                    </button>
+                    <button onclick="clearForm()" type="button" class="text-xs bg-emerald-800 hover:bg-red-900/60 text-emerald-100 px-3 py-2 rounded-lg border border-emerald-700 transition flex items-center gap-1.5" title="Limpiar formulario">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Limpiar</span>
+                    </button>
+                    <button onclick="generatePDF()" id="btn-download" type="button" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-sm px-4 py-2 rounded-lg shadow-md transition flex items-center gap-2 cursor-pointer">
+                        <i data-lucide="file-down" class="w-4 h-4"></i>
+                        <span>Descargar PDF</span>
+                    </button>
+                    <button onclick="openEmailModal()" type="button" class="bg-white hover:bg-slate-100 text-emerald-950 font-semibold text-sm px-4 py-2 rounded-lg shadow-md transition flex items-center gap-2 cursor-pointer">
+                        <i data-lucide="send" class="w-4 h-4 text-emerald-700"></i>
+                        <span>Enviar al Docente</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notificación Toast -->
+        <div id="toast" class="fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300">
+            <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-slate-700">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>
+                <span id="toast-msg" class="text-sm font-medium">Acción completada</span>
+            </div>
+        </div>
+
+        <!-- Split View: Formulario + Vista Previa -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- COLUMNA IZQUIERDA: FORMULARIO INTERACTIVO -->
+            <div class="lg:col-span-6 space-y-6">
+                <!-- Barra de Progreso -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Progreso de la ficha</span>
+                        <span id="progress-text" class="text-xs font-bold text-emerald-700">0% completado</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                        <div id="progress-bar" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <form id="project-form" class="space-y-6">
+                    <!-- SECCIÓN 0: DATOS DEL EQUIPO -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                        <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                            <span class="bg-slate-800 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">
+                                <i data-lucide="users" class="w-4 h-4"></i>
+                            </span>
+                            <h2 class="font-bold text-slate-800 text-base">Datos del Equipo de Trabajo (2 o 3 integrantes)</h2>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre del Equipo / Grupo *</label>
+                                <input type="text" id="teamName" oninput="updatePreview()" placeholder="Identifiquen a su equipo..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Año / Sección / Curso *</label>
+                                <input type="text" id="courseSection" oninput="updatePreview()" placeholder="Indiquen su año y sección..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Integrantes del Grupo (2 o 3 estudiantes) *</label>
+                            <textarea id="members" rows="2" oninput="updatePreview()" placeholder="Nombres y apellidos de los integrantes..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+                        </div>
+
+                        <!-- CÁMARA WEB PARA FOTO DEL EQUIPO -->
+                        <div class="pt-2 border-t border-slate-100">
+                            <label class="block text-xs font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
+                                <i data-lucide="camera" class="w-4 h-4 text-emerald-600"></i>
+                                <span>Foto del Equipo (Usando la cámara de la laptop) *</span>
+                            </label>
+                            <div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-4 text-center space-y-3">
+                                <div id="camera-container" class="hidden relative mx-auto max-w-sm rounded-xl overflow-hidden bg-black shadow-inner aspect-video">
+                                    <video id="webcam-video" autoplay playsinline class="w-full h-full object-cover transform -scale-x-100"></video>
+                                    <div id="countdown-overlay" class="hidden absolute inset-0 bg-black/50 flex items-center justify-center text-white text-5xl font-extrabold"></div>
+                                </div>
+                                <div id="photo-preview-box" class="hidden relative mx-auto max-w-sm rounded-xl overflow-hidden border-2 border-emerald-500 shadow-sm aspect-video bg-slate-900">
+                                    <img id="captured-photo-form" src="" alt="Foto del equipo" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="flex flex-wrap items-center justify-center gap-2">
+                                    <button type="button" id="btn-start-cam" onclick="startCamera()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                                        <i data-lucide="video" class="w-3.5 h-3.5"></i>
+                                        <span>Activar Cámara</span>
+                                    </button>
+                                    <button type="button" id="btn-take-photo" onclick="takePhotoWithTimer()" class="hidden bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center gap-1.5 cursor-pointer">
+                                        <i data-lucide="aperture" class="w-4 h-4"></i>
+                                        <span>Tomar Foto (3s)</span>
+                                    </button>
+                                    <button type="button" id="btn-retake-photo" onclick="startCamera()" class="hidden bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                        <span>Volver a tomar</span>
+                                    </button>
+                                    <label class="bg-white hover:bg-slate-100 text-slate-600 border border-slate-300 text-xs font-medium px-3 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                                        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                        <span>Subir archivo</span>
+                                        <input type="file" accept="image/*" onchange="handleFileUpload(event)" class="hidden" />
+                                    </label>
+                                </div>
+                                <p class="text-[11px] text-slate-500">Asegúrense de que los 2 o 3 integrantes salgan visibles en el encuadre.</p>
+                            </div>
+                            <canvas id="photo-canvas" class="hidden"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- BLOQUE A: IDENTIDAD Y PROPÓSITO (1 al 4) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+                        <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                            <span class="bg-emerald-600 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">1-4</span>
+                            <h2 class="font-bold text-slate-800 text-base">Identidad y Propósito del Juego</h2>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                <span class="text-emerald-600 font-bold">1.</span> Nombre de tu juego *
+                            </label>
+                            <input type="text" id="q1_name" oninput="updatePreview()" placeholder="Elijan un título atractivo y memorable..." class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                <span class="text-emerald-600 font-bold">2.</span> Objetivo del juego *
+                            </label>
+                            <textarea id="q2_objective" rows="2" oninput="updatePreview()" placeholder="¿Cuál es la meta principal que persigue el jugador durante la partida?" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                <span class="text-emerald-600 font-bold">3.</span> ¿A quién va dirigido? *
+                            </label>
+                            <input type="text" id="q3_audience" oninput="updatePreview()" placeholder="Definan el rango de edad o perfil del público..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                <span class="text-emerald-600 font-bold">4.</span> ¿Qué problema intenta resolver? *
+                            </label>
+                            <textarea id="q4_problem" rows="2" oninput="updatePreview()" placeholder="¿Qué dificultad o hábito financiero real busca mejorar?" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- BLOQUE B: CONTENIDO Y FORMATO (5 al 7) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+                        <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                            <span class="bg-emerald-600 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">5-7</span>
+                            <h2 class="font-bold text-slate-800 text-base">Contenido Financiero y Formato</h2>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                <span class="text-emerald-600 font-bold">5.</span> ¿Qué conceptos financieros de lo visto en clase van a trabajar? *
+                            </label>
+                            <textarea id="q5_concepts" rows="2" oninput="updatePreview()" placeholder="Mencionen los temas de clase que aplicarán en las reglas o cartas..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                <span class="text-emerald-600 font-bold">6.</span> ¿Cuál es el formato del juego? <span class="text-xs font-normal text-slate-500">(Pueden seleccionar uno o combinar varios)</span> *
+                            </label>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="format-options">
+                                <label class="flex items-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500">
+                                    <input type="checkbox" value="Juego de mesa" onchange="updatePreview()" class="format-cb w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                    <span class="text-xs font-medium text-slate-700">🎲 Juego de mesa</span>
+                                </label>
+                                <label class="flex items-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500">
+                                    <input type="checkbox" value="Juego de cartas" onchange="updatePreview()" class="format-cb w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                    <span class="text-xs font-medium text-slate-700">🃏 Juego de cartas</span>
+                                </label>
+                                <label class="flex items-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500">
+                                    <input type="checkbox" value="Juego de rol" onchange="updatePreview()" class="format-cb w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                    <span class="text-xs font-medium text-slate-700">🎭 Juego de rol</span>
+                                </label>
+                                <label class="flex items-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500">
+                                    <input type="checkbox" value="Trivia / Preguntas" onchange="updatePreview()" class="format-cb w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                    <span class="text-xs font-medium text-slate-700">❓ Trivia</span>
+                                </label>
+                                <label class="flex items-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500 col-span-2 sm:col-span-2">
+                                    <input type="checkbox" id="format-other-cb" value="Otro" onchange="toggleOtherFormat(); updatePreview()" class="format-cb w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                    <span class="text-xs font-medium text-slate-700">✨ Otro formato:</span>
+                                    <input type="text" id="format-other-text" oninput="updatePreview()" placeholder="Especificar..." disabled class="w-full text-xs bg-transparent border-b border-slate-300 focus:border-emerald-500 outline-none disabled:opacity-40" />
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                <span class="text-emerald-600 font-bold">7.</span> Resume tu idea del juego *
+                            </label>
+                            <textarea id="q7_summary" rows="3" oninput="updatePreview()" placeholder="Describan brevemente la temática y de qué trata la experiencia..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- BLOQUE C: MECÁNICAS Y DINÁMICA (8 al 11) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+                        <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                            <span class="bg-emerald-600 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">8-11</span>
+                            <h2 class="font-bold text-slate-800 text-base">Mecánicas y Dinámica de Juego</h2>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                <span class="text-emerald-600 font-bold">8.</span> ¿Cómo ganan, pierden o avanzan los jugadores? *
+                            </label>
+                            <textarea id="q8_mechanics" rows="3" oninput="updatePreview()" placeholder="Expliquen el sistema de turnos, progreso y condiciones de victoria o derrota..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                <span class="text-emerald-600 font-bold">9.</span> Desafíos del juego *
+                            </label>
+                            <textarea id="q9_challenges" rows="2" oninput="updatePreview()" placeholder="¿Qué obstáculos o situaciones pondrán a prueba las decisiones del jugador?" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                <span class="text-emerald-600 font-bold">10.</span> ¿Cuál es el castigo y la recompensa en el juego? *
+                            </label>
+                            <textarea id="q10_reward_punishment" rows="2" oninput="updatePreview()" placeholder="¿Qué consecuencias tienen las buenas y malas decisiones financieras?" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                <span class="text-emerald-600 font-bold">11.</span> ¿Qué lo hace divertido y fluido para jugar? *
+                            </label>
+                            <textarea id="q11_fun" rows="2" oninput="updatePreview()" placeholder="¿Qué elemento evita que el juego sea lento o predecible?" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- BLOQUE D: APRENDIZAJE, PRODUCCIÓN Y EXTRAS (12 al 15) -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+                        <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+                            <span class="bg-emerald-600 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">12-15</span>
+                            <h2 class="font-bold text-slate-800 text-base">Aprendizaje y Producción</h2>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                <span class="text-emerald-600 font-bold">12.</span> ¿Qué aprenderán los jugadores? *
+                            </label>
+                            <textarea id="q12_learning" rows="2" oninput="updatePreview()" placeholder="¿Qué reflexión o habilidad práctica se llevarán al terminar?" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">
+                                <span class="text-emerald-600 font-bold">13.</span> ¿Qué materiales van a utilizar para la producción del juego? *
+                            </label>
+                            <textarea id="q13_materials" rows="2" oninput="updatePreview()" placeholder="Enumeración de insumos necesarios para construir su prototipo..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+                        </div>
+                        <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200/80 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-sm font-semibold text-slate-800">
+                                    <span class="text-amber-600 font-bold">14.</span> Número de jugadores y duración estimada
+                                </label>
+                                <span class="text-[10px] uppercase font-bold tracking-wider bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full">Sugerida</span>
+                            </div>
+                            <input type="text" id="q14_logistics" oninput="updatePreview()" placeholder="¿Cuántas personas participan y cuánto dura una partida?" class="w-full px-3.5 py-2 text-sm bg-white border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none transition" />
+                        </div>
+                        <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200/80 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-sm font-semibold text-slate-800">
+                                    <span class="text-amber-600 font-bold">15.</span> Distribución de roles en el equipo y materiales reciclados
+                                </label>
+                                <span class="text-[10px] uppercase font-bold tracking-wider bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full">Sugerida</span>
+                            </div>
+                            <textarea id="q15_roles" rows="2" oninput="updatePreview()" placeholder="¿Cómo se dividirán el trabajo entre los 2 o 3 integrantes y qué recursos reutilizarán?" class="w-full px-3.5 py-2 text-sm bg-white border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none transition"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- COLUMNA DERECHA: VISTA PREVIA EN TIEMPO REAL DEL DOCUMENTO PDF -->
+            <div class="lg:col-span-6">
+                <div class="sticky top-24">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="eye" class="w-4 h-4 text-emerald-700"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Vista Previa del Documento PDF</span>
+                        </div>
+                        <span class="text-xs text-slate-400">Se actualiza automáticamente</span>
+                    </div>
+                    <div class="bg-slate-300/70 p-3 sm:p-5 rounded-2xl border border-slate-300 overflow-auto max-h-[calc(100vh-140px)]">
+                        <!-- PLANTILLA REAL QUE SE EXPORTA A PDF -->
+                        <div id="pdf-template" class="w-full max-w-[210mm] mx-auto bg-white p-8 shadow-xl rounded-sm text-slate-800">
+                            <!-- Encabezado Institucional del PDF -->
+                            <div class="border-b-2 border-emerald-700 pb-4 mb-5 flex justify-between items-center gap-4">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-14 h-14 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+                                        <svg viewBox="0 0 64 64" class="w-11 h-11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="8" y="36" width="8" height="18" rx="2" fill="#10B981"/>
+                                            <rect x="20" y="28" width="8" height="26" rx="2" fill="#059669"/>
+                                            <rect x="32" y="20" width="8" height="34" rx="2" fill="#047857"/>
+                                            <circle cx="48" cy="20" r="10" fill="#F59E0B" stroke="#B45309" stroke-width="2"/>
+                                            <text x="48" y="24" text-anchor="middle" fill="#FFFFFF" font-size="12" font-weight="bold" font-family="Inter, sans-serif">$</text>
+                                            <path d="M10 30L22 20L32 23L42 12" stroke="#065F46" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-700">Educación Financiera • Proyecto de Cierre de Lapso</p>
+                                        <h1 id="prev-q1" class="text-xl font-extrabold text-slate-900 mt-0.5">NOMBRE DEL JUEGO</h1>
+                                        <p id="prev-formats" class="text-[11px] font-medium text-emerald-800 mt-1 inline-block bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
+                                            Formato: Por definir
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="text-right text-[10px] text-slate-500 shrink-0">
+                                    <p class="font-bold text-slate-700">FICHA DE PRODUCCIÓN</p>
+                                    <p id="prev-date"></p>
+                                    <p class="text-emerald-700 font-medium mt-0.5">visiumdigitalca@gmail.com</p>
+                                </div>
+                            </div>
+
+                            <!-- Tabla de Datos del Equipo + Foto Grupal -->
+                            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3.5 mb-5 text-xs flex flex-col sm:flex-row justify-between items-stretch gap-4">
+                                <div class="flex-1 flex flex-col justify-between space-y-2">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <span class="font-bold text-slate-500 uppercase text-[10px] block">Equipo / Grupo:</span>
+                                            <span id="prev-team" class="font-semibold text-slate-800">—</span>
+                                        </div>
+                                        <div>
+                                            <span class="font-bold text-slate-500 uppercase text-[10px] block">Curso / Sección:</span>
+                                            <span id="prev-section" class="font-semibold text-slate-800">—</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span class="font-bold text-slate-500 uppercase text-[10px] block">Integrantes (2-3):</span>
+                                        <span id="prev-members" class="text-slate-700">—</span>
+                                    </div>
+                                </div>
+                                <div class="w-full sm:w-36 h-24 rounded-lg border border-slate-300 bg-white overflow-hidden flex flex-col items-center justify-center shrink-0 relative">
+                                    <img id="prev-team-photo" src="" alt="Foto del equipo" class="hidden w-full h-full object-cover" />
+                                    <div id="prev-photo-placeholder" class="text-center p-2 text-slate-400">
+                                        <svg class="w-6 h-6 mx-auto mb-1 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <span class="text-[9px] font-medium block leading-tight">Foto del Equipo</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contenido de los 15 puntos -->
+                            <div class="space-y-3.5 text-xs leading-relaxed">
+                                <div class="grid grid-cols-2 gap-3.5 pdf-section">
+                                    <div class="border border-slate-200 rounded-lg p-3">
+                                        <h3 class="font-bold text-emerald-800 text-[11px] uppercase mb-1">2. Objetivo del Juego</h3>
+                                        <p id="prev-q2" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                    </div>
+                                    <div class="border border-slate-200 rounded-lg p-3">
+                                        <h3 class="font-bold text-emerald-800 text-[11px] uppercase mb-1">3. Público Dirigido</h3>
+                                        <p id="prev-q3" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3.5 pdf-section">
+                                    <div class="border border-slate-200 rounded-lg p-3">
+                                        <h3 class="font-bold text-emerald-800 text-[11px] uppercase mb-1">4. Problema que Intenta Resolver</h3>
+                                        <p id="prev-q4" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                    </div>
+                                    <div class="border border-slate-200 rounded-lg p-3">
+                                        <h3 class="font-bold text-emerald-800 text-[11px] uppercase mb-1">5. Conceptos Financieros Trabajados</h3>
+                                        <p id="prev-q5" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                    </div>
+                                </div>
+                                <div class="border border-slate-200 rounded-lg p-3 bg-emerald-50/30 pdf-section">
+                                    <h3 class="font-bold text-emerald-800 text-[11px] uppercase mb-1">7. Resumen de la Idea del Juego</h3>
+                                    <p id="prev-q7" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                </div>
+                                <div class="border border-slate-200 rounded-lg p-3 pdf-section">
+                                    <h3 class="font-bold text-emerald-800 text-[11px] uppercase mb-1">8. Cómo Ganan, Pierden o Avanzan los Jugadores</h3>
+                                    <p id="prev-q8" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3.5 pdf-section">
+                                    <div class="border border-slate-200 rounded-lg p-3">
+                                        <h3 class="font-bold text-emerald-800 text-[11px] uppercase mb-1">9. Desafíos del Juego</h3>
+                                        <p id="prev-q9" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                    </div>
+                                    <div class="border border-slate-200 rounded-lg p-3">
+                                        <h3 class="font-bold text-emerald-800 text-[11px] uppercase mb-1">10. Castigo y Recompensa</h3>
+                                        <p id="prev-q10" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3.5 pdf-section">
+                                    <div class="border border-slate-200 rounded-lg p-3">
+                                        <h3 class="font-bold text-emerald-800 text-[11px] uppercase mb-1">11. Factor Divertido y Fluidez</h3>
+                                        <p id="prev-q11" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                    </div>
+                                    <div class="border border-slate-200 rounded-lg p-3">
+                                        <h3 class="font-bold text-emerald-800 text-[11px] uppercase mb-1">12. Aprendizaje Esperado</h3>
+                                        <p id="prev-q12" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                    </div>
+                                </div>
+                                <div class="border border-slate-200 rounded-lg p-3 pdf-section">
+                                    <h3 class="font-bold text-emerald-800 text-[11px] uppercase mb-1">13. Materiales para la Producción</h3>
+                                    <p id="prev-q13" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3.5 pdf-section">
+                                    <div class="border border-amber-200 bg-amber-50/30 rounded-lg p-3">
+                                        <h3 class="font-bold text-amber-900 text-[11px] uppercase mb-1">14. Jugadores y Duración</h3>
+                                        <p id="prev-q14" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                    </div>
+                                    <div class="border border-amber-200 bg-amber-50/30 rounded-lg p-3">
+                                        <h3 class="font-bold text-amber-900 text-[11px] uppercase mb-1">15. Roles y Sostenibilidad</h3>
+                                        <p id="prev-q15" class="text-slate-700 whitespace-pre-line">Sin completar...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pie de página del PDF -->
+                            <div class="mt-6 pt-3 border-t border-slate-200 flex justify-between items-center text-[10px] text-slate-400">
+                                <span>Ficha de Planificación • Proyecto Financiero</span>
+                                <span>Entrega: visiumdigitalca@gmail.com</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL PARA ENVIAR POR CORREO AL DOCENTE -->
+        <div id="email-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 fade-in">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="bg-emerald-100 p-2 rounded-lg text-emerald-700">
+                            <i data-lucide="mail" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-800 text-lg">Enviar Ficha al Docente</h3>
+                    </div>
+                    <button onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div class="space-y-4 text-sm">
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 space-y-1">
+                        <p class="font-bold flex items-center gap-1.5">
+                            <i data-lucide="info" class="w-4 h-4 text-amber-600"></i>
+                            Importante antes de enviar:
+                        </p>
+                        <p>1. Haz clic en <strong>"Descargar PDF y Abrir Correo"</strong> para guardar el archivo en la laptop.</p>
+                        <p>2. Se abrirá el correo dirigido al docente; solo deben <strong>adjuntar el PDF descargado</strong>.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Correo electrónico del Docente</label>
+                        <input type="email" id="teacher-email" value="visiumdigitalca@gmail.com" readonly class="w-full px-3.5 py-2.5 text-sm bg-slate-100 font-semibold text-emerald-900 border border-slate-300 rounded-xl outline-none" />
+                    </div>
+                    <div class="flex flex-col gap-2 pt-2">
+                        <button onclick="downloadAndEmail()" type="button" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2.5 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 cursor-pointer">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span>Descargar PDF y Abrir Correo</span>
+                        </button>
+                        <button onclick="closeEmailModal()" type="button" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 px-4 rounded-xl transition cursor-pointer">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER (original) -->
+    <footer class="mt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 border-t border-gray-300">
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Visium Digital</h3>
+                    <p class="text-gray-600 text-sm">Escuela de diseño e innovación</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Contactos</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-brand-whatsapp"></i> (+58) 424 152 9071
+                        </li>
+                        <li class="flex items-center gap-2 text-gray-600 text-sm">
+                            <i class="ti ti-mail"></i> visiumdigitalca@gmail.com
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-800 mb-4">Síguenos</h3>
+                    <div class="flex space-x-3">
+                        <a href="https://www.instagram.com/visium.digital.c.a/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-instagram text-xl"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/visium-digital/" class="text-gray-600 hover:text-gray-800">
+                            <i class="ti ti-brand-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center pt-6 border-t border-gray-200">
+                <p class="text-sm text-gray-500">© 2025 Visium Digital</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript de la plantilla del juego -->
+    <script>
+        // Inicializar iconos Lucide
+        lucide.createIcons();
+
+        let mediaStream = null;
+        let teamPhotoDataUrl = '';
+
+        const today = new Date();
+        document.getElementById('prev-date').textContent = today.toLocaleDateString('es-ES', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        async function startCamera() {
+            try {
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                }
+                mediaStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, 
+                    audio: false 
+                });
+                const video = document.getElementById('webcam-video');
+                video.srcObject = mediaStream;
+
+                document.getElementById('camera-container').classList.remove('hidden');
+                document.getElementById('photo-preview-box').classList.add('hidden');
+                document.getElementById('btn-start-cam').classList.add('hidden');
+                document.getElementById('btn-retake-photo').classList.add('hidden');
+                document.getElementById('btn-take-photo').classList.remove('hidden');
+            } catch (err) {
+                console.error('Error accediendo a la cámara:', err);
+                showToast('No se pudo acceder a la cámara. Verifica los permisos o sube una foto.');
+            }
+        }
+
+        function takePhotoWithTimer() {
+            const overlay = document.getElementById('countdown-overlay');
+            const btnTake = document.getElementById('btn-take-photo');
+            btnTake.disabled = true;
+            overlay.classList.remove('hidden');
+            let count = 3;
+            overlay.textContent = count;
+
+            const interval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    overlay.textContent = count;
+                } else {
+                    clearInterval(interval);
+                    overlay.classList.add('hidden');
+                    btnTake.disabled = false;
+                    captureSnapshot();
+                }
+            }, 1000);
+        }
+
+        function captureSnapshot() {
+            const video = document.getElementById('webcam-video');
+            const canvas = document.getElementById('photo-canvas');
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            setTeamPhoto(dataUrl);
+
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                setTeamPhoto(e.target.result);
+                if (mediaStream) {
+                    mediaStream.getTracks().forEach(track => track.stop());
+                    mediaStream = null;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function setTeamPhoto(dataUrl) {
+            teamPhotoDataUrl = dataUrl;
+            document.getElementById('captured-photo-form').src = dataUrl;
+            document.getElementById('camera-container').classList.add('hidden');
+            document.getElementById('photo-preview-box').classList.remove('hidden');
+            document.getElementById('btn-start-cam').classList.add('hidden');
+            document.getElementById('btn-take-photo').classList.add('hidden');
+            document.getElementById('btn-retake-photo').classList.remove('hidden');
+
+            const prevImg = document.getElementById('prev-team-photo');
+            const prevPlaceholder = document.getElementById('prev-photo-placeholder');
+            prevImg.src = dataUrl;
+            prevImg.classList.remove('hidden');
+            prevPlaceholder.classList.add('hidden');
+
+            updatePreview();
+            showToast('¡Foto del equipo agregada a la ficha!');
+        }
+
+        function toggleOtherFormat() {
+            const cb = document.getElementById('format-other-cb');
+            const input = document.getElementById('format-other-text');
+            input.disabled = !cb.checked;
+            if (cb.checked) input.focus();
+        }
+
+        function getSelectedFormats() {
+            const checkboxes = document.querySelectorAll('.format-cb:checked');
+            let formats = [];
+            checkboxes.forEach(cb => {
+                if (cb.value === 'Otro') {
+                    const otherVal = document.getElementById('format-other-text').value.trim();
+                    formats.push(otherVal ? `Otro (${otherVal})` : 'Otro formato');
+                } else {
+                    formats.push(cb.value);
+                }
+            });
+            return formats;
+        }
+
+        function updatePreview() {
+            const mapFields = [
+                { input: 'teamName', prev: 'prev-team', default: '—' },
+                { input: 'courseSection', prev: 'prev-section', default: '—' },
+                { input: 'members', prev: 'prev-members', default: '—' },
+                { input: 'q1_name', prev: 'prev-q1', default: 'NOMBRE DEL JUEGO' },
+                { input: 'q2_objective', prev: 'prev-q2', default: 'Sin completar...' },
+                { input: 'q3_audience', prev: 'prev-q3', default: 'Sin completar...' },
+                { input: 'q4_problem', prev: 'prev-q4', default: 'Sin completar...' },
+                { input: 'q5_concepts', prev: 'prev-q5', default: 'Sin completar...' },
+                { input: 'q7_summary', prev: 'prev-q7', default: 'Sin completar...' },
+                { input: 'q8_mechanics', prev: 'prev-q8', default: 'Sin completar...' },
+                { input: 'q9_challenges', prev: 'prev-q9', default: 'Sin completar...' },
+                { input: 'q10_reward_punishment', prev: 'prev-q10', default: 'Sin completar...' },
+                { input: 'q11_fun', prev: 'prev-q11', default: 'Sin completar...' },
+                { input: 'q12_learning', prev: 'prev-q12', default: 'Sin completar...' },
+                { input: 'q13_materials', prev: 'prev-q13', default: 'Sin completar...' },
+                { input: 'q14_logistics', prev: 'prev-q14', default: 'Sin completar...' },
+                { input: 'q15_roles', prev: 'prev-q15', default: 'Sin completar...' }
+            ];
+
+            let completedCount = 0;
+            const totalFields = mapFields.length + 2;
+
+            mapFields.forEach(item => {
+                const val = document.getElementById(item.input).value.trim();
+                const prevEl = document.getElementById(item.prev);
+                if (val) {
+                    prevEl.textContent = item.input === 'q1_name' ? val.toUpperCase() : val;
+                    prevEl.classList.remove('text-slate-400');
+                    completedCount++;
+                } else {
+                    prevEl.textContent = item.default;
+                }
+            });
+
+            const formats = getSelectedFormats();
+            const prevFormats = document.getElementById('prev-formats');
+            if (formats.length > 0) {
+                prevFormats.textContent = 'Formato: ' + formats.join(' + ');
+                completedCount++;
+            } else {
+                prevFormats.textContent = 'Formato: Por definir';
+            }
+
+            if (teamPhotoDataUrl) {
+                completedCount++;
+            }
+
+            const percent = Math.round((completedCount / totalFields) * 100);
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('progress-text').textContent = percent + '% completado';
+
+            saveToLocalStorage();
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3500);
+        }
+
+        function generatePDF() {
+            const gameName = document.getElementById('q1_name').value.trim() || 'Proyecto_Financiero';
+            const cleanFileName = gameName.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g, '').replace(/\s+/g, '_');
+            const element = document.getElementById('pdf-template');
+
+            const btn = document.getElementById('btn-download');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<span>Generando PDF...</span>';
+            btn.disabled = true;
+
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     `Ficha_${cleanFileName}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                showToast('¡PDF generado y descargado correctamente!');
+            }).catch(err => {
+                console.error(err);
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                showToast('Hubo un error al generar el PDF.');
+            });
+        }
+
+        function openEmailModal() {
+            const modal = document.getElementById('email-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeEmailModal() {
+            const modal = document.getElementById('email-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function downloadAndEmail() {
+            const teacherEmail = document.getElementById('teacher-email').value.trim();
+            if (!teacherEmail || !teacherEmail.includes('@')) {
+                showToast('Por favor, ingresa un correo válido del docente.');
+                return;
+            }
+
+            generatePDF();
+
+            const gameName = document.getElementById('q1_name').value.trim() || 'Sin título';
+            const teamName = document.getElementById('teamName').value.trim() || 'Equipo';
+            const section = document.getElementById('courseSection').value.trim() || '';
+            const members = document.getElementById('members').value.trim() || '';
+
+            const subject = encodeURIComponent(`Ficha Juego Financiero: "${gameName}" - ${teamName} (${section})`);
+            const body = encodeURIComponent(
+                `Estimado/a Profesor/a,\n\n` +
+                `Adjuntamos en formato PDF la ficha de planificación de nuestro juego financiero para el cierre de lapso.\n\n` +
+                `• Nombre del Juego: ${gameName}\n` +
+                `• Equipo: ${teamName}\n` +
+                `• Curso/Sección: ${section}\n` +
+                `• Integrantes: ${members}\n\n` +
+                `Saludos cordiales.`
+            );
+
+            setTimeout(() => {
+                window.location.href = `mailto:${teacherEmail}?subject=${subject}&body=${body}`;
+                closeEmailModal();
+            }, 1000);
+        }
+
+        function fillExampleData() {
+            document.getElementById('teamName').value = 'Inversionistas del Futuro';
+            document.getElementById('courseSection').value = '4to Año - Sección A';
+            document.getElementById('members').value = 'María Pérez, Carlos Gómez, Sofía Rodríguez, Luis Martínez';
+            
+            document.getElementById('q1_name').value = 'Meta Financiera: El Gran Salto';
+            document.getElementById('q2_objective').value = 'Construir un fondo de emergencia y alcanzar una meta de ahorro/inversión de $10,000 evitando caer en sobreendeudamiento por gastos hormiga o imprevistos.';
+            document.getElementById('q3_audience').value = 'Estudiantes de educación media (13 a 17 años) y sus familias.';
+            document.getElementById('q4_problem').value = 'La falta de planificación financiera en los jóvenes y el desconocimiento sobre la diferencia entre necesidades, deseos e inversiones.';
+            document.getElementById('q5_concepts').value = 'Presupuesto personal, ahorro, gastos hormiga, inflación, inversión, activos vs. pasivos, fondo de emergencia.';
+            
+            document.querySelectorAll('.format-cb').forEach(cb => cb.checked = false);
+            document.querySelector('input[value="Juego de mesa"]').checked = true;
+            document.querySelector('input[value="Juego de cartas"]').checked = true;
+            toggleOtherFormat();
+
+            document.getElementById('q7_summary').value = 'Los jugadores recorren un tablero que representa un año calendario (12 meses). En cada mes reciben un sueldo base, deben pagar gastos fijos y tomar decisiones mediante cartas de oportunidad (inversiones) o cartas de imprevistos.';
+            document.getElementById('q8_mechanics').value = 'Se avanza lanzando un dado por turnos. Gana el primer jugador que complete su fondo de emergencia y alcance la meta de patrimonio neto. Pierde quien quede en bancarrota (deudas mayores a su capacidad de pago durante 2 turnos seguidos).';
+            document.getElementById('q9_challenges').value = 'Superar crisis económicas del tablero (inflación que sube los precios), resistir cartas de tentación (compras impulsivas) y resolver emergencias sin tener ahorros.';
+            document.getElementById('q10_reward_punishment').value = 'Recompensa: Quienes invierten en activos reciben ingresos pasivos cada vez que pasan por la casilla de cobro. Castigo: Quienes usan crédito sin respaldo pagan intereses altos o pierden un turno.';
+            document.getElementById('q11_fun').value = 'Incluye cartas de "Subasta Rápida" donde todos compiten al mismo tiempo por un negocio, y eventos sorpresa que cambian la economía del tablero.';
+            document.getElementById('q12_learning').value = 'Aprenderán a priorizar el ahorro antes de gastar, a evaluar riesgos antes de invertir y a identificar cómo los gastos pequeños afectan el presupuesto mensual.';
+            document.getElementById('q13_materials').value = 'Cartón reciclado para el tablero, cartulina de colores para 60 cartas, billetes didácticos impresos, 2 dados y fichas hechas con tapas plásticas pintadas.';
+            document.getElementById('q14_logistics').value = 'De 2 a 5 jugadores • Duración estimada: 40 minutos por partida.';
+            document.getElementById('q15_roles').value = 'María y Sofía diseñan el tablero y billetes; Carlos y Luis redactan las cartas y el reglamento. Usaremos cajas de cereal y tapas reutilizadas para que el costo sea mínimo.';
+
+            updatePreview();
+            showToast('Se cargó un ejemplo guía. ¡Edítalo con tus propias ideas!');
+        }
+
+        function clearForm() {
+            document.getElementById('project-form').reset();
+            toggleOtherFormat();
+            
+            teamPhotoDataUrl = '';
+            document.getElementById('photo-preview-box').classList.add('hidden');
+            document.getElementById('camera-container').classList.add('hidden');
+            document.getElementById('btn-start-cam').classList.remove('hidden');
+            document.getElementById('btn-take-photo').classList.add('hidden');
+            document.getElementById('btn-retake-photo').classList.add('hidden');
+            document.getElementById('prev-team-photo').classList.add('hidden');
+            document.getElementById('prev-photo-placeholder').classList.remove('hidden');
+
+            localStorage.removeItem('fichaJuegoFinanciero');
+            updatePreview();
+            showToast('Formulario limpiado.');
+        }
+
+        function saveToLocalStorage() {
+            const data = {};
+            const inputs = document.querySelectorAll('#project-form input[type="text"], #project-form textarea');
+            inputs.forEach(el => data[el.id] = el.value);
+            
+            const checkedFormats = [];
+            document.querySelectorAll('.format-cb:checked').forEach(cb => checkedFormats.push(cb.value));
+            data.formats = checkedFormats;
+            data.teamPhoto = teamPhotoDataUrl;
+
+            try {
+                localStorage.setItem('fichaJuegoFinanciero', JSON.stringify(data));
+            } catch (e) {
+                console.warn('No se pudo guardar la imagen en caché local por tamaño.');
+            }
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('fichaJuegoFinanciero');
+            if (!saved) return;
+            try {
+                const data = JSON.parse(saved);
+                Object.keys(data).forEach(key => {
+                    if (key === 'formats') {
+                        document.querySelectorAll('.format-cb').forEach(cb => {
+                            cb.checked = data.formats.includes(cb.value);
+                        });
+                        toggleOtherFormat();
+                    } else if (key === 'teamPhoto' && data.teamPhoto) {
+                        setTeamPhoto(data.teamPhoto);
+                    } else {
+                        const el = document.getElementById(key);
+                        if (el) el.value = data[key];
+                    }
+                });
+            } catch (e) {
+                console.error('Error cargando datos guardados', e);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromLocalStorage();
+            updatePreview();
+        });
+    </script>
+</body>
+</html>

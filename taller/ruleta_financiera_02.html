@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ficha de Diseño + Ruleta Financiera - Visium Digital</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- html2pdf.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+    #pdf-template { background: white; color: #1f2937; box-sizing: border-box; }
+    .pdf-section { break-inside: avoid; page-break-inside: avoid; }
+    .fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* RULETA */
+    .roulette-wheel {
+      transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    .segment-label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+      pointer-events: none;
+      white-space: nowrap;
+      text-align: center;
+      width: 70px;
+      line-height: 1.1;
+      transform-origin: center;
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- HEADER ORIGINAL (respetado de la plantilla) -->
+  <header class="bg-emerald-900 text-white shadow-lg sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-emerald-500/20 p-2.5 rounded-xl border border-emerald-400/30">
+          <i data-lucide="coins" class="w-7 h-7 text-emerald-300"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight">Ficha Técnica: Juego Financiero</h1>
+          <p class="text-xs text-emerald-200">Proyecto de Cierre de Lapso • Educación Financiera</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <button onclick="fillExampleData()" type="button" class="text-xs bg-emerald-800 hover:bg-emerald-700 text-emerald-100 px-3 py-2 rounded-lg border border-emerald-700 transition flex items-center gap-1.5">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i><span>Ver Ejemplo</span>
+        </button>
+        <button onclick="clearForm()" type="button" class="text-xs bg-emerald-800 hover:bg-red-900/60 text-emerald-100 px-3 py-2 rounded-lg border border-emerald-700 transition flex items-center gap-1.5">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i><span>Limpiar</span>
+        </button>
+        <button onclick="generatePDF()" id="btn-download" type="button" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-sm px-4 py-2 rounded-lg shadow-md transition flex items-center gap-2 cursor-pointer">
+          <i data-lucide="file-down" class="w-4 h-4"></i><span>Descargar PDF</span>
+        </button>
+        <button onclick="openEmailModal()" type="button" class="bg-white hover:bg-slate-100 text-emerald-950 font-semibold text-sm px-4 py-2 rounded-lg shadow-md transition flex items-center gap-2 cursor-pointer">
+          <i data-lucide="send" class="w-4 h-4 text-emerald-700"></i><span>Enviar al Docente</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- TOAST -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300">
+    <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-slate-700">
+      <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>
+      <span id="toast-msg" class="text-sm font-medium">Acción completada</span>
+    </div>
+  </div>
+
+  <!-- ================= JUEGO: RULETA FINANCIERA (LIGHT) ================= -->
+  <section class="max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div class="text-center mb-6">
+      <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">
+        <i class="ti ti-roulette text-emerald-600 mr-2"></i>Ruleta Financiera
+      </h2>
+      <p class="text-slate-500 text-sm mt-1">Gira la ruleta, toma decisiones y aprende a manejar tus finanzas</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Ruleta -->
+      <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col items-center">
+        <div class="relative w-72 h-72 md:w-80 md:h-80 mx-auto mb-4">
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 z-10">
+            <div class="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-emerald-600 drop-shadow"></div>
+          </div>
+          <div id="wheel" class="roulette-wheel w-full h-full rounded-full relative overflow-hidden border-4 border-emerald-700 shadow-xl" style="transform: rotate(0deg);"></div>
+        </div>
+        <button id="spinBtn" onclick="spinWheel()" class="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-lg px-10 py-3 rounded-xl shadow-lg transition-all duration-200 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+          <i class="ti ti-player-play"></i> Girar ruleta
+        </button>
+        <div id="resultMessage" class="mt-5 text-center text-slate-700 font-medium text-lg min-h-[60px] flex items-center justify-center px-4 py-2 bg-slate-50 rounded-xl w-full border border-slate-200">
+          <span class="text-slate-400 text-sm">Presiona "Girar ruleta" para empezar</span>
+        </div>
+      </div>
+
+      <!-- Panel lateral -->
+      <div class="space-y-5">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 text-center">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Tu saldo</p>
+          <p id="balanceDisplay" class="text-4xl font-extrabold text-emerald-700">$1,000</p>
+          <div class="flex justify-center gap-2 mt-2 text-xs text-slate-500">
+            <i class="ti ti-arrow-up-right text-emerald-500"></i> Gana o pierde según la casilla
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+          <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+            <i class="ti ti-history text-emerald-600"></i> Historial de giros
+          </h3>
+          <ul id="historyList" class="space-y-1.5 max-h-52 overflow-y-auto pr-1 text-sm">
+            <li class="text-slate-400 text-xs italic">Sin giros aún...</li>
+          </ul>
+        </div>
+        <div class="bg-emerald-50 rounded-2xl border border-emerald-200 p-4 text-xs text-emerald-900 space-y-1.5">
+          <p class="font-bold flex items-center gap-1"><i class="ti ti-info-circle"></i> ¿Cómo jugar?</p>
+          <p>1. Gira la ruleta. Cada casilla te dará una ganancia o pérdida.</p>
+          <p>2. Aprende a identificar decisiones financieras: ahorro, inversión, gastos hormiga, deudas.</p>
+          <p>3. El objetivo es terminar con el mayor saldo posible.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reflexión -->
+    <div class="mt-8 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+      <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+        <i class="ti ti-bulb text-amber-500"></i> Reflexión financiera
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <span class="text-emerald-600 font-bold">Ahorro</span>
+          <p class="text-slate-600 mt-1">Guardar una parte de tus ingresos te protege de imprevistos.</p>
+        </div>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <span class="text-emerald-600 font-bold">Inversión</span>
+          <p class="text-slate-600 mt-1">Invertir con conocimiento puede hacer crecer tu dinero.</p>
+        </div>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <span class="text-emerald-600 font-bold">Gastos hormiga</span>
+          <p class="text-slate-600 mt-1">Pequeños gastos diarios pueden afectar tu presupuesto.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ================= FIN DEL JUEGO ================= -->
+
+  <!-- CONTENEDOR PRINCIPAL (FORMULARIO + VISTA PREVIA) -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- COLUMNA IZQUIERDA: FORMULARIO INTERACTIVO -->
+    <div class="lg:col-span-6 space-y-6">
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Progreso de la ficha</span>
+          <span id="progress-text" class="text-xs font-bold text-emerald-700">0% completado</span>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+          <div id="progress-bar" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <form id="project-form" class="space-y-6">
+        <!-- SECCIÓN 0: DATOS DEL EQUIPO -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+            <span class="bg-slate-800 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">
+              <i data-lucide="users" class="w-4 h-4"></i>
+            </span>
+            <h2 class="font-bold text-slate-800 text-base">Datos del Equipo de Trabajo (2 o 3 integrantes)</h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre del Equipo / Grupo *</label>
+              <input type="text" id="teamName" oninput="updatePreview()" placeholder="Identifiquen a su equipo..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Año / Sección / Curso *</label>
+              <input type="text" id="courseSection" oninput="updatePreview()" placeholder="Indiquen su año y sección..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Integrantes del Grupo (2 o 3 estudiantes) *</label>
+            <textarea id="members" rows="2" oninput="updatePreview()" placeholder="Nombres y apellidos de los integrantes..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+          </div>
+          <div class="pt-2 border-t border-slate-100">
+            <label class="block text-xs font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
+              <i data-lucide="camera" class="w-4 h-4 text-emerald-600"></i>
+              <span>Foto del Equipo (Usando la cámara de la laptop) *</span>
+            </label>
+            <div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-4 text-center space-y-3">
+              <div id="camera-container" class="hidden relative mx-auto max-w-sm rounded-xl overflow-hidden bg-black shadow-inner aspect-video">
+                <video id="webcam-video" autoplay playsinline class="w-full h-full object-cover transform -scale-x-100"></video>
+                <div id="countdown-overlay" class="hidden absolute inset-0 bg-black/50 flex items-center justify-center text-white text-5xl font-extrabold"></div>
+              </div>
+              <div id="photo-preview-box" class="hidden relative mx-auto max-w-sm rounded-xl overflow-hidden border-2 border-emerald-500 shadow-sm aspect-video bg-slate-900">
+                <img id="captured-photo-form" src="" alt="Foto del equipo" class="w-full h-full object-cover" />
+              </div>
+              <div class="flex flex-wrap items-center justify-center gap-2">
+                <button type="button" id="btn-start-cam" onclick="startCamera()" class="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="video" class="w-3.5 h-3.5"></i><span>Activar Cámara</span>
+                </button>
+                <button type="button" id="btn-take-photo" onclick="takePhotoWithTimer()" class="hidden bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold px-4 py-2 rounded-lg shadow transition flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="aperture" class="w-4 h-4"></i><span>Tomar Foto (3s)</span>
+                </button>
+                <button type="button" id="btn-retake-photo" onclick="startCamera()" class="hidden bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i><span>Volver a tomar</span>
+                </button>
+                <label class="bg-white hover:bg-slate-100 text-slate-600 border border-slate-300 text-xs font-medium px-3 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
+                  <i data-lucide="upload" class="w-3.5 h-3.5"></i><span>Subir archivo</span>
+                  <input type="file" accept="image/*" onchange="handleFileUpload(event)" class="hidden" />
+                </label>
+              </div>
+              <p class="text-[11px] text-slate-500">Asegúrense de que los 2 o 3 integrantes salgan visibles en el encuadre.</p>
+            </div>
+            <canvas id="photo-canvas" class="hidden"></canvas>
+          </div>
+        </div>
+
+        <!-- BLOQUE A: IDENTIDAD Y PROPÓSITO (1 al 4) -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+          <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+            <span class="bg-emerald-600 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">1-4</span>
+            <h2 class="font-bold text-slate-800 text-base">Identidad y Propósito del Juego</h2>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"><span class="text-emerald-600 font-bold">1.</span> Nombre de tu juego *</label>
+            <input type="text" id="q1_name" oninput="updatePreview()" placeholder="Elijan un título atractivo y memorable..." class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"><span class="text-emerald-600 font-bold">2.</span> Objetivo del juego *</label>
+            <textarea id="q2_objective" rows="2" oninput="updatePreview()" placeholder="¿Cuál es la meta principal que persigue el jugador durante la partida?" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"><span class="text-emerald-600 font-bold">3.</span> ¿A quién va dirigido? *</label>
+            <input type="text" id="q3_audience" oninput="updatePreview()" placeholder="Definan el rango de edad o perfil del público..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"><span class="text-emerald-600 font-bold">4.</span> ¿Qué problema intenta resolver? *</label>
+            <textarea id="q4_problem" rows="2" oninput="updatePreview()" placeholder="¿Qué dificultad o hábito financiero real busca mejorar?" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+          </div>
+        </div>
+
+        <!-- BLOQUE B: CONTENIDO Y FORMATO (5 al 7) -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+          <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+            <span class="bg-emerald-600 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">5-7</span>
+            <h2 class="font-bold text-slate-800 text-base">Contenido Financiero y Formato</h2>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"><span class="text-emerald-600 font-bold">5.</span> ¿Qué conceptos financieros de lo visto en clase van a trabajar? *</label>
+            <textarea id="q5_concepts" rows="2" oninput="updatePreview()" placeholder="Mencionen los temas de clase que aplicarán en las reglas o cartas..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2"><span class="text-emerald-600 font-bold">6.</span> ¿Cuál es el formato del juego? <span class="text-xs font-normal text-slate-500">(Pueden seleccionar uno o combinar varios)</span> *</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="format-options">
+              <label class="flex items-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500">
+                <input type="checkbox" value="Juego de mesa" onchange="updatePreview()" class="format-cb w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                <span class="text-xs font-medium text-slate-700">🎲 Juego de mesa</span>
+              </label>
+              <label class="flex items-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500">
+                <input type="checkbox" value="Juego de cartas" onchange="updatePreview()" class="format-cb w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                <span class="text-xs font-medium text-slate-700">🃏 Juego de cartas</span>
+              </label>
+              <label class="flex items-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500">
+                <input type="checkbox" value="Juego de rol" onchange="updatePreview()" class="format-cb w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                <span class="text-xs font-medium text-slate-700">🎭 Juego de rol</span>
+              </label>
+              <label class="flex items-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500">
+                <input type="checkbox" value="Trivia / Preguntas" onchange="updatePreview()" class="format-cb w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                <span class="text-xs font-medium text-slate-700">❓ Trivia</span>
+              </label>
+              <label class="flex items-center gap-2 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500 col-span-2 sm:col-span-2">
+                <input type="checkbox" id="format-other-cb" value="Otro" onchange="toggleOtherFormat(); updatePreview()" class="format-cb w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                <span class="text-xs font-medium text-slate-700">✨ Otro formato:</span>
+                <input type="text" id="format-other-text" oninput="updatePreview()" placeholder="Especificar..." disabled class="w-full text-xs bg-transparent border-b border-slate-300 focus:border-emerald-500 outline-none disabled:opacity-40" />
+              </label>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"><span class="text-emerald-600 font-bold">7.</span> Resume tu idea del juego *</label>
+            <textarea id="q7_summary" rows="3" oninput="updatePreview()" placeholder="Describan brevemente la temática y de qué trata la experiencia..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+          </div>
+        </div>
+
+        <!-- BLOQUE C: MECÁNICAS Y DINÁMICA (8 al 11) -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+          <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+            <span class="bg-emerald-600 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">8-11</span>
+            <h2 class="font-bold text-slate-800 text-base">Mecánicas y Dinámica de Juego</h2>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"><span class="text-emerald-600 font-bold">8.</span> ¿Cómo ganan, pierden o avanzan los jugadores? *</label>
+            <textarea id="q8_mechanics" rows="3" oninput="updatePreview()" placeholder="Expliquen el sistema de turnos, progreso y condiciones de victoria o derrota..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"><span class="text-emerald-600 font-bold">9.</span> Desafíos del juego *</label>
+            <textarea id="q9_challenges" rows="2" oninput="updatePreview()" placeholder="¿Qué obstáculos o situaciones pondrán a prueba las decisiones del jugador?" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"><span class="text-emerald-600 font-bold">10.</span> ¿Cuál es el castigo y la recompensa en el juego? *</label>
+            <textarea id="q10_reward_punishment" rows="2" oninput="updatePreview()" placeholder="¿Qué consecuencias tienen las buenas y malas decisiones financieras?" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"><span class="text-emerald-600 font-bold">11.</span> ¿Qué lo hace divertido y fluido para jugar? *</label>
+            <textarea id="q11_fun" rows="2" oninput="updatePreview()" placeholder="¿Qué elemento evita que el juego sea lento o predecible?" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+          </div>
+        </div>
+
+        <!-- BLOQUE D: APRENDIZAJE, PRODUCCIÓN Y EXTRAS (12 al 15) -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+          <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+            <span class="bg-emerald-600 text-white w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold">12-15</span>
+            <h2 class="font-bold text-slate-800 text-base">Aprendizaje y Producción</h2>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"><span class="text-emerald-600 font-bold">12.</span> ¿Qué aprenderán los jugadores? *</label>
+            <textarea id="q12_learning" rows="2" oninput="updatePreview()" placeholder="¿Qué reflexión o habilidad práctica se llevarán al terminar?" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"><span class="text-emerald-600 font-bold">13.</span> ¿Qué materiales van a utilizar para la producción del juego? *</label>
+            <textarea id="q13_materials" rows="2" oninput="updatePreview()" placeholder="Enumeración de insumos necesarios para construir su prototipo..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"></textarea>
+          </div>
+          <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200/80 space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-semibold text-slate-800"><span class="text-amber-600 font-bold">14.</span> Número de jugadores y duración estimada</label>
+              <span class="text-[10px] uppercase font-bold tracking-wider bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full">Sugerida</span>
+            </div>
+            <input type="text" id="q14_logistics" oninput="updatePreview()" placeholder="¿Cuántas personas participan y cuánto dura una partida?" class="w-full px-3.5 py-2 text-sm bg-white border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none transition" />
+          </div>
+          <div class="bg-amber-50/60 p-4 rounded-xl border border-amber-200/80 space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-semibold text-slate-800"><span class="text-amber-600 font-bold">15.</span> Distribución de roles en el equipo y materiales reciclados</label>
+              <span class="text-[10px] uppercase font-bold tracking-wider bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full">Sugerida</span>
+            </div>
+            <textarea id="q15_roles" rows="2" oninput="updatePreview()" placeholder="¿Cómo se dividirán el trabajo entre los 2 o 3 integrantes y qué recursos reutilizarán?" class="w-full px-3.5 py-2 text-sm bg-white border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none transition"></textarea>
+          </div>
